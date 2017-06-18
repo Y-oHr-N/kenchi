@@ -1,3 +1,9 @@
+.. image:: https://travis-ci.org/Y-oHr-N/kenchi.svg?branch=master
+    :target: https://travis-ci.org/Y-oHr-N/kenchi
+
+.. image:: https://badge.fury.io/py/kenchi.svg
+    :target: https://badge.fury.io/py/kenchi
+
 kenchi
 ======
 
