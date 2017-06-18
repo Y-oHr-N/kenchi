@@ -4,10 +4,13 @@ python:
   - 3.5
 
 install:
+  - pip install coveralls
   - pip install numpy
   - pip install scipy
   - pip install scikit-learn
-  - pip install .
 
 script:
-  - python setup.py test
+  - coverage run --source=kenchi setup.py test
+
+after_scipt:
+  - coveralls
