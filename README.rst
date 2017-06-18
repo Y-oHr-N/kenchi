@@ -1,6 +1,9 @@
 .. image:: https://travis-ci.org/Y-oHr-N/kenchi.svg?branch=master
     :target: https://travis-ci.org/Y-oHr-N/kenchi
 
+.. image:: https://coveralls.io/repos/github/Y-oHr-N/kenchi/badge.svg?branch=master
+    :target: https://coveralls.io/github/Y-oHr-N/kenchi?branch=master
+
 .. image:: https://badge.fury.io/py/kenchi.svg
     :target: https://badge.fury.io/py/kenchi
 
