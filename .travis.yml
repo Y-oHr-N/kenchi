@@ -1,7 +1,8 @@
 language: python
 
 python:
-  - 3.5
+  - "3.5"
+  - "3.6"
 
 install:
   - pip install coveralls
@@ -12,5 +13,5 @@ install:
 script:
   - coverage run --source=kenchi setup.py test
 
-after_scipt:
+after_success:
   - coveralls
