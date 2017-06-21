@@ -4,8 +4,15 @@
 .. image:: https://coveralls.io/repos/github/Y-oHr-N/kenchi/badge.svg?branch=master
     :target: https://coveralls.io/github/Y-oHr-N/kenchi?branch=master
 
+.. image:: https://codeclimate.com/github/Y-oHr-N/kenchi/badges/gpa.svg
+    :target: https://codeclimate.com/github/Y-oHr-N/kenchi
+
 .. image:: https://badge.fury.io/py/kenchi.svg
     :target: https://badge.fury.io/py/kenchi
+
+.. image:: https://readthedocs.org/projects/kenchi/badge/?version=latest
+    :target: http://kenchi.readthedocs.io/en/latest/?badge=latest
+    :alt: Documentation Status
 
 kenchi
 ======
