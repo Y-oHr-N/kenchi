@@ -22,9 +22,9 @@ This is a set of python modules for anomaly detection.
 Requirements
 ------------
 
--  numpy
--  scipy
--  scikit-learn
+-  numpy (>=1.12.1)
+-  scipy (>=0.19.0)
+-  scikit-learn (>=0.18.1)
 
 Installation
 ------------

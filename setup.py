@@ -11,7 +11,7 @@ setup(
     version          = __version__,
     author           = 'Kon',
     author_email     = 'kon.y.ohr.n@gmail.com',
-    url              = 'http://y-ohr-n.github.io/kenchi',
+    url              = 'http://kenchi.readthedocs.io',
     description      = 'A set of python modules for anomaly detection',
     long_description = readme,
     license          = 'MIT',
