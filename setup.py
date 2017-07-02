@@ -6,6 +6,9 @@ from kenchi import __version__
 with open('README.rst') as f:
     readme           = f.read()
 
+with open('requirements.txt') as f:
+    requires         = f.read().splitlines()
+
 setup(
     name             = 'kenchi',
     version          = __version__,
@@ -16,6 +19,6 @@ setup(
     long_description = readme,
     license          = 'MIT',
     packages         = find_packages(exclude=['tests']),
-    install_requires = ['numpy', 'scipy', 'scikit-learn'],
+    install_requires = requires,
     test_suite       = 'kenchi.tests'
 )
