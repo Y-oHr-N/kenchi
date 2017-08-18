@@ -1,7 +1,6 @@
 import numpy as np
-from sklearn.metrics import pairwise_distances
 from sklearn.neighbors import NearestNeighbors
-from sklearn.utils.validation import check_array, check_is_fitted
+from sklearn.utils.validation import check_array
 
 from .base import BaseDetector, DetectorMixin
 

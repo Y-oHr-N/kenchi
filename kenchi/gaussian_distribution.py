@@ -1,5 +1,4 @@
 import numpy as np
-import scipy.linalg as LA
 from scipy.stats import chi2
 from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_array, check_is_fitted
