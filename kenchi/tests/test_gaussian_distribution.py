@@ -1,6 +1,8 @@
 from unittest import TestCase
 
 import numpy as np
+from sklearn.model_selection import ParameterGrid
+
 from kenchi import GaussianDetector
 
 
@@ -28,7 +30,15 @@ class GaussianDetectorTest(TestCase):
             )
         )
 
-        det        = GaussianDetector(use_method_of_moments=True)
+        param_grid = {
+            'assume_independent':    [False, True],
+            'fpr':                   [0.1],
+            'threshold':             [None, 3.0],
+            'use_method_of_moments': [True]
+        }
 
-        self.assertIsInstance(det.fit(X_train), GaussianDetector)
-        self.assertGreater(det.score(X_test, y_test), 0.0)
+        for params in ParameterGrid(param_grid):
+            det    = GaussianDetector().set_params(**params)
+
+            self.assertIsInstance(det.fit(X_train), GaussianDetector)
+            self.assertGreater(det.score(X_test, y_test), 0.0)

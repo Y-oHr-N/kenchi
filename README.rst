@@ -22,9 +22,10 @@ This is a set of python modules for anomaly detection.
 Requirements
 ------------
 
--  numpy (>=1.12.1)
--  scipy (>=0.19.0)
--  scikit-learn (>=0.18.1)
+-  Python (>=3.5)
+-  numpy (>=1.11.2)
+-  scipy (>=0.18.1)
+-  scikit-learn (>=0.18.0)
 
 Installation
 ------------
@@ -65,4 +66,6 @@ Usage
 License
 -------
 
-`The MIT License <./LICENSE>`__
+The MIT License (MIT)
+
+Copyright (c) 2017 Kon

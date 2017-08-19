@@ -1,6 +1,8 @@
 from unittest import TestCase
 
 import numpy as np
+from sklearn.model_selection import ParameterGrid
+
 from kenchi import VMFDetector
 
 
@@ -28,7 +30,14 @@ class VMFDetectorTest(TestCase):
             )
         )
 
-        det        = VMFDetector(fpr=0.1)
+        param_grid = {
+            'assume_normalized': [False, True],
+            'fpr':               [0.1],
+            'threshold':         [None, 1.0]
+        }
 
-        self.assertIsInstance(det.fit(X_train), VMFDetector)
-        self.assertGreater(det.score(X_test, y_test), 0.0)
+        for params in ParameterGrid(param_grid):
+            det    = VMFDetector().set_params(**params)
+
+            self.assertIsInstance(det.fit(X_train), VMFDetector)
+            self.assertGreater(det.score(X_test, y_test), 0.0)

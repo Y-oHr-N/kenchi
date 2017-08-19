@@ -1,6 +1,8 @@
 from unittest import TestCase
 
 import numpy as np
+from sklearn.model_selection import ParameterGrid
+
 from kenchi import EmpiricalDetector
 
 
@@ -28,7 +30,10 @@ class EmpiricalDetectorTest(TestCase):
             )
         )
 
-        det        = EmpiricalDetector()
+        param_grid = {'fpr': [0.1], 'threshold': [None, 10.0]}
 
-        self.assertIsInstance(det.fit(X_train), EmpiricalDetector)
-        self.assertGreater(det.score(X_test, y_test), 0.0)
+        for params in ParameterGrid(param_grid):
+            det    = EmpiricalDetector().set_params(**params)
+
+            self.assertIsInstance(det.fit(X_train), EmpiricalDetector)
+            self.assertGreater(det.score(X_test, y_test), 0.0)
