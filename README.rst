@@ -1,6 +1,9 @@
 .. image:: https://travis-ci.org/Y-oHr-N/kenchi.svg?branch=master
     :target: https://travis-ci.org/Y-oHr-N/kenchi
 
+.. image:: https://ci.appveyor.com/api/projects/status/5cjkl0jrxo7gmug0/branch/master?svg=true
+    :target: https://ci.appveyor.com/project/Y-oHr-N/kenchi/branch/master
+
 .. image:: https://coveralls.io/repos/github/Y-oHr-N/kenchi/badge.svg?branch=master
     :target: https://coveralls.io/github/Y-oHr-N/kenchi?branch=master
 
@@ -12,7 +15,6 @@
 
 .. image:: https://readthedocs.org/projects/kenchi/badge/?version=latest
     :target: http://kenchi.readthedocs.io/en/latest/?badge=latest
-    :alt: Documentation Status
 
 kenchi
 ======

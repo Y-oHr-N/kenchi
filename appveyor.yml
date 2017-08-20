@@ -1,0 +1,27 @@
+branches:
+  only:
+    - master
+    - develop
+
+environment:
+  matrix:
+    - PYTHON: "C:\\Miniconda35"
+    - PYTHON: "C:\\Miniconda35-x64"
+    - PYTHON: "C:\\Miniconda36"
+    - PYTHON: "C:\\Miniconda36-x64"
+
+install:
+  - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
+  - "conda install --yes --quiet wheel"
+  - "conda install --yes --quiet --file requirements.txt"
+
+build: off
+
+test_script:
+  - "python setup.py test"
+
+after_test:
+  - "python setup.py bdist_wheel"
+
+artifacts:
+  - path: dist\*
