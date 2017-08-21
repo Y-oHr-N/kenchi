@@ -52,46 +52,6 @@ class GaussianDetector(BaseDetector, DetectorMixin):
         self.threshold             = threshold
         self.use_method_of_moments = use_method_of_moments
 
-    def fit(self, X, y=None):
-        """Fits the model according to the given training data.
-
-        Parameters
-        ----------
-        X : array-like, shape = (n_samples, n_features)
-            Samples.
-
-        Returns
-        -------
-        self : object
-            Returns self.
-        """
-
-        X                       = check_array(X)
-        n_samples, n_features   = X.shape
-
-        self.mean_              = np.mean(X, axis=0)
-        self.var_               = np.var(X, axis=0)
-
-        if not self.assume_independent:
-            self.covariance_    = np.cov(X, rowvar=False, bias=1)
-
-        if self.threshold is None:
-            if self.use_method_of_moments:
-                scores          = self.compute_anomaly_score(X)
-                mo1             = np.mean(scores)
-                mo2             = np.mean(scores ** 2)
-                m_mo            = 2.0 * mo1 ** 2 / (mo2 - mo1 ** 2)
-                s_mo            = (mo2 - mo1 ** 2) / 2.0 / mo1
-                self._threshold = chi2.ppf(1.0 - self.fpr, m_mo, scale=s_mo)
-
-            else:
-                self._threshold = chi2.ppf(1.0 - self.fpr, n_features, scale=1.0)
-
-        else:
-            self._threshold     = self.threshold
-
-        return self
-
     def compute_anomaly_score(self, X):
         """Computes the anomaly score.
 
@@ -125,3 +85,45 @@ class GaussianDetector(BaseDetector, DetectorMixin):
                     V         = self.covariance_
                 )
             )
+
+    def fit(self, X, y=None):
+        """Fits the model according to the given training data.
+
+        Parameters
+        ----------
+        X : array-like, shape = (n_samples, n_features)
+            Samples.
+
+        Returns
+        -------
+        self : object
+            Returns self.
+        """
+
+        X                       = check_array(X)
+        n_samples, n_features   = X.shape
+
+        self.mean_              = np.mean(X, axis=0)
+        self.var_               = np.var(X, axis=0)
+
+        if not self.assume_independent:
+            self.covariance_    = np.cov(X, rowvar=False, bias=1)
+
+        if self.threshold is None:
+            if self.use_method_of_moments:
+                scores          = self.compute_anomaly_score(X)
+                mo1             = np.mean(scores)
+                mo2             = np.mean(scores ** 2)
+                m_mo            = 2.0 * mo1 ** 2 / (mo2 - mo1 ** 2)
+                s_mo            = (mo2 - mo1 ** 2) / 2.0 / mo1
+                self._threshold = chi2.ppf(1.0 - self.fpr, m_mo, scale=s_mo)
+
+            else:
+                self._threshold = chi2.ppf(
+                    1.0 - self.fpr, n_features, scale=1.0
+                )
+
+        else:
+            self._threshold     = self.threshold
+
+        return self
