@@ -49,7 +49,7 @@ Usage
     >>> test_size  = 100
     >>> n_outliers = 10
     >>> n_features = 10
-    >>> rnd        = np.random.RamdomState(0)
+    >>> rnd        = np.random.RandomState(0)
     >>> X_train    = rnd.normal(size=(train_size, n_features))
     >>> X_test     = np.concatenate(
     ...     (
