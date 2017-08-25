@@ -38,7 +38,7 @@ class VMFDetector(BaseDetector, DetectorMixin):
         self.threshold         = threshold
 
     def compute_anomaly_score(self, X):
-        """Computes the anomaly score.
+        """Compute the anomaly score.
 
         Parameters
         ----------
@@ -59,7 +59,7 @@ class VMFDetector(BaseDetector, DetectorMixin):
         return 1.0 - X @ self.mean_direction_
 
     def fit(self, X, y=None):
-        """Fits the model according to the given training data.
+        """Fit the model according to the given training data.
 
         Parameters
         ----------
@@ -69,7 +69,7 @@ class VMFDetector(BaseDetector, DetectorMixin):
         Returns
         -------
         self : object
-            Returns self.
+            Return self.
         """
 
         X                    = check_array(X)

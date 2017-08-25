@@ -35,7 +35,7 @@ class EmpiricalDetector(BaseDetector, DetectorMixin):
         self.threshold   = threshold
 
     def compute_anomaly_score(self, X):
-        """Computes the anomaly score.
+        """Compute the anomaly score.
 
         Parameters
         ----------
@@ -55,18 +55,21 @@ class EmpiricalDetector(BaseDetector, DetectorMixin):
 
         return -np.log(self.n_neighbors) + n_features * np.log(radius)
 
-    def fit(self, X, y=None):
-        """Fits the model according to the given training data.
+    def fit(self, X, y=None, X_valid=None):
+        """Fit the model according to the given training data.
 
         Parameters
         ----------
         X : array-like, shape = (n_samples, n_features)
             Samples.
 
+        X_valid : array-like, shape = (n_samples, n_features)
+            Validation samples. used to compute to the threshold.
+
         Returns
         -------
         self : object
-            Returns self.
+            Return self.
         """
 
         X                   = check_array(X)
@@ -79,7 +82,11 @@ class EmpiricalDetector(BaseDetector, DetectorMixin):
         ).fit(X)
 
         if self.threshold is None:
-            scores          = self.compute_anomaly_score(X)
+            if X_valid is None:
+                scores      = self.compute_anomaly_score(X)
+            else:
+                scores      = self.compute_anomaly_score(X_valid)
+
             self._threshold = np.percentile(scores, 100.0 * (1.0 - self.fpr))
 
         else:
