@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.stats import chi2
+from sklearn.covariance import empirical_covariance, graph_lasso, ledoit_wolf
 from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_array, check_is_fitted
 
@@ -7,7 +8,7 @@ from .base import BaseDetector, DetectorMixin
 
 
 class GaussianDetector(BaseDetector, DetectorMixin):
-    """"Detector in Gaussian distribution.
+    """Detector in Gaussian distribution.
 
     Parameters
     ----------
@@ -53,7 +54,7 @@ class GaussianDetector(BaseDetector, DetectorMixin):
         self.use_method_of_moments = use_method_of_moments
 
     def compute_anomaly_score(self, X):
-        """Computes the anomaly score.
+        """Compute the anomaly score.
 
         Parameters
         ----------
@@ -87,7 +88,7 @@ class GaussianDetector(BaseDetector, DetectorMixin):
             )
 
     def fit(self, X, y=None):
-        """Fits the model according to the given training data.
+        """Fit the model according to the given training data.
 
         Parameters
         ----------
@@ -97,7 +98,7 @@ class GaussianDetector(BaseDetector, DetectorMixin):
         Returns
         -------
         self : object
-            Returns self.
+            Return self.
         """
 
         X                       = check_array(X)
@@ -125,5 +126,121 @@ class GaussianDetector(BaseDetector, DetectorMixin):
 
         else:
             self._threshold     = self.threshold
+
+        return self
+
+
+class GGMDetector(BaseDetector, DetectorMixin):
+    """Detector using Gaussian graphical models.
+
+    Parameters
+    ----------
+    alpha : float
+        Regularization parameter.
+
+    assume_centered : bool
+        If True, data are not centered before computation.
+
+    max_iter : integer
+        Maximum number of iterations.
+
+    q : float
+        Percentile to compute, which must be between 0 and 100 inclusive.
+
+    threshold : float or None
+        Threshold. If None, it is computed automatically.
+
+    tol : float
+        The tolerance to declare convergence. If the dual gap goes below this
+        value, iterations are stopped.
+
+    Attributes
+    ----------
+    covariance_ : ndarray, shape = (n_features, n_features)
+        Estimated covariance matrix.
+
+    precision_ : ndarray, shape = (n_features, n_features)
+        Estimated pseudo inverse matrix.
+    """
+
+    def __init__(
+        self, alpha=0.01,     assume_centered=False, max_iter=100,
+        q=99, threshold=None, tol=0.0001
+    ):
+        self.alpha           = alpha
+        self.assume_centered = assume_centered
+        self.max_iter        = max_iter
+        self.q               = q
+        self.threshold       = threshold
+        self.tol             = tol
+
+    def compute_anomaly_score(self, X):
+        """Compute the anomaly scores.
+
+        Parameters
+        ----------
+        X : array-like, shape = (n_samples, n_features)
+            Test samples.
+
+        Returns
+        -------
+        scores : ndarray, shape = (n_samples, n_features)
+            Anomaly scores for test samples.
+        """
+
+        check_is_fitted(self, ['covariance_', 'precision_'])
+
+        first_term  = 0.5 * np.log(2.0 * np.pi / np.diag(self.precision_))
+        second_term = 0.5 / np.diag(
+            self.precision_
+        ) * (X @ self.precision_) ** 2
+
+        return first_term + second_term
+
+    def fit(self, X, y=None, X_valid=None):
+        """Fit the model according to the given training data.
+
+        Parameters
+        ----------
+        X : array-like, shape = (n_samples, n_features)
+            Samples.
+
+        X_valid : array-like, shape = (n_samples, n_features)
+            Validation samples. used to compute to the threshold.
+
+        Returns
+        -------
+        self : object
+            Return self.
+        """
+
+        X                                 = check_array(X)
+
+        emp_cov                           = empirical_covariance(
+            X                             = X,
+            assume_centered               = self.assume_centered
+        )
+
+        self.covariance_, self.precision_ = graph_lasso(
+            emp_cov                       = emp_cov,
+            alpha                         = self.alpha,
+            max_iter                      = self.max_iter,
+            tol                           = self.tol
+        )
+
+        if self.threshold is None:
+            if X_valid is None:
+                scores                    = self.compute_anomaly_score(X)
+            else:
+                scores                    = self.compute_anomaly_score(X_valid)
+
+            self._threshold               = np.percentile(
+                a                         = scores,
+                q                         = self.q,
+                axis                      = 0
+            )
+
+        else:
+            self._threshold               = self.threshold
 
         return self
