@@ -16,13 +16,13 @@ class BaseDetector(BaseEstimator, metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def fit(self, X, y=None):
+    def fit(self, X, y=None, **fit_param):
         """Fit the model according to the given training data."""
 
         pass
 
-    def fit_predict(self, X, y=None):
-        """"Fit the model to the training set X and returns the labels (0
+    def fit_predict(self, X, y=None, **fit_param):
+        """"Fit the model to the training set X and return the labels (0
         inlier, 1 outlier) on the training set.
 
         Parameters
@@ -36,7 +36,7 @@ class BaseDetector(BaseEstimator, metaclass=ABCMeta):
             Return 0 for inliers and 1 for outliers.
         """
 
-        return self.fit(X, y).predict(X)
+        return self.fit(X, y, **fit_param).predict(X)
 
     def predict(self, X):
         """Predict if a particular sample is an outlier or not.
