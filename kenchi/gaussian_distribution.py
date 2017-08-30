@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.stats import chi2
-from sklearn.covariance import empirical_covariance, graph_lasso, ledoit_wolf
+from sklearn.covariance import empirical_covariance, graph_lasso
 from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_array, check_is_fitted
 
@@ -34,12 +34,13 @@ class GaussianDetector(BaseDetector, DetectorMixin):
     mean_ : ndarray, shape = (n_features)
         Mean value for each feature in the training set.
 
-    var_ : ndarray, shape = (n_features)
-        Variance for each feature in the training set.
-
     covariance_ : ndarray, shape = (n_features, n_features)
         Estimated covariance matrix. Stored only if assume_independent is set to
         False.
+
+    var_ : ndarray, shape = (n_features)
+        Variance for each feature in the training set. Stored only if
+        assume_independent is set to True.
     """
 
     def __init__(
@@ -52,40 +53,6 @@ class GaussianDetector(BaseDetector, DetectorMixin):
         self.n_jobs                = n_jobs
         self.threshold             = threshold
         self.use_method_of_moments = use_method_of_moments
-
-    def compute_anomaly_score(self, X):
-        """Compute the anomaly score.
-
-        Parameters
-        ----------
-        X : array-like, shape = (n_samples, n_features)
-            Test samples.
-
-        Returns
-        -------
-        scores : ndarray, shape = (n_samples)
-            Anomaly score for test samples.
-        """
-
-        check_is_fitted(self, ['mean_', 'var_'])
-
-        n_samples, n_features = X.shape
-
-        if self.assume_independent:
-            return np.sum(
-                ((X - self.mean_) / self.var_) ** 2, axis=1
-            )
-
-        else:
-            return np.ravel(
-                pairwise_distances(
-                    X         = X,
-                    Y         = np.reshape(self.mean_, (1, n_features)),
-                    metric    = 'mahalanobis',
-                    n_jobs    = self.n_jobs,
-                    V         = self.covariance_
-                )
-            )
 
     def fit(self, X, y=None):
         """Fit the model according to the given training data.
@@ -102,13 +69,15 @@ class GaussianDetector(BaseDetector, DetectorMixin):
         """
 
         X                       = check_array(X)
-        n_samples, n_features   = X.shape
+        _, n_features           = X.shape
 
         self.mean_              = np.mean(X, axis=0)
-        self.var_               = np.var(X, axis=0)
 
-        if not self.assume_independent:
-            self.covariance_    = np.cov(X, rowvar=False, bias=1)
+        if self.assume_independent:
+            self.var_           = np.var(X, axis=0)
+
+        else:
+            self.covariance_    = empirical_covariance(X)
 
         if self.threshold is None:
             if self.use_method_of_moments:
@@ -116,7 +85,7 @@ class GaussianDetector(BaseDetector, DetectorMixin):
                 mo1             = np.mean(scores)
                 mo2             = np.mean(scores ** 2)
                 m_mo            = 2.0 * mo1 ** 2 / (mo2 - mo1 ** 2)
-                s_mo            = (mo2 - mo1 ** 2) / 2.0 / mo1
+                s_mo            = 0.5 * (mo2 - mo1 ** 2) / mo1
                 self._threshold = chi2.ppf(1.0 - self.fpr, m_mo, scale=s_mo)
 
             else:
@@ -128,6 +97,40 @@ class GaussianDetector(BaseDetector, DetectorMixin):
             self._threshold     = self.threshold
 
         return self
+
+    def compute_anomaly_score(self, X):
+        """Compute the anomaly score.
+
+        Parameters
+        ----------
+        X : array-like, shape = (n_samples, n_features)
+            Test samples.
+
+        Returns
+        -------
+        scores : ndarray, shape = (n_samples)
+            Anomaly score for test samples.
+        """
+
+        check_is_fitted(self, ['mean_'])
+
+        _, n_features      = X.shape
+
+        if self.assume_independent:
+            return np.sum(
+                ((X - self.mean_) / self.var_) ** 2, axis=1
+            )
+
+        else:
+            return np.ravel(
+                pairwise_distances(
+                    X      = X,
+                    Y      = np.reshape(self.mean_, (1, n_features)),
+                    metric = 'mahalanobis',
+                    n_jobs = self.n_jobs,
+                    V      = self.covariance_
+                )
+            )
 
 
 class GGMDetector(BaseDetector, DetectorMixin):
@@ -164,8 +167,8 @@ class GGMDetector(BaseDetector, DetectorMixin):
     """
 
     def __init__(
-        self, alpha=0.01,     assume_centered=False, max_iter=100,
-        q=99, threshold=None, tol=0.0001
+        self,   alpha=0.01,     assume_centered=False, max_iter=100,
+        q=99.9, threshold=None, tol=0.0001
     ):
         self.alpha           = alpha
         self.assume_centered = assume_centered
@@ -173,29 +176,6 @@ class GGMDetector(BaseDetector, DetectorMixin):
         self.q               = q
         self.threshold       = threshold
         self.tol             = tol
-
-    def compute_anomaly_score(self, X):
-        """Compute the anomaly scores.
-
-        Parameters
-        ----------
-        X : array-like, shape = (n_samples, n_features)
-            Test samples.
-
-        Returns
-        -------
-        scores : ndarray, shape = (n_samples, n_features)
-            Anomaly scores for test samples.
-        """
-
-        check_is_fitted(self, ['covariance_', 'precision_'])
-
-        first_term  = 0.5 * np.log(2.0 * np.pi / np.diag(self.precision_))
-        second_term = 0.5 / np.diag(
-            self.precision_
-        ) * (X @ self.precision_) ** 2
-
-        return first_term + second_term
 
     def fit(self, X, y=None, X_valid=None):
         """Fit the model according to the given training data.
@@ -231,6 +211,7 @@ class GGMDetector(BaseDetector, DetectorMixin):
         if self.threshold is None:
             if X_valid is None:
                 scores                    = self.compute_anomaly_score(X)
+
             else:
                 scores                    = self.compute_anomaly_score(X_valid)
 
@@ -244,3 +225,27 @@ class GGMDetector(BaseDetector, DetectorMixin):
             self._threshold               = self.threshold
 
         return self
+
+    def compute_anomaly_score(self, X):
+        """Compute the anomaly score.
+
+        Parameters
+        ----------
+        X : array-like, shape = (n_samples, n_features)
+            Test samples.
+
+        Returns
+        -------
+        scores : ndarray, shape = (n_samples, n_features)
+            Anomaly score for test samples.
+        """
+
+        check_is_fitted(self, ['covariance_', 'precision_'])
+
+        first_term  = 0.5 * np.log(2.0 * np.pi / np.diag(self.precision_))
+
+        second_term = 0.5 / np.diag(
+            self.precision_
+        ) * (X @ self.precision_) ** 2
+
+        return first_term + second_term

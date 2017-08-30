@@ -34,27 +34,6 @@ class EmpiricalDetector(BaseDetector, DetectorMixin):
         self.p           = p
         self.threshold   = threshold
 
-    def compute_anomaly_score(self, X):
-        """Compute the anomaly score.
-
-        Parameters
-        ----------
-        X : array-like, shape = (n_samples, n_features)
-            Test samples.
-
-        Returns
-        -------
-        scores : ndarray, shape = (n_samples)
-            The anomaly score for test samples.
-        """
-
-        n_samples, n_features = X.shape
-
-        dist, ind             = self._neigh.kneighbors(X)
-        radius                = np.max(dist, axis=1)
-
-        return -np.log(self.n_neighbors) + n_features * np.log(radius)
-
     def fit(self, X, y=None, X_valid=None):
         """Fit the model according to the given training data.
 
@@ -84,6 +63,7 @@ class EmpiricalDetector(BaseDetector, DetectorMixin):
         if self.threshold is None:
             if X_valid is None:
                 scores      = self.compute_anomaly_score(X)
+
             else:
                 scores      = self.compute_anomaly_score(X_valid)
 
@@ -93,3 +73,24 @@ class EmpiricalDetector(BaseDetector, DetectorMixin):
             self._threshold = self.threshold
 
         return self
+
+    def compute_anomaly_score(self, X):
+        """Compute the anomaly score.
+
+        Parameters
+        ----------
+        X : array-like, shape = (n_samples, n_features)
+            Test samples.
+
+        Returns
+        -------
+        scores : ndarray, shape = (n_samples)
+            The anomaly score for test samples.
+        """
+
+        _, n_features = X.shape
+
+        dist, _       = self._neigh.kneighbors(X)
+        radius        = np.max(dist, axis=1)
+
+        return -np.log(self.n_neighbors) + n_features * np.log(radius)

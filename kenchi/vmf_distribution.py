@@ -37,27 +37,6 @@ class VMFDetector(BaseDetector, DetectorMixin):
         self.norm              = norm
         self.threshold         = threshold
 
-    def compute_anomaly_score(self, X):
-        """Compute the anomaly score.
-
-        Parameters
-        ----------
-        X : array-like, shape = (n_samples, n_features)
-            Test samples.
-
-        Returns
-        -------
-        scores : ndarray, shape = (n_samples)
-            Anomaly score for test samples.
-        """
-
-        check_is_fitted(self, ['mean_direction_'])
-
-        if not self.assume_normalized:
-            X = self._normalizer.transform(X)
-
-        return 1.0 - X @ self.mean_direction_
-
     def fit(self, X, y=None):
         """Fit the model according to the given training data.
 
@@ -86,10 +65,31 @@ class VMFDetector(BaseDetector, DetectorMixin):
             mo1              = np.mean(scores)
             mo2              = np.mean(scores ** 2)
             m_mo             = 2.0 * mo1 ** 2 / (mo2 - mo1 ** 2)
-            s_mo             = (mo2 - mo1 ** 2) / 2.0 / mo1
+            s_mo             = 0.5 * (mo2 - mo1 ** 2) / mo1
             self._threshold  = chi2.ppf(1.0 - self.fpr, m_mo, scale=s_mo)
 
         else:
             self._threshold  = self.threshold
 
         return self
+
+    def compute_anomaly_score(self, X):
+        """Compute the anomaly score.
+
+        Parameters
+        ----------
+        X : array-like, shape = (n_samples, n_features)
+            Test samples.
+
+        Returns
+        -------
+        scores : ndarray, shape = (n_samples)
+            Anomaly score for test samples.
+        """
+
+        check_is_fitted(self, ['mean_direction_'])
+
+        if not self.assume_normalized:
+            X = self._normalizer.transform(X)
+
+        return 1.0 - X @ self.mean_direction_

@@ -10,12 +10,6 @@ class BaseDetector(BaseEstimator, metaclass=ABCMeta):
     """Base class for all detectors."""
 
     @abstractmethod
-    def compute_anomaly_score(self, X):
-        """Compute the anomaly score."""
-
-        pass
-
-    @abstractmethod
     def fit(self, X, y=None, **fit_param):
         """Fit the model according to the given training data."""
 
@@ -37,6 +31,12 @@ class BaseDetector(BaseEstimator, metaclass=ABCMeta):
         """
 
         return self.fit(X, y, **fit_param).predict(X)
+
+    @abstractmethod
+    def compute_anomaly_score(self, X):
+        """Compute the anomaly score."""
+
+        pass
 
     def predict(self, X):
         """Predict if a particular sample is an outlier or not.
@@ -92,9 +92,9 @@ class DetectorMixin:
         tp, fn, fp, tn = np.ravel(cnf_matrix)
 
         # Compute the specificity (a.k.a. normal sample accuracy)
-        r0             = tn / (fp + tn)
+        specificity    = tn / (fp + tn)
 
         # Compute the sensitivity (a.k.a. anomalous sample accuracy)
-        r1             = tp / (tp + fn)
+        sensitivity    = tp / (tp + fn)
 
-        return 2.0 * r0 * r1 / (r0 + r1)
+        return 2.0 * specificity * sensitivity / (specificity + sensitivity)
