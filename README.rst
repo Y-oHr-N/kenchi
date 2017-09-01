@@ -50,13 +50,13 @@ Usage
     >>> n_outliers = 10
     >>> n_features = 10
     >>> rnd        = np.random.RandomState(0)
-    >>> X_train    = rnd.normal(size=(train_size, n_features))
-    >>> X_test     = np.concatenate(
-    ...     (
-    ...         rnd.normal(size=(test_size - n_outliers, n_features)),
-    ...         rnd.uniform(-10.0, 10.0, size=(n_outliers, n_features))
-    ...     )
-    ... )
+    >>> mean       = np.zeros(n_features)
+    >>> cov        = np.eye(n_features)
+    >>> X_train    = rnd.multivariate_normal(mean, cov, train_size)
+    >>> X_test     = np.concatenate((
+    ...     rnd.multivariate_normal(mean, cov, test_size - n_outliers),
+    ...     rnd.uniform(-10.0, 10.0, size=(n_outliers, n_features))
+    ... ))
     >>> det        = GaussianDetector(use_method_of_moments=True).fit(X_train)
     >>> det.predict(X_test)
     array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
