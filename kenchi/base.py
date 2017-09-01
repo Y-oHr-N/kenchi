@@ -68,6 +68,8 @@ class BaseDetector(BaseEstimator, metaclass=ABCMeta):
 class DetectorMixin:
     """Mixin class for all detectors."""
 
+    _estimator_type = 'detector'
+
     def score(self, X, y):
         """Return the F1 score.
 

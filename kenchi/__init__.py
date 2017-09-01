@@ -1,4 +1,4 @@
-from .base import DetectorMixin
+from .base import BaseDetector, DetectorMixin
 from .gaussian_distribution import GaussianDetector, GGMDetector
 from .empirical_distribution import EmpiricalDetector
 from .mixture_distribution import GaussianMixtureDetector
