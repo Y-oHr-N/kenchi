@@ -3,10 +3,10 @@ from unittest import TestCase
 import numpy as np
 from sklearn.model_selection import ParameterGrid
 
-from kenchi import EmpiricalDetector
+from kenchi import GaussianMixtureDetector
 
 
-class EmpiricalDetectorTest(TestCase):
+class GaussianMixtureDetectorTest(TestCase):
     def test_score(self):
         train_size = 1000
         test_size  = 100
@@ -30,10 +30,10 @@ class EmpiricalDetectorTest(TestCase):
             np.ones(n_outliers, dtype=np.int32),
         ))
 
-        param_grid = {'fpr': [0.1], 'threshold': [None, 10.0]}
+        param_grid = {'threshold': [None]}
 
         for params in ParameterGrid(param_grid):
-            det    = EmpiricalDetector().set_params(**params)
+            det    = GaussianMixtureDetector().set_params(**params)
 
-            self.assertIsInstance(det.fit(X_train), EmpiricalDetector)
+            self.assertIsInstance(det.fit(X_train), GaussianMixtureDetector)
             self.assertGreater(det.score(X_test, y_test), 0.5)

@@ -15,20 +15,20 @@ class VMFDetectorTest(TestCase):
 
         rnd        = np.random.RandomState(0)
 
-        X_train    = rnd.normal(size=(train_size, n_features))
+        mean       = np.zeros(n_features)
+        cov        = np.eye(n_features)
 
-        X_test     = np.concatenate(
-            (
-                rnd.normal(size=(test_size - n_outliers, n_features)),
-                rnd.uniform(-10.0, 10.0, size=(n_outliers, n_features))
-            )
-        )
-        y_test     = np.concatenate(
-            (
-                np.zeros(test_size - n_outliers, dtype=np.int32),
-                np.ones(n_outliers, dtype=np.int32),
-            )
-        )
+        X_train    = rnd.multivariate_normal(mean, cov, train_size)
+
+        X_test     = np.concatenate((
+            rnd.multivariate_normal(mean, cov, test_size - n_outliers),
+            rnd.uniform(-10.0, 10.0, size=(n_outliers, n_features))
+        ))
+
+        y_test     = np.concatenate((
+            np.zeros(test_size - n_outliers, dtype=np.int32),
+            np.ones(n_outliers, dtype=np.int32),
+        ))
 
         param_grid = {
             'assume_normalized': [False, True],
