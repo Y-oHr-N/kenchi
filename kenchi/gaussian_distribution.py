@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.stats import chi2
-from sklearn.covariance import empirical_covariance, graph_lasso
+from sklearn.covariance import EmpiricalCovariance, MinCovDet, graph_lasso
 from sklearn.metrics import pairwise_distances
 from sklearn.utils.validation import check_array, check_is_fitted
 
@@ -12,6 +12,9 @@ class GaussianDetector(BaseDetector, DetectorMixin):
 
     Parameters
     ----------
+    assume_centered : bool
+        If True, data are not centered before computation.
+
     assume_independent : bool
         If True, each feature is conditionally independent of every other
         feature.
@@ -19,9 +22,13 @@ class GaussianDetector(BaseDetector, DetectorMixin):
     fpr : float
         False positive rate. Used to compute the threshold.
 
+    mode : string
+        Specify the method to compute the covariance. It must be one of 'emp'
+        or 'mcd'.
+
     n_jobs : integer
-        Number of jobs to run in parallel. If -1, then the number of jobs is set
-        to the number of CPU cores. Doesn't affect fit method.
+        Number of jobs to run in parallel. If -1, then the number of jobs is
+        set to the number of CPU cores. Doesn't affect fit method.
 
     threshold : float or None
         Threshold. If None, it is computed automatically.
@@ -35,21 +42,19 @@ class GaussianDetector(BaseDetector, DetectorMixin):
         Mean value for each feature in the training set.
 
     covariance_ : ndarray, shape = (n_features, n_features)
-        Estimated covariance matrix. Stored only if assume_independent is set to
-        False.
-
-    var_ : ndarray, shape = (n_features)
-        Variance for each feature in the training set. Stored only if
-        assume_independent is set to True.
+        Estimated covariance matrix.
     """
 
     def __init__(
-        self,           assume_independent=False,
-        fpr=0.01,       n_jobs=1,
-        threshold=None, use_method_of_moments=False
+        self,                     assume_centered=False,
+        assume_independent=False, fpr=0.01,
+        mode='emp',               n_jobs=1,
+        threshold=None,           use_method_of_moments=False
     ):
+        self.assume_centered       = assume_centered
         self.assume_independent    = assume_independent
         self.fpr                   = fpr
+        self.mode                  = mode
         self.n_jobs                = n_jobs
         self.threshold             = threshold
         self.use_method_of_moments = use_method_of_moments
@@ -73,11 +78,14 @@ class GaussianDetector(BaseDetector, DetectorMixin):
 
         self.mean_              = np.mean(X, axis=0)
 
-        if self.assume_independent:
-            self.var_           = np.var(X, axis=0)
+        covariance_estimator    = {
+            'emp': EmpiricalCovariance(assume_centered=self.assume_centered),
+            'mcd': MinCovDet(assume_centered=self.assume_centered)
+        }
 
-        else:
-            self.covariance_    = empirical_covariance(X)
+        self.covariance_        = covariance_estimator[self.mode].fit(
+            X
+        ).covariance_
 
         if self.threshold is None:
             if self.use_method_of_moments:
@@ -112,13 +120,13 @@ class GaussianDetector(BaseDetector, DetectorMixin):
             Anomaly score for test samples.
         """
 
-        check_is_fitted(self, ['mean_'])
+        check_is_fitted(self, ['mean_', 'covariance_'])
 
         _, n_features      = X.shape
 
         if self.assume_independent:
             return np.sum(
-                ((X - self.mean_) / self.var_) ** 2, axis=1
+                ((X - self.mean_) / np.diag(self.covariance_)) ** 2, axis=1
             )
 
         else:
@@ -196,10 +204,9 @@ class GGMDetector(BaseDetector, DetectorMixin):
 
         X                                 = check_array(X)
 
-        emp_cov                           = empirical_covariance(
-            X                             = X,
+        emp_cov                           = EmpiricalCovariance(
             assume_centered               = self.assume_centered
-        )
+        ).fit(X).covariance_
 
         self.covariance_, self.precision_ = graph_lasso(
             emp_cov                       = emp_cov,

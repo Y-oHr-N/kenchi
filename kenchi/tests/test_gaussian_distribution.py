@@ -33,6 +33,7 @@ class GaussianDetectorTest(TestCase):
         param_grid = {
             'assume_independent':    [False, True],
             'fpr':                   [0.1],
+            'mode':                  ['emp', 'mcd'],
             'threshold':             [None, 3.0],
             'use_method_of_moments': [True]
         }
