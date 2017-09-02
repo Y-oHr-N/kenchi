@@ -14,8 +14,8 @@ class EmpiricalDetector(BaseDetector, DetectorMixin):
         False positive rate. Used to compute the threshold.
 
     n_jobs : integer
-        Number of jobs to run in parallel. If -1, then the number of jobs is set
-        to the number of CPU cores. Doesn't affect fit method.
+        Number of jobs to run in parallel. If -1, then the number of jobs is
+        set to the number of CPU cores. Doesn't affect fit method.
 
     n_neighbors : integer
         Number of neighbors.

@@ -23,7 +23,7 @@ class GaussianMixtureDetector(BaseDetector, DetectorMixin):
     n_components : integer
         Number of mixture components.
 
-    precisions_init : array-like, shape = (n_components, n_features, n_features)
+    precisions_init : array-like
         User-provided initial precisions.
 
     random_state : integer, RandomState instance or None
@@ -43,17 +43,17 @@ class GaussianMixtureDetector(BaseDetector, DetectorMixin):
 
     Attributes
     ----------
-    weights_ : array-like, shape = (n_components)
-        Weights of each mixture components.
+    weights_ : ndarray, shape = (n_components)
+        Weight of each mixture component.
 
-    means_ : array-like, shape = (n_components, n_features)
+    means_ : ndarray, shape = (n_components, n_features)
         Mean of each mixture component.
 
-    covariances_ : array-like, shape = (n_components, n_features, n_features)
+    covariances_ : ndarray
         Covariance of each mixture component.
 
-    precisions_ : array-like, shape = (n_components, n_features, n_features)
-        Precision matrices for each component in the mixture.
+    precisions_ : ndarray
+        Precision matrix of each mixture component.
     """
 
     def __init__(
