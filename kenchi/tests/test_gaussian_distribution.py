@@ -31,18 +31,17 @@ class GaussianDetectorTest(TestCase):
         ))
 
         param_grid = {
-            'assume_independent':    [False, True],
             'fpr':                   [0.1],
             'mode':                  ['emp', 'mcd'],
             'threshold':             [None, 3.0],
-            'use_method_of_moments': [True]
+            'use_method_of_moments': [False, True]
         }
 
         for params in ParameterGrid(param_grid):
             det    = GaussianDetector().set_params(**params)
 
             self.assertIsInstance(det.fit(X_train), GaussianDetector)
-            self.assertGreater(det.score(X_test, y_test), 0.0)
+            self.assertGreater(det.score(X_test, y_test), 0.5)
 
 
 class GGMDetectorTest(TestCase):
