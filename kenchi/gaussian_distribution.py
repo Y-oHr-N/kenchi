@@ -113,6 +113,10 @@ class GGMDetector(BaseDetector, DetectorMixin):
     max_iter : integer
         Maximum number of iterations.
 
+    mode : string
+        Specify the method to compute the covariance. It must be one of 'emp'
+        or 'mcd'.
+
     q : float
         Percentile to compute, which must be between 0 and 100 inclusive.
 
@@ -133,12 +137,13 @@ class GGMDetector(BaseDetector, DetectorMixin):
     """
 
     def __init__(
-        self,   alpha=0.01,     assume_centered=False, max_iter=100,
-        q=99.9, threshold=None, tol=0.0001
+        self,       alpha=0.01, assume_centered=False, max_iter=100,
+        mode='emp', q=99.9,     threshold=None,        tol=0.0001
     ):
         self.alpha           = alpha
         self.assume_centered = assume_centered
         self.max_iter        = max_iter
+        self.mode            = mode
         self.q               = q
         self.threshold       = threshold
         self.tol             = tol
@@ -162,12 +167,17 @@ class GGMDetector(BaseDetector, DetectorMixin):
 
         X                                 = check_array(X)
 
-        emp_cov                           = EmpiricalCovariance(
-            assume_centered               = self.assume_centered
-        ).fit(X).covariance_
+        covariance_estimator              = {
+            'emp': EmpiricalCovariance(assume_centered=self.assume_centered),
+            'mcd': MinCovDet(assume_centered=self.assume_centered)
+        }
+
+        covariance                        = covariance_estimator[
+            self.mode
+        ].fit(X).covariance_
 
         self.covariance_, self.precision_ = graph_lasso(
-            emp_cov                       = emp_cov,
+            emp_cov                       = covariance,
             alpha                         = self.alpha,
             max_iter                      = self.max_iter,
             tol                           = self.tol

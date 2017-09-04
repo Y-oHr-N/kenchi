@@ -68,7 +68,10 @@ class GGMDetectorTest(TestCase):
             np.ones(n_outliers, dtype=np.int32),
         ))
 
-        param_grid = {'threshold': [None, 3.0 * np.ones(n_features)]}
+        param_grid = {
+            'mode':      ['emp', 'mcd'],
+            'threshold': [None, 3.0 * np.ones(n_features)]
+        }
 
         for params in ParameterGrid(param_grid):
             det    = GGMDetector().set_params(**params)
