@@ -30,12 +30,7 @@ class GaussianDetectorTest(TestCase):
             np.ones(n_outliers, dtype=np.int32),
         ))
 
-        param_grid = {
-            'fpr':                   [0.1],
-            'mode':                  ['emp', 'mcd'],
-            'threshold':             [None, 3.0],
-            'use_method_of_moments': [False, True]
-        }
+        param_grid = {'use_method_of_moments': [False, True]}
 
         for params in ParameterGrid(param_grid):
             det    = GaussianDetector().set_params(**params)
@@ -68,10 +63,7 @@ class GGMDetectorTest(TestCase):
             np.ones(n_outliers, dtype=np.int32),
         ))
 
-        param_grid = {
-            'mode':      ['emp', 'mcd'],
-            'threshold': [None, 3.0 * np.ones(n_features)]
-        }
+        param_grid = {'q': [99.9]}
 
         for params in ParameterGrid(param_grid):
             det    = GGMDetector().set_params(**params)

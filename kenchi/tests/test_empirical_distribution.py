@@ -30,7 +30,7 @@ class EmpiricalDetectorTest(TestCase):
             np.ones(n_outliers, dtype=np.int32),
         ))
 
-        param_grid = {'fpr': [0.1], 'threshold': [None, 10.0]}
+        param_grid = {'fpr': [0.01]}
 
         for params in ParameterGrid(param_grid):
             det    = EmpiricalDetector().set_params(**params)

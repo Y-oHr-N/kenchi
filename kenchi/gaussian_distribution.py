@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.stats import chi2
-from sklearn.covariance import EmpiricalCovariance, MinCovDet, graph_lasso
-from sklearn.utils.validation import check_array, check_is_fitted
+from sklearn.covariance import MinCovDet, graph_lasso
+from sklearn.utils.validation import check_array
 
 from .base import BaseDetector, DetectorMixin
 
@@ -17,26 +17,32 @@ class GaussianDetector(BaseDetector, DetectorMixin):
     fpr : float
         False positive rate. Used to compute the threshold.
 
-    mode : string
-        Specify the method to compute the covariance. It must be one of 'emp'
-        or 'mcd'.
+    random_state : int, RandomState instance or None
+        Seed of the pseudo random number generator to use when shuffling the
+        data.
 
-    threshold : float or None
-        Threshold. If None, it is computed automatically.
+    support_fraction : float
+        Proportion of points to be included in the support of the raw MCD
+        estimate.
 
     use_method_of_moments : bool
         If True, the method of moments is used to compute the threshold.
+
+    Attributes
+    ----------
+    threshold_ : float
+        Threshold.
     """
 
     def __init__(
-        self,           assume_centered=False,
-        fpr=0.01,       mode='emp',
-        threshold=None, use_method_of_moments=False
+        self,                  assume_centered=False,
+        fpr=0.01,              random_state=None,
+        support_fraction=None, use_method_of_moments=False
     ):
         self.assume_centered       = assume_centered
         self.fpr                   = fpr
-        self.mode                  = mode
-        self.threshold             = threshold
+        self.random_state          = random_state
+        self.support_fraction      = support_fraction
         self.use_method_of_moments = use_method_of_moments
 
     def fit(self, X, y=None):
@@ -53,32 +59,25 @@ class GaussianDetector(BaseDetector, DetectorMixin):
             Return self.
         """
 
-        X                          = check_array(X)
-        _, n_features              = X.shape
+        X                    = check_array(X)
+        _, n_features        = X.shape
 
-        covariance_estimator       = {
-            'emp': EmpiricalCovariance(assume_centered=self.assume_centered),
-            'mcd': MinCovDet(assume_centered=self.assume_centered)
-        }
+        self._mcd            = MinCovDet(
+            assume_centered  = self.assume_centered,
+            random_state     = self.random_state,
+            support_fraction = self.support_fraction
+        ).fit(X)
 
-        self._covariance_estimator = covariance_estimator[self.mode].fit(X)
-
-        if self.threshold is None:
-            if self.use_method_of_moments:
-                scores             = self.compute_anomaly_score(X)
-                mo1                = np.mean(scores)
-                mo2                = np.mean(scores ** 2)
-                m_mo               = 2.0 * mo1 ** 2 / (mo2 - mo1 ** 2)
-                s_mo               = 0.5 * (mo2 - mo1 ** 2) / mo1
-                self._threshold    = chi2.ppf(1.0 - self.fpr, m_mo, scale=s_mo)
-
-            else:
-                self._threshold    = chi2.ppf(
-                    1.0 - self.fpr, n_features, scale=1.0
-                )
+        if self.use_method_of_moments:
+            scores           = self._mcd.dist_
+            mo1              = np.mean(scores)
+            mo2              = np.mean(scores ** 2)
+            m_mo             = 2.0 * mo1 ** 2 / (mo2 - mo1 ** 2)
+            s_mo             = 0.5 * (mo2 - mo1 ** 2) / mo1
+            self.threshold_  = chi2.ppf(1.0 - self.fpr, m_mo, scale=s_mo)
 
         else:
-            self._threshold        = self.threshold
+            self.threshold_  = chi2.ppf(1.0 - self.fpr, n_features, scale=1.0)
 
         return self
 
@@ -96,7 +95,7 @@ class GaussianDetector(BaseDetector, DetectorMixin):
             Anomaly score for test samples.
         """
 
-        return np.sqrt(self._covariance_estimator.mahalanobis(X))
+        return self._mcd.mahalanobis(X)
 
 
 class GGMDetector(BaseDetector, DetectorMixin):
@@ -113,15 +112,16 @@ class GGMDetector(BaseDetector, DetectorMixin):
     max_iter : integer
         Maximum number of iterations.
 
-    mode : string
-        Specify the method to compute the covariance. It must be one of 'emp'
-        or 'mcd'.
-
     q : float
         Percentile to compute, which must be between 0 and 100 inclusive.
 
-    threshold : float or None
-        Threshold. If None, it is computed automatically.
+    random_state : int, RandomState instance or None
+        Seed of the pseudo random number generator to use when shuffling the
+        data.
+
+    support_fraction : float
+        Proportion of points to be included in the support of the raw MCD
+        estimate.
 
     tol : float
         The tolerance to declare convergence. If the dual gap goes below this
@@ -134,30 +134,30 @@ class GGMDetector(BaseDetector, DetectorMixin):
 
     precision_ : ndarray, shape = (n_features, n_features)
         Estimated pseudo inverse matrix.
+
+    threshold_ : ndarray, shape = (n_features)
+        Threshold.
     """
 
     def __init__(
-        self,       alpha=0.01, assume_centered=False, max_iter=100,
-        mode='emp', q=99.9,     threshold=None,        tol=0.0001
+        self,       alpha=0.01,        assume_centered=False, max_iter=100,
+        q=99.9,     random_state=None, support_fraction=None, tol=0.0001
     ):
-        self.alpha           = alpha
-        self.assume_centered = assume_centered
-        self.max_iter        = max_iter
-        self.mode            = mode
-        self.q               = q
-        self.threshold       = threshold
-        self.tol             = tol
+        self.alpha            = alpha
+        self.assume_centered  = assume_centered
+        self.max_iter         = max_iter
+        self.q                = q
+        self.random_state     = random_state
+        self.support_fraction = support_fraction
+        self.tol              = tol
 
-    def fit(self, X, y=None, X_valid=None):
+    def fit(self, X, y=None):
         """Fit the model according to the given training data.
 
         Parameters
         ----------
         X : array-like, shape = (n_samples, n_features)
             Samples.
-
-        X_valid : array-like, shape = (n_samples, n_features)
-            Validation samples. used to compute to the threshold.
 
         Returns
         -------
@@ -167,37 +167,25 @@ class GGMDetector(BaseDetector, DetectorMixin):
 
         X                                 = check_array(X)
 
-        covariance_estimator              = {
-            'emp': EmpiricalCovariance(assume_centered=self.assume_centered),
-            'mcd': MinCovDet(assume_centered=self.assume_centered)
-        }
-
-        covariance                        = covariance_estimator[
-            self.mode
-        ].fit(X).covariance_
+        self._mcd                         = MinCovDet(
+            assume_centered               = self.assume_centered,
+            random_state                  = self.random_state,
+            support_fraction              = self.support_fraction
+        ).fit(X)
 
         self.covariance_, self.precision_ = graph_lasso(
-            emp_cov                       = covariance,
+            emp_cov                       = self._mcd.covariance_,
             alpha                         = self.alpha,
             max_iter                      = self.max_iter,
             tol                           = self.tol
         )
 
-        if self.threshold is None:
-            if X_valid is None:
-                scores                    = self.compute_anomaly_score(X)
-
-            else:
-                scores                    = self.compute_anomaly_score(X_valid)
-
-            self._threshold               = np.percentile(
-                a                         = scores,
-                q                         = self.q,
-                axis                      = 0
-            )
-
-        else:
-            self._threshold               = self.threshold
+        scores                            = self.compute_anomaly_score(X)
+        self.threshold_                   = np.percentile(
+            a                             = scores,
+            q                             = self.q,
+            axis                          = 0
+        )
 
         return self
 
@@ -215,12 +203,10 @@ class GGMDetector(BaseDetector, DetectorMixin):
             Anomaly score for test samples.
         """
 
-        check_is_fitted(self, ['covariance_', 'precision_'])
-
         first_term  = 0.5 * np.log(2.0 * np.pi / np.diag(self.precision_))
 
         second_term = 0.5 / np.diag(
             self.precision_
-        ) * (X @ self.precision_) ** 2
+        ) * ((X - self._mcd.location_) @ self.precision_) ** 2
 
         return first_term + second_term

@@ -23,18 +23,19 @@ class EmpiricalDetector(BaseDetector, DetectorMixin):
     p : integer
         Power parameter for the Minkowski metric.
 
-    threshold : float
-        Threshold. If None, it is computed automatically.
+    Attributes
+    ----------
+    threshold_ : float
+        Threshold.
     """
 
-    def __init__(self, fpr=0.01, n_jobs=1, n_neighbors=5, p=2, threshold=None):
+    def __init__(self, fpr=0.01, n_jobs=1, n_neighbors=5, p=2):
         self.fpr         = fpr
         self.n_jobs      = n_jobs
         self.n_neighbors = n_neighbors
         self.p           = p
-        self.threshold   = threshold
 
-    def fit(self, X, y=None, X_valid=None):
+    def fit(self, X, y=None):
         """Fit the model according to the given training data.
 
         Parameters
@@ -42,35 +43,23 @@ class EmpiricalDetector(BaseDetector, DetectorMixin):
         X : array-like, shape = (n_samples, n_features)
             Samples.
 
-        X_valid : array-like, shape = (n_samples, n_features)
-            Validation samples. used to compute to the threshold.
-
         Returns
         -------
         self : object
             Return self.
         """
 
-        X                   = check_array(X)
+        X               = check_array(X)
 
-        self._neigh         = NearestNeighbors(
-            metric          = 'minkowski',
-            n_jobs          = self.n_jobs,
-            n_neighbors     = self.n_neighbors,
-            p               = self.p
+        self._neigh     = NearestNeighbors(
+            metric      = 'minkowski',
+            n_jobs      = self.n_jobs,
+            n_neighbors = self.n_neighbors,
+            p           = self.p
         ).fit(X)
 
-        if self.threshold is None:
-            if X_valid is None:
-                scores      = self.compute_anomaly_score(X)
-
-            else:
-                scores      = self.compute_anomaly_score(X_valid)
-
-            self._threshold = np.percentile(scores, 100.0 * (1.0 - self.fpr))
-
-        else:
-            self._threshold = self.threshold
+        scores          = self.compute_anomaly_score(X)
+        self.threshold_ = np.percentile(scores, 100.0 * (1.0 - self.fpr))
 
         return self
 

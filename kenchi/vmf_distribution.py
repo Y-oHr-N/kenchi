@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.stats import chi2
 from sklearn.preprocessing import Normalizer
-from sklearn.utils.validation import check_array, check_is_fitted
+from sklearn.utils.validation import check_array
 
 from .base import BaseDetector, DetectorMixin
 
@@ -17,25 +17,18 @@ class VMFDetector(BaseDetector, DetectorMixin):
     fpr : float
         False positive rate. Used to compute the threshold.
 
-    norm : ‘l1’, ‘l2’, or ‘max’
-        Norm to use to normalize each non zero sample.
-
-    threshold : float or None
-        Threshold. If None, it is computed automatically.
-
     Attributes
     ----------
     mean_direction_ : ndarray, shape = (n_features)
         Mean direction.
+
+    threshold_ : float
+        Threshold.
     """
 
-    def __init__(
-        self, assume_normalized=False, fpr=0.01, norm='l2', threshold=None
-    ):
+    def __init__(self, assume_normalized=False, fpr=0.01):
         self.assume_normalized = assume_normalized
         self.fpr               = fpr
-        self.norm              = norm
-        self.threshold         = threshold
 
     def fit(self, X, y=None):
         """Fit the model according to the given training data.
@@ -54,22 +47,18 @@ class VMFDetector(BaseDetector, DetectorMixin):
         X                    = check_array(X)
 
         if not self.assume_normalized:
-            self._normalizer = Normalizer(norm=self.norm).fit(X)
+            self._normalizer = Normalizer().fit(X)
             X                = self._normalizer.transform(X)
 
         mean                 = np.mean(X, axis=0)
-        self.mean_direction_ = mean / np.sqrt(mean @ mean)
+        self.mean_direction_ = mean / np.linalg.norm(mean)
 
-        if self.threshold is None:
-            scores           = self.compute_anomaly_score(X)
-            mo1              = np.mean(scores)
-            mo2              = np.mean(scores ** 2)
-            m_mo             = 2.0 * mo1 ** 2 / (mo2 - mo1 ** 2)
-            s_mo             = 0.5 * (mo2 - mo1 ** 2) / mo1
-            self._threshold  = chi2.ppf(1.0 - self.fpr, m_mo, scale=s_mo)
-
-        else:
-            self._threshold  = self.threshold
+        scores               = self.compute_anomaly_score(X)
+        mo1                  = np.mean(scores)
+        mo2                  = np.mean(scores ** 2)
+        m_mo                 = 2.0 * mo1 ** 2 / (mo2 - mo1 ** 2)
+        s_mo                 = 0.5 * (mo2 - mo1 ** 2) / mo1
+        self.threshold_      = chi2.ppf(1.0 - self.fpr, m_mo, scale=s_mo)
 
         return self
 
@@ -86,8 +75,6 @@ class VMFDetector(BaseDetector, DetectorMixin):
         scores : ndarray, shape = (n_samples)
             Anomaly score for test samples.
         """
-
-        check_is_fitted(self, ['mean_direction_'])
 
         if not self.assume_normalized:
             X = self._normalizer.transform(X)

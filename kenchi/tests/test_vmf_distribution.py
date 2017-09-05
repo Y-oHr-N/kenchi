@@ -30,11 +30,7 @@ class VMFDetectorTest(TestCase):
             np.ones(n_outliers, dtype=np.int32),
         ))
 
-        param_grid = {
-            'assume_normalized': [False, True],
-            'fpr':               [0.1],
-            'threshold':         [None, 1.0]
-        }
+        param_grid = {'assume_normalized': [False, True], 'fpr': [0.1]}
 
         for params in ParameterGrid(param_grid):
             det    = VMFDetector().set_params(**params)

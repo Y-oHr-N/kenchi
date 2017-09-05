@@ -30,7 +30,7 @@ class GaussianMixtureDetectorTest(TestCase):
             np.ones(n_outliers, dtype=np.int32),
         ))
 
-        param_grid = {'threshold': [None]}
+        param_grid = {'fpr': [0.01]}
 
         for params in ParameterGrid(param_grid):
             det    = GaussianMixtureDetector().set_params(**params)

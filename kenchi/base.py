@@ -3,7 +3,7 @@ from abc import ABCMeta, abstractmethod
 import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.metrics import confusion_matrix
-from sklearn.utils.validation import check_X_y, check_array
+from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 
 
 class BaseDetector(BaseEstimator, metaclass=ABCMeta):
@@ -52,16 +52,18 @@ class BaseDetector(BaseEstimator, metaclass=ABCMeta):
             Return 0 for inliers and 1 for outliers.
         """
 
+        check_is_fitted(self, ['threshold_'])
+
         X = check_array(X)
 
-        if isinstance(self._threshold, float):
+        if isinstance(self.threshold_, float):
             return (
-                self.compute_anomaly_score(X) > self._threshold
+                self.compute_anomaly_score(X) > self.threshold_
             ).astype(np.int32)
 
         else:
             return np.any(
-                self.compute_anomaly_score(X) > self._threshold, axis=1
+                self.compute_anomaly_score(X) > self.threshold_, axis=1
             ).astype(np.int32)
 
 
