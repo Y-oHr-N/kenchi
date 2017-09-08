@@ -6,6 +6,9 @@ from kenchi import __version__
 with open('README.rst') as f:
     readme           = f.read()
 
+with open('LICENSE') as f:
+    license          = f.read()
+
 with open('requirements.txt') as f:
     requires         = f.read().splitlines()
 
@@ -17,7 +20,7 @@ setup(
     url              = 'http://kenchi.readthedocs.io',
     description      = 'A set of python modules for anomaly detection',
     long_description = readme,
-    license          = 'MIT',
+    license          = license,
     packages         = find_packages(exclude=['tests']),
     install_requires = requires,
     test_suite       = 'kenchi.tests'
