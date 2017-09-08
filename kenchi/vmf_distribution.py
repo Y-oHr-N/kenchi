@@ -1,13 +1,14 @@
 import numpy as np
 from scipy.stats import chi2
+from sklearn.base import BaseEstimator
 from sklearn.preprocessing import Normalizer
 from sklearn.utils.validation import check_array
 
-from .base import BaseDetector, DetectorMixin
+from .base import DetectorMixin
 
 
-class VMFDetector(BaseDetector, DetectorMixin):
-    """Detector in Von Mises–Fisher distribution.
+class VMFOutlierDetector(BaseEstimator, DetectorMixin):
+    """Outlier detector in Von Mises–Fisher distribution.
 
     Parameters
     ----------

@@ -4,10 +4,10 @@ import numpy as np
 from sklearn.exceptions import NotFittedError
 from sklearn.model_selection import ParameterGrid
 
-from kenchi import EmpiricalDetector
+from kenchi import EmpiricalOutlierDetector
 
 
-class EmpiricalDetectorTest(TestCase):
+class EmpiricalOutlierDetectorTest(TestCase):
     def setUp(self):
         train_size   = 1000
         test_size    = 100
@@ -31,10 +31,12 @@ class EmpiricalDetectorTest(TestCase):
             np.ones(n_outliers, dtype=np.int32)
         ))
 
-        self.sut     = EmpiricalDetector()
+        self.sut     = EmpiricalOutlierDetector()
 
     def test_fit(self):
-        self.assertIsInstance(self.sut.fit(self.X_train), EmpiricalDetector)
+        self.assertIsInstance(
+            self.sut.fit(self.X_train), EmpiricalOutlierDetector
+        )
 
     def test_predict_with_notfitted(self):
         with self.assertRaises(NotFittedError):

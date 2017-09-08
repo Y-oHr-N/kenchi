@@ -1,13 +1,14 @@
 import numpy as np
 from scipy.stats import chi2
+from sklearn.base import BaseEstimator
 from sklearn.covariance import MinCovDet, graph_lasso
 from sklearn.utils.validation import check_array
 
-from .base import BaseDetector, DetectorMixin
+from .base import DetectorMixin
 
 
-class GaussianDetector(BaseDetector, DetectorMixin):
-    """Detector in Gaussian distribution.
+class GaussianOutlierDetector(BaseEstimator, DetectorMixin):
+    """Outlier detector in Gaussian distribution.
 
     Parameters
     ----------
@@ -98,8 +99,8 @@ class GaussianDetector(BaseDetector, DetectorMixin):
         return self._mcd.mahalanobis(X)
 
 
-class GGMDetector(BaseDetector, DetectorMixin):
-    """Detector using Gaussian graphical models.
+class GGMOutlierDetector(BaseEstimator, DetectorMixin):
+    """Outlier detector using Gaussian graphical models.
 
     Parameters
     ----------

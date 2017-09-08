@@ -1,19 +1,12 @@
-from abc import ABCMeta, abstractmethod
-
 import numpy as np
-from sklearn.base import BaseEstimator
 from sklearn.metrics import confusion_matrix
 from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
 
 
-class BaseDetector(BaseEstimator, metaclass=ABCMeta):
-    """Base class for all detectors."""
+class DetectorMixin:
+    """Mixin class for all detectors."""
 
-    @abstractmethod
-    def fit(self, X, y=None, **fit_param):
-        """Fit the model according to the given training data."""
-
-        pass
+    _estimator_type = 'detector'
 
     def fit_predict(self, X, y=None, **fit_param):
         """"Fit the model to the training set X and return the labels (0
@@ -31,12 +24,6 @@ class BaseDetector(BaseEstimator, metaclass=ABCMeta):
         """
 
         return self.fit(X, y, **fit_param).predict(X)
-
-    @abstractmethod
-    def compute_anomaly_score(self, X):
-        """Compute the anomaly score."""
-
-        pass
 
     def predict(self, X):
         """Predict if a particular sample is an outlier or not.
@@ -65,12 +52,6 @@ class BaseDetector(BaseEstimator, metaclass=ABCMeta):
             return np.any(
                 self.compute_anomaly_score(X) > self.threshold_, axis=1
             ).astype(np.int32)
-
-
-class DetectorMixin:
-    """Mixin class for all detectors."""
-
-    _estimator_type = 'detector'
 
     def score(self, X, y):
         """Return the F1 score.

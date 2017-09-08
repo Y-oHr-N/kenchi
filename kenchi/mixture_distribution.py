@@ -1,13 +1,14 @@
 import numpy as np
 from scipy.stats import multivariate_normal
+from sklearn.base import BaseEstimator
 from sklearn.mixture import GaussianMixture
 from sklearn.utils.validation import check_array
 
-from .base import BaseDetector, DetectorMixin
+from .base import DetectorMixin
 
 
-class GaussianMixtureDetector(BaseDetector, DetectorMixin):
-    """Detector using Gaussian mixture models.
+class GaussianMixtureOutlierDetector(BaseEstimator, DetectorMixin):
+    """Outlier detector using Gaussian mixture models.
 
     Parameters
     ----------

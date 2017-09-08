@@ -1,12 +1,13 @@
 import numpy as np
+from sklearn.base import BaseEstimator
 from sklearn.neighbors import NearestNeighbors
 from sklearn.utils.validation import check_array
 
-from .base import BaseDetector, DetectorMixin
+from .base import DetectorMixin
 
 
-class EmpiricalDetector(BaseDetector, DetectorMixin):
-    """Detector using the k-nearest neighbors algorithm.
+class EmpiricalOutlierDetector(BaseEstimator, DetectorMixin):
+    """Outlier detector using the k-nearest neighbors algorithm.
 
     Parameters
     ----------

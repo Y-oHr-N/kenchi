@@ -4,10 +4,10 @@ import numpy as np
 from sklearn.exceptions import NotFittedError
 from sklearn.model_selection import ParameterGrid
 
-from kenchi import GaussianMixtureDetector
+from kenchi import GaussianMixtureOutlierDetector
 
 
-class GaussianMixtureDetectorTest(TestCase):
+class GaussianMixtureOutlierDetectorTest(TestCase):
     def setUp(self):
         train_size   = 1000
         test_size    = 100
@@ -31,10 +31,12 @@ class GaussianMixtureDetectorTest(TestCase):
             np.ones(n_outliers, dtype=np.int32)
         ))
 
-        self.sut     = GaussianMixtureDetector()
+        self.sut     = GaussianMixtureOutlierDetector()
 
     def test_fit(self):
-        self.assertIsInstance(self.sut.fit(self.X_train), GaussianMixtureDetector)
+        self.assertIsInstance(
+            self.sut.fit(self.X_train), GaussianMixtureOutlierDetector
+        )
 
     def test_predict_with_notfitted(self):
         with self.assertRaises(NotFittedError):

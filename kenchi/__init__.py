@@ -1,7 +1,7 @@
-from .base import BaseDetector, DetectorMixin
-from .gaussian_distribution import GaussianDetector, GGMDetector
-from .empirical_distribution import EmpiricalDetector
-from .mixture_distribution import GaussianMixtureDetector
-from .vmf_distribution import VMFDetector
+from .base import DetectorMixin
+from .gaussian_distribution import GaussianOutlierDetector, GGMOutlierDetector
+from .empirical_distribution import EmpiricalOutlierDetector
+from .mixture_distribution import GaussianMixtureOutlierDetector
+from .vmf_distribution import VMFOutlierDetector
 
 __version__ = '0.2.1'
