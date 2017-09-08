@@ -82,7 +82,7 @@ class GaussianOutlierDetector(BaseEstimator, DetectorMixin):
 
         return self
 
-    def compute_anomaly_score(self, X):
+    def decision_function(self, X):
         """Compute the anomaly score.
 
         Parameters
@@ -181,7 +181,7 @@ class GGMOutlierDetector(BaseEstimator, DetectorMixin):
             tol                           = self.tol
         )
 
-        scores                            = self.compute_anomaly_score(X)
+        scores                            = self.decision_function(X)
         self.threshold_                   = np.percentile(
             a                             = scores,
             q                             = self.q,
@@ -190,7 +190,7 @@ class GGMOutlierDetector(BaseEstimator, DetectorMixin):
 
         return self
 
-    def compute_anomaly_score(self, X):
+    def decision_function(self, X):
         """Compute the anomaly score.
 
         Parameters

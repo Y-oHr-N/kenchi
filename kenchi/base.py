@@ -9,7 +9,7 @@ class DetectorMixin:
     _estimator_type = 'detector'
 
     def fit_predict(self, X, y=None, **fit_param):
-        """"Fit the model to the training set X and return the labels (0
+        """Fit the model to the training set X and return the labels (0
         inlier, 1 outlier) on the training set.
 
         Parameters
@@ -45,12 +45,12 @@ class DetectorMixin:
 
         if isinstance(self.threshold_, float):
             return (
-                self.compute_anomaly_score(X) > self.threshold_
+                self.decision_function(X) > self.threshold_
             ).astype(np.int32)
 
         else:
             return np.any(
-                self.compute_anomaly_score(X) > self.threshold_, axis=1
+                self.decision_function(X) > self.threshold_, axis=1
             ).astype(np.int32)
 
     def score(self, X, y):

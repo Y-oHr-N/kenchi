@@ -102,12 +102,12 @@ class GaussianMixtureOutlierDetector(BaseEstimator, DetectorMixin):
         self.covariances_   = gmm.covariances_
         self.precisions_    = gmm.precisions_
 
-        scores              = self.compute_anomaly_score(X)
+        scores              = self.decision_function(X)
         self.threshold_     = np.percentile(scores, 100.0 * (1.0 - self.fpr))
 
         return self
 
-    def compute_anomaly_score(self, X):
+    def decision_function(self, X):
         """Compute the anomaly score.
 
         Parameters

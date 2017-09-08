@@ -59,12 +59,12 @@ class EmpiricalOutlierDetector(BaseEstimator, DetectorMixin):
             p           = self.p
         ).fit(X)
 
-        scores          = self.compute_anomaly_score(X)
+        scores          = self.decision_function(X)
         self.threshold_ = np.percentile(scores, 100.0 * (1.0 - self.fpr))
 
         return self
 
-    def compute_anomaly_score(self, X):
+    def decision_function(self, X):
         """Compute the anomaly score.
 
         Parameters
