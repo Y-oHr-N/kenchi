@@ -88,7 +88,7 @@ class GGMOutlierDetectorTest(TestCase):
             self.sut.predict(self.X_train)
 
     def test_score(self):
-        param_grid = {'q': [99.9]}
+        param_grid    = {'fpr': [0.01]}
 
         for params in ParameterGrid(param_grid):
             with self.subTest(**params):

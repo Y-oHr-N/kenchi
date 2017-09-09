@@ -110,11 +110,11 @@ class GGMOutlierDetector(BaseEstimator, DetectorMixin):
     assume_centered : bool
         If True, data are not centered before computation.
 
+    fpr : float
+        False positive rate. Used to compute the threshold.
+
     max_iter : integer
         Maximum number of iterations.
-
-    q : float
-        Percentile to compute, which must be between 0 and 100 inclusive.
 
     random_state : int, RandomState instance or None
         Seed of the pseudo random number generator to use when shuffling the
@@ -141,13 +141,13 @@ class GGMOutlierDetector(BaseEstimator, DetectorMixin):
     """
 
     def __init__(
-        self,       alpha=0.01,        assume_centered=False, max_iter=100,
-        q=99.9,     random_state=None, support_fraction=None, tol=0.0001
+        self,     alpha=0.01,        assume_centered=False, max_iter=100,
+        fpr=0.01, random_state=None, support_fraction=None, tol=0.0001
     ):
         self.alpha            = alpha
         self.assume_centered  = assume_centered
         self.max_iter         = max_iter
-        self.q                = q
+        self.fpr              = fpr
         self.random_state     = random_state
         self.support_fraction = support_fraction
         self.tol              = tol
@@ -184,7 +184,7 @@ class GGMOutlierDetector(BaseEstimator, DetectorMixin):
         scores                            = self.decision_function(X)
         self.threshold_                   = np.percentile(
             a                             = scores,
-            q                             = self.q,
+            q                             = 100.0 * (1.0 - self.fpr),
             axis                          = 0
         )
 
