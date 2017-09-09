@@ -53,37 +53,6 @@ class DetectorMixin:
                 self.decision_function(X) > self.threshold_, axis=1
             ).astype(np.int32)
 
-    def score(self, X, y):
-        """Return the F1 score.
-
-        Parameters
-        ----------
-        X : array-like, shape = (n_samples, n_features)
-            Test samples.
-
-        y : array-like, shape = (n_samples)
-            True labels for test samples.
-
-        Returns
-        -------
-        score : float
-            F1 score.
-        """
-
-        X, y           = check_X_y(X, y)
-
-        # Compute the confusion matrix
-        cnf_matrix     = confusion_matrix(y, self.predict(X), [1, 0])
-        tp, fn, fp, tn = np.ravel(cnf_matrix)
-
-        # Compute the specificity (a.k.a. normal sample accuracy)
-        specificity    = tn / (fp + tn)
-
-        # Compute the sensitivity (a.k.a. anomalous sample accuracy)
-        sensitivity    = tp / (tp + fn)
-
-        return 2.0 * specificity * sensitivity / (specificity + sensitivity)
-
 
 def window_generator(X, window, shift):
     """Generator that yields windows from given data.
