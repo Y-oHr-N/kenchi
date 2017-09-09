@@ -1,13 +1,12 @@
-from unittest import TestCase
+import unittest
 
 import numpy as np
 from sklearn.exceptions import NotFittedError
-from sklearn.model_selection import ParameterGrid
 
 from kenchi import GaussianOutlierDetector, GGMOutlierDetector
 
 
-class GaussianOutlierDetectorTest(TestCase):
+class GaussianOutlierDetectorTest(unittest.TestCase):
     def setUp(self):
         n_samples  = 1000
         n_features = 10
@@ -24,12 +23,16 @@ class GaussianOutlierDetectorTest(TestCase):
     def test_fit_predict(self):
         self.assertTrue(np.allclose(self.sut.fit_predict(self.X), self.y))
 
+    def test_decision_function_notfitted(self):
+        with self.assertRaises(NotFittedError):
+            self.sut.decision_function(self.X)
+
     def test_predict_notfitted(self):
         with self.assertRaises(NotFittedError):
             self.sut.predict(self.X)
 
 
-class GGMOutlierDetectorTest(TestCase):
+class GGMOutlierDetectorTest(unittest.TestCase):
     def setUp(self):
         n_samples  = 1000
         n_features = 10
@@ -45,6 +48,10 @@ class GGMOutlierDetectorTest(TestCase):
 
     def test_fit_predict(self):
         self.assertTrue(np.allclose(self.sut.fit_predict(self.X), self.y))
+
+    def test_decision_function_notfitted(self):
+        with self.assertRaises(NotFittedError):
+            self.sut.decision_function(self.X)
 
     def test_predict_notfitted(self):
         with self.assertRaises(NotFittedError):

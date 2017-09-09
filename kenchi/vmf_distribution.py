@@ -2,7 +2,7 @@ import numpy as np
 from scipy.stats import chi2
 from sklearn.base import BaseEstimator
 from sklearn.preprocessing import Normalizer
-from sklearn.utils.validation import check_array
+from sklearn.utils.validation import check_array, check_is_fitted
 
 from .base import DetectorMixin
 
@@ -76,6 +76,8 @@ class VMFOutlierDetector(BaseEstimator, DetectorMixin):
         scores : ndarray, shape = (n_samples)
             Anomaly score for test samples.
         """
+
+        check_is_fitted(self, ['mean_direction_'])
 
         if not self.assume_normalized:
             X = self._normalizer.transform(X)

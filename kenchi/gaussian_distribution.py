@@ -2,7 +2,7 @@ import numpy as np
 from scipy.stats import chi2
 from sklearn.base import BaseEstimator
 from sklearn.covariance import MinCovDet, graph_lasso
-from sklearn.utils.validation import check_array
+from sklearn.utils.validation import check_array, check_is_fitted
 
 from .base import DetectorMixin
 
@@ -96,6 +96,8 @@ class GaussianOutlierDetector(BaseEstimator, DetectorMixin):
             Anomaly score for test samples.
         """
 
+        check_is_fitted(self, ['_mcd'])
+
         return self._mcd.mahalanobis(X)
 
 
@@ -116,7 +118,7 @@ class GGMOutlierDetector(BaseEstimator, DetectorMixin):
     max_iter : integer
         Maximum number of iterations.
 
-    random_state : int, RandomState instance or None
+    random_state : integer, RandomState instance or None
         Seed of the pseudo random number generator to use when shuffling the
         data.
 
@@ -203,6 +205,8 @@ class GGMOutlierDetector(BaseEstimator, DetectorMixin):
         scores : ndarray, shape = (n_samples, n_features)
             Anomaly score for test samples.
         """
+
+        check_is_fitted(self, ['_mcd'])
 
         first_term  = 0.5 * np.log(2.0 * np.pi / np.diag(self.precision_))
 

@@ -1,6 +1,5 @@
 import numpy as np
-from sklearn.metrics import confusion_matrix
-from sklearn.utils.validation import check_X_y, check_array, check_is_fitted
+from sklearn.utils.validation import check_array, check_is_fitted
 
 
 class DetectorMixin:

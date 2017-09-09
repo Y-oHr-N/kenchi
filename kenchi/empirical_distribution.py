@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.neighbors import NearestNeighbors
-from sklearn.utils.validation import check_array
+from sklearn.utils.validation import check_array, check_is_fitted
 
 from .base import DetectorMixin
 
@@ -77,6 +77,8 @@ class EmpiricalOutlierDetector(BaseEstimator, DetectorMixin):
         scores : ndarray, shape = (n_samples)
             The anomaly score for test samples.
         """
+
+        check_is_fitted(self, ['_neigh'])
 
         _, n_features = X.shape
 

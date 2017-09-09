@@ -2,7 +2,7 @@ import numpy as np
 from scipy.stats import multivariate_normal
 from sklearn.base import BaseEstimator
 from sklearn.mixture import GaussianMixture
-from sklearn.utils.validation import check_array
+from sklearn.utils.validation import check_array, check_is_fitted
 
 from .base import DetectorMixin
 
@@ -24,7 +24,8 @@ class GaussianMixtureOutlierDetector(BaseEstimator, DetectorMixin):
     n_components : integer
         Number of mixture components.
 
-    precisions_init : array-like
+    precisions_init : array-like, shape = (n_components, n_features,
+    n_features)
         User-provided initial precisions.
 
     random_state : integer, RandomState instance or None
@@ -45,10 +46,10 @@ class GaussianMixtureOutlierDetector(BaseEstimator, DetectorMixin):
     means_ : ndarray, shape = (n_components, n_features)
         Mean of each mixture component.
 
-    covariances_ : ndarray
+    covariances_ : ndarray, shape = (n_components, n_features, n_features)
         Covariance of each mixture component.
 
-    precisions_ : ndarray
+    precisions_ : ndarray, shape = (n_components, n_features, n_features)
         Precision matrix of each mixture component.
 
     threshold_ : float
@@ -120,6 +121,10 @@ class GaussianMixtureOutlierDetector(BaseEstimator, DetectorMixin):
         scores : ndarray, shape = (n_samples)
             Anomaly score for test samples.
         """
+
+        check_is_fitted(
+            self, ['weights_', 'means_', 'covariances_', 'precisions_']
+        )
 
         return -np.log(
             np.sum([
