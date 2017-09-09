@@ -1,4 +1,4 @@
-from .base import DetectorMixin
+from .base import DetectorMixin, window_generator
 from .gaussian_distribution import GaussianOutlierDetector, GGMOutlierDetector
 from .empirical_distribution import EmpiricalOutlierDetector
 from .mixture_distribution import GaussianMixtureOutlierDetector

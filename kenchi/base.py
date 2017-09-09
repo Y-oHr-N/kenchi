@@ -19,7 +19,7 @@ class DetectorMixin:
 
         Returns
         -------
-        is_outlier : ndarray, shape = (n_samples)
+        is_outlier : ndarray, shape = (n_samples) or (n_windows)
             Return 0 for inliers and 1 for outliers.
         """
 
@@ -35,7 +35,7 @@ class DetectorMixin:
 
         Returns
         -------
-        is_outlier : ndarray, shape = (n_samples)
+        is_outlier : ndarray, shape = (n_samples) or (n_windows)
             Return 0 for inliers and 1 for outliers.
         """
 
@@ -83,3 +83,33 @@ class DetectorMixin:
         sensitivity    = tp / (tp + fn)
 
         return 2.0 * specificity * sensitivity / (specificity + sensitivity)
+
+
+def window_generator(X, window, shift):
+    """Generator that yields windows from given data.
+
+    parameters
+    ----------
+    X : array-like, shpae = (n_samples, n_features)
+        Samples.
+
+    window : integer
+        Window size.
+
+    shift : integer
+        Shift size.
+
+    Returns
+    -------
+    gen : generator
+        Generator.
+    """
+
+    if window < shift:
+        raise ValueError('window must be greater than or equal to shift.')
+
+    X            = check_array(X)
+    n_samples, _ = X.shape
+
+    for i in range((n_samples - window + shift) // shift):
+        yield X[i * shift:i * shift + window]
