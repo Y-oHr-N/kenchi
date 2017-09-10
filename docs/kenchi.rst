@@ -1,15 +1,20 @@
 kenchi package
 ==============
 
+Subpackages
+-----------
+
+.. toctree::
+
+    kenchi.change_detection
+    kenchi.outlier_detection
+
 Submodules
 ----------
 
 .. toctree::
 
    kenchi.base
-   kenchi.empirical_distribution
-   kenchi.gaussian_distribution
-   kenchi.vmf_distribution
 
 Module contents
 ---------------
