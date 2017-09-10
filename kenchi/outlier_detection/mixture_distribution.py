@@ -24,8 +24,7 @@ class GaussianMixtureOutlierDetector(BaseEstimator, DetectorMixin):
     n_components : integer
         Number of mixture components.
 
-    precisions_init : array-like, shape = (n_components, n_features,
-    n_features)
+    precisions_init : array-like
         User-provided initial precisions.
 
     random_state : integer, RandomState instance or None
@@ -46,10 +45,10 @@ class GaussianMixtureOutlierDetector(BaseEstimator, DetectorMixin):
     means_ : ndarray, shape = (n_components, n_features)
         Mean of each mixture component.
 
-    covariances_ : ndarray, shape = (n_components, n_features, n_features)
+    covariances_ : ndarray
         Covariance of each mixture component.
 
-    precisions_ : ndarray, shape = (n_components, n_features, n_features)
+    precisions_ : ndarray
         Precision matrix of each mixture component.
 
     threshold_ : float
@@ -125,6 +124,8 @@ class GaussianMixtureOutlierDetector(BaseEstimator, DetectorMixin):
         check_is_fitted(
             self, ['weights_', 'means_', 'covariances_', 'precisions_']
         )
+
+        X = check_array(X)
 
         return -np.log(
             np.sum([

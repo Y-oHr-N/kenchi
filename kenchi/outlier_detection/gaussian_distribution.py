@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.stats import chi2
 from sklearn.base import BaseEstimator
-from sklearn.covariance import MinCovDet, graph_lasso
+from sklearn.covariance import graph_lasso, MinCovDet
 from sklearn.utils.validation import check_array, check_is_fitted
 
 from ..base import DetectorMixin
@@ -98,6 +98,8 @@ class GaussianOutlierDetector(BaseEstimator, DetectorMixin):
 
         check_is_fitted(self, ['_mcd'])
 
+        X = check_array(X)
+
         return self._mcd.mahalanobis(X)
 
 
@@ -143,8 +145,10 @@ class GGMOutlierDetector(BaseEstimator, DetectorMixin):
     """
 
     def __init__(
-        self,     alpha=0.01,        assume_centered=False, max_iter=100,
-        fpr=0.01, random_state=None, support_fraction=None, tol=0.0001
+        self,                  alpha=0.01,
+        assume_centered=False, max_iter=100,
+        fpr=0.01,              random_state=None,
+        support_fraction=None, tol=0.0001
     ):
         self.alpha            = alpha
         self.assume_centered  = assume_centered
@@ -208,10 +212,10 @@ class GGMOutlierDetector(BaseEstimator, DetectorMixin):
 
         check_is_fitted(self, ['_mcd'])
 
-        first_term  = 0.5 * np.log(2.0 * np.pi / np.diag(self.precision_))
+        X = check_array(X)
 
-        second_term = 0.5 / np.diag(
+        return 0.5 * np.log(
+            2.0 * np.pi / np.diag(self.precision_)
+        ) + 0.5 / np.diag(
             self.precision_
         ) * ((X - self._mcd.location_) @ self.precision_) ** 2
-
-        return first_term + second_term

@@ -80,6 +80,7 @@ class EmpiricalOutlierDetector(BaseEstimator, DetectorMixin):
 
         check_is_fitted(self, ['_neigh'])
 
+        X             = check_array(X)
         _, n_features = X.shape
 
         dist, _       = self._neigh.kneighbors(X)

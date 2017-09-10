@@ -79,6 +79,8 @@ class VMFOutlierDetector(BaseEstimator, DetectorMixin):
 
         check_is_fitted(self, ['mean_direction_'])
 
+        X     = check_array(X)
+
         if not self.assume_normalized:
             X = self._normalizer.transform(X)
 
