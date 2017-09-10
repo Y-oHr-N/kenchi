@@ -3,7 +3,7 @@ from sklearn.base import BaseEstimator
 from sklearn.neighbors import NearestNeighbors
 from sklearn.utils.validation import check_array, check_is_fitted
 
-from .base import DetectorMixin
+from ..base import DetectorMixin
 
 
 class EmpiricalOutlierDetector(BaseEstimator, DetectorMixin):

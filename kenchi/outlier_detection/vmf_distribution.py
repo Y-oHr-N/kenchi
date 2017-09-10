@@ -4,7 +4,7 @@ from sklearn.base import BaseEstimator
 from sklearn.preprocessing import Normalizer
 from sklearn.utils.validation import check_array, check_is_fitted
 
-from .base import DetectorMixin
+from ..base import DetectorMixin
 
 
 class VMFOutlierDetector(BaseEstimator, DetectorMixin):

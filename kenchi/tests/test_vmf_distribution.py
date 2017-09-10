@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 from sklearn.exceptions import NotFittedError
 
-from kenchi import VMFOutlierDetector
+from kenchi.outlier_detection import VMFOutlierDetector
 
 
 class VMFOutlierDetectorTest(unittest.TestCase):

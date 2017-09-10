@@ -3,7 +3,7 @@ import unittest
 import numpy as np
 from sklearn.exceptions import NotFittedError
 
-from kenchi import GaussianOutlierDetector, GGMOutlierDetector
+from kenchi.outlier_detection import GaussianOutlierDetector, GGMOutlierDetector
 
 
 class GaussianOutlierDetectorTest(unittest.TestCase):

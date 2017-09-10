@@ -4,7 +4,7 @@ from sklearn.base import BaseEstimator
 from sklearn.mixture import GaussianMixture
 from sklearn.utils.validation import check_array, check_is_fitted
 
-from .base import DetectorMixin
+from ..base import DetectorMixin
 
 
 class GaussianMixtureOutlierDetector(BaseEstimator, DetectorMixin):

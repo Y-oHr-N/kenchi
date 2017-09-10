@@ -44,7 +44,7 @@ Usage
 .. code:: python
 
     >>> import numpy as np
-    >>> from kenchi import GaussianDetector
+    >>> from kenchi.outlier_detection import GaussianDetector
     >>> train_size = 1000
     >>> test_size  = 100
     >>> n_outliers = 10
