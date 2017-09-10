@@ -53,7 +53,7 @@ class DetectorMixin:
             ).astype(np.int32)
 
 
-def window_generator(X, window, shift):
+def window_generator(X, window=5, shift=1):
     """Generator that yields windows from given data.
 
     parameters
