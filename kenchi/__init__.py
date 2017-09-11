@@ -1,6 +1,5 @@
-from .base import DetectorMixin, window_generator
+from .base import window_generator, DetectorMixin
 from . import change_detection
 from . import outlier_detection
 
-__version__ = '0.2.2'
-
+__version__ = '0.3.0'
