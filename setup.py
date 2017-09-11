@@ -20,5 +20,5 @@ setup(
     license          = 'MIT',
     packages         = find_packages(exclude=['tests']),
     install_requires = requires,
-    test_suite       = 'kenchi.tests'
+    test_suite       = 'kenchi.tests.suite'
 )
