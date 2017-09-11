@@ -1,9 +1,9 @@
 import numpy as np
 from sklearn.base import BaseEstimator
-from sklearn.covariance import MinCovDet, graph_lasso
+from sklearn.covariance import graph_lasso, MinCovDet
 from sklearn.utils.validation import check_array, check_is_fitted
 
-from ..base import DetectorMixin, window_generator
+from ..base import window_generator, DetectorMixin
 
 
 class GGMChangeDetector(BaseEstimator, DetectorMixin):
@@ -57,8 +57,8 @@ class GGMChangeDetector(BaseEstimator, DetectorMixin):
         self,                  alpha=0.01,
         assume_centered=False, max_iter=100,
         fpr=0.01,              random_state=None,
-        shift=1,               support_fraction=None,
-        tol=0.0001,            window=5
+        shift=10,              support_fraction=None,
+        tol=0.0001,            window=100
     ):
         self.alpha            = alpha
         self.assume_centered  = assume_centered
@@ -124,15 +124,15 @@ class GGMChangeDetector(BaseEstimator, DetectorMixin):
 
         check_is_fitted(self, ['_mcd'])
 
+        X                        = check_array(X)
         n_samples, n_features    = X.shape
-        n_windows                = (
-            n_samples - self.window + self.shift
-        ) // self.shift
 
-        scores                   = np.empty(n_windows, n_features)
+        scores                   = np.empty(
+            ((n_samples - self.window + self.shift) // self.shift, n_features)
+        )
 
         for i, X_window in enumerate(
-            window_generator(X - self._mcd.location_, self.window, self.shift)
+            window_generator(X, self.window, self.shift)
         ):
             mcd_window           = MinCovDet(
                 assume_centered  = self.assume_centered,
