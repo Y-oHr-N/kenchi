@@ -1,1 +1,1 @@
-from .gaussian_distribution import GGMChangeDetector
+from .gaussian_distns import GGMChangeDetector

@@ -6,10 +6,10 @@ Submodules
 
 .. toctree::
 
-   kenchi.outlier_detection.empirical_distribution
-   kenchi.outlier_detection.gaussian_distribution
-   kenchi.outlier_detection.mixture_distribution
-   kenchi.outlier_detection.vmf_distribution
+   kenchi.outlier_detection.empirical_distns
+   kenchi.outlier_detection.gaussian_distns
+   kenchi.outlier_detection.mixture_distns
+   kenchi.outlier_detection.vmf_distns
 
 Module contents
 ---------------

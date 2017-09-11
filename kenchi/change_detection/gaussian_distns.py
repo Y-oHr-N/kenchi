@@ -58,7 +58,7 @@ class GGMChangeDetector(BaseEstimator, DetectorMixin):
         assume_centered=False, max_iter=100,
         fpr=0.01,              random_state=None,
         shift=10,              support_fraction=None,
-        tol=0.0001,            window=100
+        tol=0.0001,            window=50
     ):
         self.alpha            = alpha
         self.assume_centered  = assume_centered

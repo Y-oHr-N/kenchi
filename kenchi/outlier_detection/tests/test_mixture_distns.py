@@ -16,7 +16,7 @@ class GaussianMixtureOutlierDetectorTest(unittest.TestCase):
             cov    = np.eye(n_features),
             size   = n_samples
         )
-        self.sut   = GaussianMixtureOutlierDetector(fpr=0.0)
+        self.sut   = GaussianMixtureOutlierDetector()
 
     def test_fit(self):
         self.assertIsInstance(

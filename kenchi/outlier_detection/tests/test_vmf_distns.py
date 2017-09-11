@@ -3,10 +3,10 @@ import unittest
 import numpy as np
 from sklearn.exceptions import NotFittedError
 
-from kenchi.outlier_detection import EmpiricalOutlierDetector
+from kenchi.outlier_detection import VMFOutlierDetector
 
 
-class EmpiricalOutlierDetectorTest(unittest.TestCase):
+class VMFOutlierDetectorTest(unittest.TestCase):
     def setUp(self):
         n_samples  = 1000
         n_features = 10
@@ -16,10 +16,10 @@ class EmpiricalOutlierDetectorTest(unittest.TestCase):
             cov    = np.eye(n_features),
             size   = n_samples
         )
-        self.sut   = EmpiricalOutlierDetector(fpr=0.0)
+        self.sut   = VMFOutlierDetector()
 
     def test_fit(self):
-        self.assertIsInstance(self.sut.fit(self.X), EmpiricalOutlierDetector)
+        self.assertIsInstance(self.sut.fit(self.X), VMFOutlierDetector)
 
     def test_fit_predict(self):
         self.assertIsInstance(self.sut.fit_predict(self.X), np.ndarray)

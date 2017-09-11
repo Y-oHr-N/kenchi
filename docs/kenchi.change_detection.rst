@@ -6,7 +6,7 @@ Submodules
 
 .. toctree::
 
-   kenchi.change_detection.gaussian_distribution
+   kenchi.change_detection.gaussian_distns
 
 Module contents
 ---------------

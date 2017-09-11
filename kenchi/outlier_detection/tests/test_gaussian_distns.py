@@ -18,7 +18,7 @@ class GaussianOutlierDetectorTest(unittest.TestCase):
             cov    = np.eye(n_features),
             size   = n_samples
         )
-        self.sut   = GaussianOutlierDetector(fpr=0.0)
+        self.sut   = GaussianOutlierDetector()
 
     def test_fit(self):
         self.assertIsInstance(self.sut.fit(self.X), GaussianOutlierDetector)
