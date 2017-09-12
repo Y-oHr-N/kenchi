@@ -15,6 +15,7 @@ Submodules
 .. toctree::
 
    kenchi.base
+   kenchi.utils
 
 Module contents
 ---------------
