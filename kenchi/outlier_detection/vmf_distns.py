@@ -5,6 +5,7 @@ from sklearn.preprocessing import Normalizer
 from sklearn.utils.validation import check_array, check_is_fitted
 
 from ..base import DetectorMixin
+from ..utils import holdattr
 
 
 class VMFOutlierDetector(BaseEstimator, DetectorMixin):
@@ -63,6 +64,7 @@ class VMFOutlierDetector(BaseEstimator, DetectorMixin):
 
         return self
 
+    @holdattr
     def decision_function(self, X):
         """Compute the anomaly score.
 

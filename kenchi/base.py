@@ -1,6 +1,8 @@
 import numpy as np
 from sklearn.utils.validation import check_array, check_is_fitted
 
+from .utils import holdattr
+
 
 class DetectorMixin:
     """Mixin class for all detectors."""
@@ -24,6 +26,7 @@ class DetectorMixin:
 
         return self.fit(X, y, **fit_param).predict(X)
 
+    @holdattr
     def predict(self, X):
         """Predict if a particular sample is an outlier or not.
 
@@ -51,33 +54,3 @@ class DetectorMixin:
             return np.any(
                 self.decision_function(X) > self.threshold_, axis=1
             ).astype(np.int32)
-
-
-def window_generator(X, window=5, shift=1):
-    """Generator that yields windows from given data.
-
-    parameters
-    ----------
-    X : array-like, shpae = (n_samples, n_features)
-        Samples.
-
-    window : integer
-        Window size.
-
-    shift : integer
-        Shift size.
-
-    Returns
-    -------
-    gen : generator
-        Generator.
-    """
-
-    if window < shift:
-        raise ValueError('window must be greater than or equal to shift.')
-
-    X            = check_array(X)
-    n_samples, _ = X.shape
-
-    for i in range((n_samples - window + shift) // shift):
-        yield X[i * shift:i * shift + window]

@@ -1,4 +1,4 @@
-from .base import window_generator, DetectorMixin
+from .base import DetectorMixin
 from . import change_detection
 from . import outlier_detection
 

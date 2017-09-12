@@ -5,6 +5,7 @@ from sklearn.covariance import graph_lasso, MinCovDet
 from sklearn.utils.validation import check_array, check_is_fitted
 
 from ..base import DetectorMixin
+from ..utils import holdattr
 
 
 class GaussianOutlierDetector(BaseEstimator, DetectorMixin):
@@ -82,6 +83,7 @@ class GaussianOutlierDetector(BaseEstimator, DetectorMixin):
 
         return self
 
+    @holdattr
     def decision_function(self, X):
         """Compute the anomaly score.
 
@@ -196,6 +198,7 @@ class GGMOutlierDetector(BaseEstimator, DetectorMixin):
 
         return self
 
+    @holdattr
     def decision_function(self, X):
         """Compute the anomaly score.
 

@@ -3,7 +3,8 @@ from sklearn.base import BaseEstimator
 from sklearn.covariance import graph_lasso, MinCovDet
 from sklearn.utils.validation import check_array, check_is_fitted
 
-from ..base import window_generator, DetectorMixin
+from ..base import DetectorMixin
+from ..utils import holdattr, window_generator
 
 
 class GGMChangeDetector(BaseEstimator, DetectorMixin):
@@ -57,8 +58,8 @@ class GGMChangeDetector(BaseEstimator, DetectorMixin):
         self,                  alpha=0.01,
         assume_centered=False, max_iter=100,
         fpr=0.01,              random_state=None,
-        shift=10,              support_fraction=None,
-        tol=0.0001,            window=50
+        shift=50,              support_fraction=None,
+        tol=0.0001,            window=100
     ):
         self.alpha            = alpha
         self.assume_centered  = assume_centered
@@ -108,6 +109,7 @@ class GGMChangeDetector(BaseEstimator, DetectorMixin):
 
         return self
 
+    @holdattr
     def decision_function(self, X):
         """Compute the anomaly score.
 
