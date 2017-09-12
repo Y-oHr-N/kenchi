@@ -120,7 +120,7 @@ class GGMChangeDetector(BaseEstimator, DetectorMixin):
 
         Returns
         -------
-        scores : ndarray, shape = (n_windows, n_features)
+        scores : array-like, shape = (n_windows, n_features)
             Anomaly score for test samples.
         """
 

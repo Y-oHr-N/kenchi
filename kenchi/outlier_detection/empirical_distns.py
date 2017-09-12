@@ -76,7 +76,7 @@ class EmpiricalOutlierDetector(BaseEstimator, DetectorMixin):
 
         Returns
         -------
-        scores : ndarray, shape = (n_samples)
+        scores : array-like, shape = (n_samples)
             The anomaly score for test samples.
         """
 

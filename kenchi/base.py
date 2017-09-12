@@ -37,7 +37,7 @@ class DetectorMixin:
 
         Returns
         -------
-        is_outlier : ndarray, shape = (n_samples) or (n_windows)
+        is_outlier : array-like, shape = (n_samples) or (n_windows)
             Return 0 for inliers and 1 for outliers.
         """
 

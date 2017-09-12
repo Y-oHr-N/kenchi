@@ -119,7 +119,7 @@ class GaussianMixtureOutlierDetector(BaseEstimator, DetectorMixin):
 
         Returns
         -------
-        scores : ndarray, shape = (n_samples)
+        scores : array-like, shape = (n_samples)
             Anomaly score for test samples.
         """
 
