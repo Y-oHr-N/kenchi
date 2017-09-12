@@ -26,6 +26,7 @@ Requirements
 
 -  Python (>=3.5)
 -  numpy (>=1.11.2)
+-  pandas (>=0.20.3)
 -  scipy (>=0.18.1)
 -  scikit-learn (>=0.18.0)
 
