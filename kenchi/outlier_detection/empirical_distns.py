@@ -4,7 +4,6 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.utils.validation import check_array, check_is_fitted
 
 from ..base import DetectorMixin
-from ..utils import holdattr
 
 
 class EmpiricalOutlierDetector(BaseEstimator, DetectorMixin):
@@ -65,7 +64,6 @@ class EmpiricalOutlierDetector(BaseEstimator, DetectorMixin):
 
         return self
 
-    @holdattr
     def decision_function(self, X):
         """Compute the anomaly score.
 

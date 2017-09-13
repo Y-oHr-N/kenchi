@@ -4,46 +4,59 @@ import pandas as pd
 from sklearn.utils.validation import check_array
 
 
-def holdattr(func):
-    """Return wrapper function that holds attributes of the DataFrame.
+def construct_pandas_object(func):
+    """Return the wrapper function that constructs a pandas object.
+
+    Parameters
+    ----------
+    func : function
+        Wrapped function.
+
+    Returns
+    -------
+    wrapper : function
+        Wrapper function.
     """
 
     @wraps(func)
     def wrapper(self, X, **kargs):
-        isdataframe         = isinstance(X, pd.DataFrame)
+        use_dataframe          =  isinstance(X, pd.DataFrame)
 
-        if isdataframe:
-            index           = X.index
-            columns         = X.columns
+        if use_dataframe:
+            index              = X.index
+            columns            = X.columns
 
-        arr                 = func(self, X, **kargs)
+        result                 = func(self, X, **kargs)
 
-        if isdataframe:
-            if hasattr(self, 'shift') and hasattr(self, 'window'):
-                index       = index[self.window - 1::self.shift]
+        if use_dataframe:
+            is_change_detector = hasattr(self, 'shift') \
+                and hasattr(self, 'window')
 
-            if arr.ndim == 1:
-                arr         = pd.Series(
-                    data    = arr,
-                    index   = index
+            if is_change_detector:
+                index          = index[self.window - 1::self.shift]
+
+            if result.ndim == 1:
+                result         = pd.Series(
+                    data       = result,
+                    index      = index
                 )
 
             else:
-                arr         = pd.DataFrame(
-                    data    = arr,
-                    index   = index,
-                    columns = columns
+                result         = pd.DataFrame(
+                    data       = result,
+                    index      = index,
+                    columns    = self._columns
                 )
 
-        return arr
+        return result
 
     return wrapper
 
 
 def window_generator(X, window=1, shift=1):
-    """Generator that yields windows from given data.
+    """Return the generator that yields windows from given data.
 
-    parameters
+    Parameters
     ----------
     X : array-like, shpae = (n_samples, n_features)
         Samples.

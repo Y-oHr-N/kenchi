@@ -4,7 +4,7 @@ from sklearn.covariance import graph_lasso, MinCovDet
 from sklearn.utils.validation import check_array, check_is_fitted
 
 from ..base import DetectorMixin
-from ..utils import holdattr, window_generator
+from ..utils import window_generator
 
 
 class GGMChangeDetector(BaseEstimator, DetectorMixin):
@@ -109,7 +109,6 @@ class GGMChangeDetector(BaseEstimator, DetectorMixin):
 
         return self
 
-    @holdattr
     def decision_function(self, X):
         """Compute the anomaly score.
 
