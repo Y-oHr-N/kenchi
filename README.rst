@@ -46,19 +46,27 @@ Usage
 
     >>> import numpy as np
     >>> from kenchi.outlier_detection import GaussianOutlierDetector
-    >>> train_size = 1000
-    >>> test_size = 100
-    >>> n_outliers = 10
-    >>> n_features = 10
-    >>> rnd = np.random.RandomState(0)
-    >>> mean = np.zeros(n_features)
-    >>> cov = np.eye(n_features)
-    >>> X_train = rnd.multivariate_normal(mean, cov, train_size)
-    >>> X_test = np.concatenate((
+    >>> train_size                = 1000
+    >>> test_size                 = 100
+    >>> n_outliers                = 10
+    >>> n_features                = 10
+    >>> rnd                       = np.random.RandomState(0)
+    >>> # Generate the training data
+    >>> X_train                   = rnd.multivariate_normal(
+    ...     mean                  = np.zeros(n_features),
+    ...     cov                   = np.eye(n_features),
+    ...     size                  = train_size
+    ... )
+    >>> # Generate the test data that contains outliers
+    >>> X_test                    = np.concatenate((
     ...     rnd.multivariate_normal(mean, cov, test_size - n_outliers),
     ...     rnd.uniform(-10.0, 10.0, size=(n_outliers, n_features))
     ... ))
-    >>> det = GaussianOutlierDetector(use_method_of_moments=True).fit(X_train)
+    >>> # Fit the model according to the given training data
+    >>> det                       = GaussianOutlierDetector(
+    ...     use_method_of_moments = True
+    ... ).fit(X_train)
+    >>> # Predict labels (0 inlier, 1 outlier) on the test dataset
     >>> det.predict(X_test)
     array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
