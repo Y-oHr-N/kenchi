@@ -18,7 +18,7 @@ class DetectorMixin(metaclass=ABCMeta):
         pass
 
     def fit_predict(self, X, y=None, **fit_param):
-        """Fit the model to the training set X and return the labels (0
+        """Fit the model to the training set X and return labels (0
         inlier, 1 outlier) on the training set.
 
         Parameters
@@ -28,7 +28,7 @@ class DetectorMixin(metaclass=ABCMeta):
 
         Returns
         -------
-        is_outlier : ndarray, shape = (n_samples) or (n_windows)
+        is_outlier : array-like, shape = (n_samples) or (n_windows)
             Return 0 for inliers and 1 for outliers.
         """
 
@@ -36,7 +36,7 @@ class DetectorMixin(metaclass=ABCMeta):
 
     @construct_pandas_object
     @abstractmethod
-    def decision_function(self, X):
+    def anomaly_score(self, X):
         """Compute the anomaly score."""
 
         pass
@@ -62,10 +62,10 @@ class DetectorMixin(metaclass=ABCMeta):
 
         if isinstance(self.threshold_, float):
             return (
-                self.decision_function(X) > self.threshold_
+                self.anomaly_score(X) > self.threshold_
             ).astype(np.int32)
 
         else:
             return np.any(
-                self.decision_function(X) > self.threshold_, axis=1
+                self.anomaly_score(X) > self.threshold_, axis=1
             ).astype(np.int32)

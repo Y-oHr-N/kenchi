@@ -31,9 +31,9 @@ class GaussianOutlierDetectorTest(unittest.TestCase):
     def test_fit_predict_dataframe(self):
         self.assertIsInstance(self.sut.fit_predict(self.df), pd.Series)
 
-    def test_decision_function_notfitted(self):
+    def test_anomaly_score_notfitted(self):
         with self.assertRaises(NotFittedError):
-            self.sut.decision_function(self.X)
+            self.sut.anomaly_score(self.X)
 
     def test_predict_notfitted(self):
         with self.assertRaises(NotFittedError):
@@ -62,9 +62,9 @@ class GGMOutlierDetectorTest(unittest.TestCase):
     def test_fit_predict_dataframe(self):
         self.assertIsInstance(self.sut.fit_predict(self.df), pd.Series)
 
-    def test_decision_function_notfitted(self):
+    def test_anomaly_score_notfitted(self):
         with self.assertRaises(NotFittedError):
-            self.sut.decision_function(self.X)
+            self.sut.anomaly_score(self.X)
 
     def test_predict_notfitted(self):
         with self.assertRaises(NotFittedError):

@@ -54,7 +54,7 @@ class VMFOutlierDetector(BaseEstimator, DetectorMixin):
         mean                 = np.mean(X, axis=0)
         self.mean_direction_ = mean / np.linalg.norm(mean)
 
-        scores               = self.decision_function(X)
+        scores               = self.anomaly_score(X)
         mo1                  = np.mean(scores)
         mo2                  = np.mean(scores ** 2)
         m_mo                 = 2.0 * mo1 ** 2 / (mo2 - mo1 ** 2)
@@ -63,7 +63,7 @@ class VMFOutlierDetector(BaseEstimator, DetectorMixin):
 
         return self
 
-    def decision_function(self, X):
+    def anomaly_score(self, X):
         """Compute the anomaly score.
 
         Parameters
