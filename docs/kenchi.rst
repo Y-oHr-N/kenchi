@@ -15,6 +15,7 @@ Submodules
 .. toctree::
 
    kenchi.base
+   kenchi.pipeline
    kenchi.utils
 
 Module contents
