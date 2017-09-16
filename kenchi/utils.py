@@ -20,7 +20,7 @@ def construct_pandas_object(func):
 
     @wraps(func)
     def wrapper(self, X, **kargs):
-        use_dataframe          =  isinstance(X, pd.DataFrame)
+        use_dataframe          = isinstance(X, pd.DataFrame)
 
         if use_dataframe:
             index              = X.index
@@ -45,7 +45,7 @@ def construct_pandas_object(func):
                 result         = pd.DataFrame(
                     data       = result,
                     index      = index,
-                    columns    = self._columns
+                    columns    = columns
                 )
 
         return result
@@ -54,7 +54,7 @@ def construct_pandas_object(func):
 
 
 def window_generator(X, window=1, shift=1):
-    """Return the generator that yields windows from given data.
+    """Return the generator that yields windows from the given data.
 
     Parameters
     ----------
