@@ -28,7 +28,7 @@ class DetectorMixin(metaclass=ABCMeta):
 
         Returns
         -------
-        y_pred : array-like
+        y_pred : array-like, shape = (n_samples) or (n_windows)
             Return 0 for inliers and 1 for outliers.
         """
 
@@ -52,7 +52,7 @@ class DetectorMixin(metaclass=ABCMeta):
 
         Returns
         -------
-        y_pred : array-like
+        y_pred : array-like, shape = (n_samples) or (n_windows)
             Return 0 for inliers and 1 for outliers.
         """
 
@@ -60,4 +60,12 @@ class DetectorMixin(metaclass=ABCMeta):
 
         X = check_array(X)
 
-        return (self.anomaly_score(X) > self.threshold_).astype(np.int32)
+        if isinstance(self.threshold_, float):
+            return (
+                self.anomaly_score(X) > self.threshold_
+            ).astype(np.int32)
+
+        else:
+            return np.any(
+                self.anomaly_score(X) > self.threshold_, axis=1
+            ).astype(np.int32)

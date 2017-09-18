@@ -27,7 +27,7 @@ class GGMChangeDetectorTest(unittest.TestCase):
         self.assertIsInstance(self.sut.fit_predict(self.X), np.ndarray)
 
     def test_fit_predict_dataframe(self):
-        self.assertIsInstance(self.sut.fit_predict(self.df), pd.DataFrame)
+        self.assertIsInstance(self.sut.fit_predict(self.df), pd.Series)
 
     def test_anomaly_score_notfitted(self):
         with self.assertRaises(NotFittedError):
