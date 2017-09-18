@@ -18,8 +18,8 @@ class DetectorMixin(metaclass=ABCMeta):
         pass
 
     def fit_predict(self, X, y=None, **fit_param):
-        """Fit the model to the training set X and return labels (0
-        inlier, 1 outlier) on the training set.
+        """Fit the model according to the given training data and predict
+        labels (0 inlier, 1 outlier) on the training set.
 
         Parameters
         ----------
@@ -28,7 +28,7 @@ class DetectorMixin(metaclass=ABCMeta):
 
         Returns
         -------
-        is_outlier : array-like
+        y_pred : array-like
             Return 0 for inliers and 1 for outliers.
         """
 
@@ -37,7 +37,7 @@ class DetectorMixin(metaclass=ABCMeta):
     @construct_pandas_object
     @abstractmethod
     def anomaly_score(self, X):
-        """Compute the anomaly score."""
+        """Compute anomaly scores."""
 
         pass
 
@@ -52,7 +52,7 @@ class DetectorMixin(metaclass=ABCMeta):
 
         Returns
         -------
-        is_outlier : array-like
+        y_pred : array-like
             Return 0 for inliers and 1 for outliers.
         """
 

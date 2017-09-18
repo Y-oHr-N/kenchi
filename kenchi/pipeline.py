@@ -18,7 +18,7 @@ class ExtendedPipeline(Pipeline):
 
     @if_delegate_has_method(delegate='_final_estimator')
     def anomaly_score(self, X):
-        """Compute the anomaly score.
+        """Apply transforms, and compute anomaly scores with the final estimator.
 
         Parameters
         ----------
@@ -28,7 +28,7 @@ class ExtendedPipeline(Pipeline):
         Returns
         -------
         scores : array-like
-            Anomaly score for test samples.
+            Anomaly scores for test samples.
         """
 
         for _, transform in self.steps[:-1]:
