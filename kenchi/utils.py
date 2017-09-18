@@ -19,21 +19,21 @@ def construct_pandas_object(func):
     """
 
     @wraps(func)
-    def wrapper(self, X, **kargs):
+    def wrapper(estimator, X, **kargs):
         use_dataframe          = isinstance(X, pd.DataFrame)
 
         if use_dataframe:
             index              = X.index
             columns            = X.columns
 
-        result                 = func(self, X, **kargs)
+        result                 = func(estimator, X, **kargs)
 
         if use_dataframe:
-            is_change_detector = hasattr(self, 'shift') \
-                and hasattr(self, 'window')
+            is_change_detector = hasattr(estimator, 'shift') \
+                and hasattr(estimator, 'window')
 
             if is_change_detector:
-                index          = index[self.window - 1::self.shift]
+                index          = index[estimator.window - 1::estimator.shift]
 
             if result.ndim == 1:
                 result         = pd.Series(
