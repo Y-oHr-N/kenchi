@@ -20,33 +20,13 @@ def construct_pandas_object(func):
 
     @wraps(func)
     def wrapper(estimator, X, **kargs):
-        use_dataframe          = isinstance(X, pd.DataFrame)
+        result        = func(estimator, X, **kargs)
 
-        if use_dataframe:
-            index              = X.index
-            columns            = X.columns
-
-        result                 = func(estimator, X, **kargs)
-
-        if use_dataframe:
-            is_change_detector = hasattr(estimator, 'shift') \
-                and hasattr(estimator, 'window')
-
-            if is_change_detector:
-                index          = index[estimator.window - 1::estimator.shift]
-
-            if result.ndim == 1:
-                result         = pd.Series(
-                    data       = result,
-                    index      = index
-                )
-
-            else:
-                result         = pd.DataFrame(
-                    data       = result,
-                    index      = index,
-                    columns    = columns
-                )
+        if isinstance(X, pd.DataFrame):
+            result    = pd.Series(
+                data  = result,
+                index = X.index
+            )
 
         return result
 
@@ -61,10 +41,10 @@ def window_generator(X, window=1, shift=1):
     X : array-like, shpae = (n_samples, n_features)
         Samples.
 
-    window : integer
+    window : integer, default 1
         Window size.
 
-    shift : integer
+    shift : integer, default 1
         Shift size.
 
     Returns
