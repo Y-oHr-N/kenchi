@@ -12,21 +12,21 @@ class GaussianOutlierDetector(BaseEstimator, DetectorMixin):
 
     Parameters
     ----------
-    assume_centered : bool
+    assume_centered : boolean, default False
         If True, data are not centered before computation.
 
-    fpr : float
+    fpr : float, default 0.01
         False positive rate. Used to compute the threshold.
 
-    random_state : int, RandomState instance or None
+    random_state : integer, RandomState instance, default None
         Seed of the pseudo random number generator to use when shuffling the
         data.
 
-    support_fraction : float
+    support_fraction : float, default None
         Proportion of points to be included in the support of the raw MCD
         estimate.
 
-    use_method_of_moments : bool
+    use_method_of_moments : boolean, default False
         If True, the method of moments is used to compute the threshold.
 
     Attributes
@@ -83,7 +83,7 @@ class GaussianOutlierDetector(BaseEstimator, DetectorMixin):
         return self
 
     def anomaly_score(self, X):
-        """Compute the anomaly score.
+        """Compute anomaly scores.
 
         Parameters
         ----------
@@ -92,11 +92,11 @@ class GaussianOutlierDetector(BaseEstimator, DetectorMixin):
 
         Returns
         -------
-        scores : array-like, shape = (n_samples)
-            Anomaly score for test samples.
+        scores : array-like, shape = (n_samples,)
+            Anomaly scores for test samples.
         """
 
-        check_is_fitted(self, ['_mcd'])
+        check_is_fitted(self, '_mcd')
 
         X = check_array(X)
 
@@ -108,28 +108,28 @@ class GGMOutlierDetector(BaseEstimator, DetectorMixin):
 
     Parameters
     ----------
-    alpha : float
+    alpha : float, default 0.01
         Regularization parameter.
 
-    assume_centered : bool
+    assume_centered : boolean, default False
         If True, data are not centered before computation.
 
-    fpr : float
+    fpr : float, default 0.01
         False positive rate. Used to compute the threshold.
 
-    max_iter : integer
+    max_iter : integer, default 100
         Maximum number of iterations.
 
-    random_state : integer, RandomState instance or None
+    random_state : integer, RandomState instance, default None
         Seed of the pseudo random number generator to use when shuffling the
         data.
 
-    support_fraction : float
+    support_fraction : float, default None
         Proportion of points to be included in the support of the raw MCD
         estimate.
 
-    tol : float
-        The tolerance to declare convergence. If the dual gap goes below this
+    tol : float, default 0.0001
+        Tolerance to declare convergence. If the dual gap goes below this
         value, iterations are stopped.
 
     Attributes
@@ -140,7 +140,7 @@ class GGMOutlierDetector(BaseEstimator, DetectorMixin):
     precision_ : ndarray, shape = (n_features, n_features)
         Estimated pseudo inverse matrix.
 
-    threshold_ : ndarray, shape = (n_features)
+    threshold_ : ndarray, shape = (n_features,)
         Threshold.
     """
 
@@ -197,7 +197,7 @@ class GGMOutlierDetector(BaseEstimator, DetectorMixin):
         return self
 
     def anomaly_score(self, X):
-        """Compute the anomaly score.
+        """Compute anomaly scores.
 
         Parameters
         ----------
@@ -207,10 +207,10 @@ class GGMOutlierDetector(BaseEstimator, DetectorMixin):
         Returns
         -------
         scores : array-like, shape = (n_samples, n_features)
-            Anomaly score for test samples.
+            Anomaly scores for test samples.
         """
 
-        check_is_fitted(self, ['_mcd'])
+        check_is_fitted(self, '_mcd')
 
         X = check_array(X)
 

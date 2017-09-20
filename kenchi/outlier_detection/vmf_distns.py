@@ -12,15 +12,15 @@ class VMFOutlierDetector(BaseEstimator, DetectorMixin):
 
     Parameters
     ----------
-    assume_normalized : bool
+    assume_normalized : boolean, default False
         If False, data are normalized before computation.
 
-    fpr : float
+    fpr : float, default 0.01
         False positive rate. Used to compute the threshold.
 
     Attributes
     ----------
-    mean_direction_ : ndarray, shape = (n_features)
+    mean_direction_ : ndarray, shape = (n_features,)
         Mean direction.
 
     threshold_ : float
@@ -64,7 +64,7 @@ class VMFOutlierDetector(BaseEstimator, DetectorMixin):
         return self
 
     def anomaly_score(self, X):
-        """Compute the anomaly score.
+        """Compute anomaly scores.
 
         Parameters
         ----------
@@ -73,11 +73,11 @@ class VMFOutlierDetector(BaseEstimator, DetectorMixin):
 
         Returns
         -------
-        scores : array-like, shape = (n_samples)
-            Anomaly score for test samples.
+        scores : array-like, shape = (n_samples,)
+            Anomaly scores for test samples.
         """
 
-        check_is_fitted(self, ['mean_direction_'])
+        check_is_fitted(self, 'mean_direction_')
 
         X     = check_array(X)
 

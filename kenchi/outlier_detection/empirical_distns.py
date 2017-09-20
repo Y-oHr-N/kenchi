@@ -11,17 +11,17 @@ class EmpiricalOutlierDetector(BaseEstimator, DetectorMixin):
 
     Parameters
     ----------
-    fpr : float
+    fpr : float, default 0.01
         False positive rate. Used to compute the threshold.
 
-    n_jobs : integer
+    n_jobs : integer, default 1
         Number of jobs to run in parallel. If -1, then the number of jobs is
         set to the number of CPU cores. Doesn't affect fit method.
 
-    n_neighbors : integer
+    n_neighbors : integer, default 5
         Number of neighbors.
 
-    p : integer
+    p : integer, default 2
         Power parameter for the Minkowski metric.
 
     Attributes
@@ -65,7 +65,7 @@ class EmpiricalOutlierDetector(BaseEstimator, DetectorMixin):
         return self
 
     def anomaly_score(self, X):
-        """Compute the anomaly score.
+        """Compute anomaly scores.
 
         Parameters
         ----------
@@ -74,11 +74,11 @@ class EmpiricalOutlierDetector(BaseEstimator, DetectorMixin):
 
         Returns
         -------
-        scores : array-like, shape = (n_samples)
-            The anomaly score for test samples.
+        scores : array-like, shape = (n_samples,)
+            anomaly scores for test samples.
         """
 
-        check_is_fitted(self, ['_neigh'])
+        check_is_fitted(self, '_neigh')
 
         X             = check_array(X)
         _, n_features = X.shape
