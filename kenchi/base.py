@@ -46,7 +46,7 @@ class DetectorMixin(metaclass=ABCMeta):
 
         check_is_fitted(self, 'threshold_')
 
-        return (self.anomaly_score(X) > self.threshold_).astype(np.int32)
+        return (self.anomaly_score(X, y) > self.threshold_).astype(np.int32)
 
     def fit_detect(self, X, y=None, **fit_params):
         """Fit the model according to the given training data and detect if a
