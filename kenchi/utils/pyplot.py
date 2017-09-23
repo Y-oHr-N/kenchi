@@ -4,20 +4,24 @@ import numpy as np
 
 def plot_anomaly_score(
     det,              X,
-    ax=None,          title=None,
+    y=None,           ax=None,
     xlim=None,        ylim=None,
     xlabel='Samples', ylabel='Anomaly score',
-    grid=True,        **kwargs
+    title=None,       grid=True,
+    **kwargs
 ):
     """Plot anomaly scores.
 
     Parameters
     ----------
-    det : object
-        kenchi Detector
+    det : detector
+        Detector
 
     X : array-like, shape = (n_samples, n_features)
         Test samples.
+
+    y : array-like, shape = (n_samples,), default None
+        Targets.
 
     ax : matplotlib Axes, default None
         Target axes instance.
@@ -51,7 +55,7 @@ def plot_anomaly_score(
     n_samples, _ = X.shape
 
     xlocs        = np.arange(n_samples)
-    scores       = det.anomaly_score(X)
+    scores       = det.anomaly_score(X, y)
 
     if ax is None:
         _, ax    = plt.subplots(1, 1)
@@ -62,14 +66,14 @@ def plot_anomaly_score(
     if ylim is None:
         ylim     = (0, 1.1 * max(max(scores), det.threshold_))
 
-    if title is not None:
-        ax.set_title(title)
-
     if xlabel is not None:
         ax.set_xlabel(xlabel)
 
     if ylabel is not None:
         ax.set_ylabel(ylabel)
+
+    if title is not None:
+        ax.set_title(title)
 
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
