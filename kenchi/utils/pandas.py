@@ -18,8 +18,8 @@ def construct_pandas_object(func):
     """
 
     @wraps(func)
-    def wrapper(estimator, X, **kargs):
-        result        = func(estimator, X, **kargs)
+    def wrapper(estimator, X, *args, **kargs):
+        result        = func(estimator, X, *args, **kargs)
 
         if isinstance(X, pd.DataFrame):
             result    = pd.Series(
