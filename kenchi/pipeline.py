@@ -115,10 +115,6 @@ class ExtendedPipeline(Pipeline):
             Return 0 for inliers and 1 for outliers.
         """
 
-        Xt         = X
-
-        for _, transform in self.steps[:-1]:
-            if transform is not None:
-                Xt = transform.transform(Xt)
+        Xt, fit_params = self._fit(X, y, **fit_params)
 
         return self._final_estimator.fit_detect(Xt, y)
