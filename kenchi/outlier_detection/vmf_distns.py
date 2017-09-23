@@ -41,7 +41,7 @@ class VMFOutlierDetector(BaseEstimator, DetectorMixin):
 
         Returns
         -------
-        self : object
+        self : detector
             Return self.
         """
 
@@ -63,8 +63,8 @@ class VMFOutlierDetector(BaseEstimator, DetectorMixin):
 
         return self
 
-    def anomaly_score(self, X):
-        """Compute anomaly scores.
+    def anomaly_score(self, X, y=None):
+        """Compute anomaly scores for test samples.
 
         Parameters
         ----------

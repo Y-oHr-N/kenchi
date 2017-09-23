@@ -81,7 +81,7 @@ class GaussianMixtureOutlierDetector(BaseEstimator, DetectorMixin):
 
         Returns
         -------
-        self : object
+        self : detector
             Return self.
         """
 
@@ -107,8 +107,8 @@ class GaussianMixtureOutlierDetector(BaseEstimator, DetectorMixin):
 
         return self
 
-    def anomaly_score(self, X):
-        """Compute anomaly scores.
+    def anomaly_score(self, X, y=None):
+        """Compute anomaly scores for test samples.
 
         Parameters
         ----------
