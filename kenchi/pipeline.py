@@ -1,8 +1,7 @@
 from sklearn.pipeline import Pipeline
 from sklearn.utils.metaestimators import if_delegate_has_method
 
-from .plotting import plot_anomaly_score
-from .utils import construct_pandas_object
+from .utils import construct_pandas_object, plot_anomaly_score
 
 
 class ExtendedPipeline(Pipeline):
@@ -38,13 +37,17 @@ class ExtendedPipeline(Pipeline):
 
     @if_delegate_has_method(delegate='_final_estimator')
     @construct_pandas_object
-    def anomaly_score(self, X):
-        """Apply transforms, and compute anomaly scores with the final estimator.
+    def anomaly_score(self, X, y=None):
+        """Apply transforms, and compute anomaly scores for test samples with
+        the final estimator.
 
         Parameters
         ----------
         X : array-like, shape = (n_samples, n_features)
             Test samples.
+
+        y : array-like, shape = (n_samples,), default None
+            Targets.
 
         Returns
         -------
@@ -52,34 +55,46 @@ class ExtendedPipeline(Pipeline):
             Anomaly scores for test samples.
         """
 
+        Xt         = X
+
         for _, transform in self.steps[:-1]:
             if transform is not None:
-                X = transform.transform(X)
+                Xt = transform.transform(Xt)
 
-        return self._final_estimator.anomaly_score(X)
+        return self._final_estimator.anomaly_score(Xt, y)
 
     @if_delegate_has_method(delegate='_final_estimator')
     @construct_pandas_object
-    def predict(self, X):
-        """Apply transforms, and predict with the final estimator.
+    def detect(self, X, y=None):
+        """Apply transforms, and detect if a particular sample is an outlier or
+        not.
 
         Parameters
         ----------
         X : array-like, shape = (n_samples, n_features)
             Test samples.
 
+        y : array-like, shape = (n_samples,), default None
+            Targets.
+
         Returns
         -------
-        y_pred : array-like, shape = (n_samples,)
-            Labels for test samples.
+        is_outlier : array-like, shape = (n_samples,)
+            Return 0 for inliers and 1 for outliers.
         """
 
-        return super(ExtendedPipeline, self).predict(X)
+        Xt         = X
+
+        for _, transform in self.steps[:-1]:
+            if transform is not None:
+                Xt = transform.transform(Xt)
+
+        return self._final_estimator.detect(Xt, y)
 
     @if_delegate_has_method(delegate='_final_estimator')
     @construct_pandas_object
-    def fit_predict(self, X, y=None, **fit_params):
-        """Applies fit_predict of last step in pipeline after transforms.
+    def fit_detect(self, X, y=None, **fit_params):
+        """Applies fit_detect of last step in pipeline after transforms.
 
         Parameters
         ----------
@@ -96,8 +111,14 @@ class ExtendedPipeline(Pipeline):
 
         Returns
         -------
-        y_pred : array-like, shape = (n_samples,)
-            Labels for samples.
+        is_outlier : array-like, shape = (n_samples,)
+            Return 0 for inliers and 1 for outliers.
         """
 
-        return super(ExtendedPipeline, self).fit_predict(X, y, **fit_params)
+        Xt         = X
+
+        for _, transform in self.steps[:-1]:
+            if transform is not None:
+                Xt = transform.transform(Xt)
+
+        return self._final_estimator.fit_detect(Xt, y)

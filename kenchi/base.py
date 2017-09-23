@@ -3,9 +3,7 @@ from abc import abstractmethod, ABCMeta
 import numpy as np
 from sklearn.utils.validation import check_is_fitted
 
-
-from .plotting import plot_anomaly_score
-from .utils import construct_pandas_object
+from .utils import construct_pandas_object, plot_anomaly_score
 
 
 class DetectorMixin(metaclass=ABCMeta):
@@ -23,23 +21,26 @@ class DetectorMixin(metaclass=ABCMeta):
 
     @abstractmethod
     @construct_pandas_object
-    def anomaly_score(self, X):
-        """Compute anomaly scores."""
+    def anomaly_score(self, X, y=None):
+        """Compute anomaly scores for test samples."""
 
         pass
 
     @construct_pandas_object
-    def predict(self, X):
-        """Predict if a particular sample is an outlier or not.
+    def detect(self, X, y=None):
+        """Detect if a particular sample is an outlier or not.
 
         Parameters
         ----------
         X : array-like, shape = (n_samples, n_features)
             Test samples.
 
+        y : array-like, shape = (n_samples,), default None
+            Targets.
+
         Returns
         -------
-        y_pred : array-like, shape = (n_samples,)
+        is_outlier : array-like, shape = (n_samples,)
             Return 0 for inliers and 1 for outliers.
         """
 
@@ -47,19 +48,22 @@ class DetectorMixin(metaclass=ABCMeta):
 
         return (self.anomaly_score(X) > self.threshold_).astype(np.int32)
 
-    def fit_predict(self, X, y=None, **fit_params):
-        """Fit the model according to the given training data and predict
-        labels (0 inlier, 1 outlier) on the training set.
+    def fit_detect(self, X, y=None, **fit_params):
+        """Fit the model according to the given training data and detect if a
+        particular sample is an outlier or not.
 
         Parameters
         ----------
         X : array-like, shape = (n_samples, n_features)
             Samples.
 
+        y : array-like, shape = (n_samples,), default None
+            Targets.
+
         Returns
         -------
-        y_pred : array-like, shape = (n_samples,)
+        is_outlier : array-like, shape = (n_samples,)
             Return 0 for inliers and 1 for outliers.
         """
 
-        return self.fit(X, y, **fit_params).predict(X)
+        return self.fit(X, y, **fit_params).detect(X, y)
