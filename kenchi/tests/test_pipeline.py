@@ -28,13 +28,16 @@ class ExtendedPipelineTest(unittest.TestCase):
     def test_fit(self):
         self.assertIsInstance(self.sut.fit(self.X), ExtendedPipeline)
 
-    def test_fit_predict_ndarray(self):
-        self.assertIsInstance(self.sut.fit_predict(self.X), np.ndarray)
+    def test_fit_detect_ndarray(self):
+        self.assertIsInstance(self.sut.fit_detect(self.X), np.ndarray)
+
+    def test_fit_detect_dataframe(self):
+        self.assertIsInstance(self.sut.fit_detect(self.df), pd.Series)
 
     def test_anomaly_score_notfitted(self):
         with self.assertRaises(NotFittedError):
             self.sut.anomaly_score(self.X)
 
-    def test_predict_notfitted(self):
+    def test_detect_notfitted(self):
         with self.assertRaises(NotFittedError):
-            self.sut.predict(self.X)
+            self.sut.detect(self.X)
