@@ -5,6 +5,7 @@ from sklearn.mixture import GaussianMixture
 from sklearn.utils.validation import check_array, check_is_fitted
 
 from ..base import DetectorMixin
+from ..utils import assign_info_on_pandas_obj, construct_pandas_obj
 
 
 class GaussianMixtureOutlierDetector(BaseEstimator, DetectorMixin):
@@ -71,6 +72,7 @@ class GaussianMixtureOutlierDetector(BaseEstimator, DetectorMixin):
         self.tol             = tol
         self.weights_init    = weights_init
 
+    @assign_info_on_pandas_obj
     def fit(self, X, y=None):
         """Fit the model according to the given training data.
 
@@ -107,6 +109,7 @@ class GaussianMixtureOutlierDetector(BaseEstimator, DetectorMixin):
 
         return self
 
+    @construct_pandas_obj
     def anomaly_score(self, X, y=None):
         """Compute anomaly scores for test samples.
 

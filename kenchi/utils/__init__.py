@@ -1,7 +1,8 @@
-from .pandas import construct_pandas_object
+from .pandas import assign_info_on_pandas_obj, construct_pandas_obj
 from .pyplot import plot_anomaly_score
 
 __all__ = [
-    'construct_pandas_object',
+    'assign_info_on_pandas_obj',
+    'construct_pandas_obj',
     'plot_anomaly_score'
 ]

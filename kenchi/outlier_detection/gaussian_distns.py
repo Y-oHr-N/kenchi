@@ -5,6 +5,7 @@ from sklearn.covariance import graph_lasso, MinCovDet
 from sklearn.utils.validation import check_array, check_is_fitted
 
 from ..base import DetectorMixin
+from ..utils import assign_info_on_pandas_obj, construct_pandas_obj
 
 
 class GaussianOutlierDetector(BaseEstimator, DetectorMixin):
@@ -46,6 +47,7 @@ class GaussianOutlierDetector(BaseEstimator, DetectorMixin):
         self.support_fraction      = support_fraction
         self.use_method_of_moments = use_method_of_moments
 
+    @assign_info_on_pandas_obj
     def fit(self, X, y=None):
         """Fit the model according to the given training data.
 
@@ -82,6 +84,7 @@ class GaussianOutlierDetector(BaseEstimator, DetectorMixin):
 
         return self
 
+    @construct_pandas_obj
     def anomaly_score(self, X, y=None):
         """Compute anomaly scores for test samples.
 
@@ -158,6 +161,7 @@ class GGMOutlierDetector(BaseEstimator, DetectorMixin):
         self.support_fraction = support_fraction
         self.tol              = tol
 
+    @assign_info_on_pandas_obj
     def fit(self, X, y=None):
         """Fit the model according to the given training data.
 
@@ -196,6 +200,7 @@ class GGMOutlierDetector(BaseEstimator, DetectorMixin):
 
         return self
 
+    @construct_pandas_obj
     def anomaly_score(self, X, y=None):
         """Compute anomaly scores for test samples.
 

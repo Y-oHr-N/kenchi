@@ -1,7 +1,9 @@
 from sklearn.pipeline import Pipeline
 from sklearn.utils.metaestimators import if_delegate_has_method
 
-from .utils import construct_pandas_object, plot_anomaly_score
+from .utils import (
+    assign_info_on_pandas_obj, construct_pandas_obj, plot_anomaly_score
+)
 
 
 class ExtendedPipeline(Pipeline):
@@ -36,7 +38,33 @@ class ExtendedPipeline(Pipeline):
     )(plot_anomaly_score)
 
     @if_delegate_has_method(delegate='_final_estimator')
-    @construct_pandas_object
+    @assign_info_on_pandas_obj
+    def fit(self, X, y=None, **fit_params):
+        """Fit the model according to the given training data.
+
+        Parameters
+        ----------
+        X : array-like, shape = (n_samples, n_features)
+            Samples.
+
+        y : array-like, shape = (n_samples,), default None
+            Targets.
+
+        **fit_params : dictionary of string -> object
+            Parameters passed to the ``fit`` method of each step, where
+            each parameter name is prefixed such that parameter ``p`` for step
+            ``s`` has key ``s__p``.
+
+        Returns
+        -------
+        self : pipeline
+            Return self.
+        """
+
+        return super().fit(X, y, **fit_params)
+
+    @if_delegate_has_method(delegate='_final_estimator')
+    @construct_pandas_obj
     def anomaly_score(self, X, y=None):
         """Apply transforms, and compute anomaly scores for test samples with
         the final estimator.
@@ -64,7 +92,7 @@ class ExtendedPipeline(Pipeline):
         return self._final_estimator.anomaly_score(Xt, y)
 
     @if_delegate_has_method(delegate='_final_estimator')
-    @construct_pandas_object
+    @construct_pandas_obj
     def detect(self, X, y=None):
         """Apply transforms, and detect if a particular sample is an outlier or
         not.
@@ -92,7 +120,8 @@ class ExtendedPipeline(Pipeline):
         return self._final_estimator.detect(Xt, y)
 
     @if_delegate_has_method(delegate='_final_estimator')
-    @construct_pandas_object
+    @construct_pandas_obj
+    @assign_info_on_pandas_obj
     def fit_detect(self, X, y=None, **fit_params):
         """Applies fit_detect of last step in pipeline after transforms.
 
@@ -117,4 +146,4 @@ class ExtendedPipeline(Pipeline):
 
         Xt, fit_params = self._fit(X, y, **fit_params)
 
-        return self._final_estimator.fit_detect(Xt, y)
+        return self._final_estimator.fit_detect(Xt, y, **fit_params)

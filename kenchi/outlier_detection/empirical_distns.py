@@ -4,6 +4,7 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.utils.validation import check_array, check_is_fitted
 
 from ..base import DetectorMixin
+from ..utils import assign_info_on_pandas_obj, construct_pandas_obj
 
 
 class EmpiricalOutlierDetector(BaseEstimator, DetectorMixin):
@@ -36,6 +37,7 @@ class EmpiricalOutlierDetector(BaseEstimator, DetectorMixin):
         self.n_neighbors = n_neighbors
         self.p           = p
 
+    @assign_info_on_pandas_obj
     def fit(self, X, y=None):
         """Fit the model according to the given training data.
 
@@ -64,6 +66,7 @@ class EmpiricalOutlierDetector(BaseEstimator, DetectorMixin):
 
         return self
 
+    @construct_pandas_obj
     def anomaly_score(self, X, y=None):
         """Compute anomaly scores for test samples.
 

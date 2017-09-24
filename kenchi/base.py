@@ -3,7 +3,7 @@ from abc import abstractmethod, ABCMeta
 import numpy as np
 from sklearn.utils.validation import check_is_fitted
 
-from .utils import construct_pandas_object, plot_anomaly_score
+from .utils import construct_pandas_obj, plot_anomaly_score
 
 
 class DetectorMixin(metaclass=ABCMeta):
@@ -20,13 +20,12 @@ class DetectorMixin(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    @construct_pandas_object
     def anomaly_score(self, X, y=None):
         """Compute anomaly scores for test samples."""
 
         pass
 
-    @construct_pandas_object
+    @construct_pandas_obj
     def detect(self, X, y=None):
         """Detect if a particular sample is an outlier or not.
 
