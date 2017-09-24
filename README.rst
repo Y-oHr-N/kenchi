@@ -25,6 +25,7 @@ Requirements
 ------------
 
 -  Python (>=3.5)
+-  matplotlib (>=2.0.2)
 -  numpy (>=1.11.2)
 -  pandas (>=0.20.3)
 -  scipy (>=0.18.1)
@@ -72,7 +73,7 @@ Usage
     >>> det                       = GaussianOutlierDetector(
     ...     use_method_of_moments = True
     ... ).fit(X_train)
-    >>> # Compute the anomaly score
+    >>> # Compute anomaly scores for test samples
     >>> det.anomaly_score(X_test)
     array([  10.2279816 ,    8.42753754,   18.84554722,    6.08748561,
               4.90015449,    5.89225341,   11.21254526,   12.13837514,
@@ -99,8 +100,8 @@ Usage
               8.07578519,   12.90307535,  312.98229821,  317.97220149,
             355.38275459,  319.76722516,  324.12299603,  501.27083702,
             223.06641889,  332.14889184,  327.98300878,  295.4773678 ])
-    >>> # Predict labels (0 inlier, 1 outlier)
-    >>> det.predict(X_test)
+    >>> # Detect if a particular sample is an outlier or not
+    >>> det.detect(X_test)
     array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
