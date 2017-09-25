@@ -26,9 +26,6 @@ def plot_anomaly_score(
     ax : matplotlib Axes, default None
         Target axes instance.
 
-    title : string, default None
-        Axes title. To disable, pass None.
-
     xlim : tuple, default None
         Tuple passed to ax.xlim().
 
@@ -40,6 +37,9 @@ def plot_anomaly_score(
 
     ylabel : string, default 'Anomaly score'
         Y axis title label. To disable, pass None.
+
+    title : string, default None
+        Axes title. To disable, pass None.
 
     grid : boolean, default True
         If True, turn the axes grids on.
