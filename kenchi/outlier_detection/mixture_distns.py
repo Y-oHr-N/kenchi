@@ -1,6 +1,5 @@
 import numpy as np
 from scipy.stats import multivariate_normal
-from sklearn.base import BaseEstimator
 from sklearn.mixture import GaussianMixture
 from sklearn.utils.validation import check_array, check_is_fitted
 
@@ -8,7 +7,7 @@ from ..base import DetectorMixin
 from ..utils import assign_info_on_pandas_obj, construct_pandas_obj
 
 
-class GaussianMixtureOutlierDetector(BaseEstimator, DetectorMixin):
+class GaussianMixtureOutlierDetector(GaussianMixture, DetectorMixin):
     """Outlier detector using Gaussian mixture models.
 
     Parameters
@@ -63,14 +62,17 @@ class GaussianMixtureOutlierDetector(BaseEstimator, DetectorMixin):
         random_state=None, tol=1e-03,
         weights_init=None
     ):
-        self.fpr             = fpr
-        self.max_iter        = max_iter
-        self.means_init      = means_init
-        self.n_components    = n_components
-        self.precisions_init = precisions_init
-        self.random_state    = random_state
-        self.tol             = tol
-        self.weights_init    = weights_init
+        super().__init__(
+            max_iter        = max_iter,
+            means_init      = means_init,
+            n_components    = n_components,
+            precisions_init = precisions_init,
+            random_state    = random_state,
+            tol             = tol,
+            weights_init    = weights_init
+        )
+
+        self.fpr            = fpr
 
     @assign_info_on_pandas_obj
     def fit(self, X, y=None):
@@ -87,25 +89,12 @@ class GaussianMixtureOutlierDetector(BaseEstimator, DetectorMixin):
             Return self.
         """
 
-        X                   = check_array(X)
+        X               = check_array(X)
 
-        gmm                 = GaussianMixture(
-            max_iter        = self.max_iter,
-            means_init      = self.means_init,
-            n_components    = self.n_components,
-            precisions_init = self.precisions_init,
-            random_state    = self.random_state,
-            tol             = self.tol,
-            weights_init    = self.weights_init
-        ).fit(X)
+        super().fit(X)
 
-        self.weights_       = gmm.weights_
-        self.means_         = gmm.means_
-        self.covariances_   = gmm.covariances_
-        self.precisions_    = gmm.precisions_
-
-        scores              = self.anomaly_score(X)
-        self.threshold_     = np.percentile(scores, 100.0 * (1.0 - self.fpr))
+        scores          = self.anomaly_score(X)
+        self.threshold_ = np.percentile(scores, 100.0 * (1.0 - self.fpr))
 
         return self
 
