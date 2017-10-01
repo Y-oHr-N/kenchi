@@ -1,4 +1,4 @@
-from abc import abstractmethod, ABCMeta
+from abc import abstractmethod, ABC
 
 import numpy as np
 from sklearn.utils.validation import check_is_fitted
@@ -6,7 +6,7 @@ from sklearn.utils.validation import check_is_fitted
 from .utils import construct_pandas_obj, plot_anomaly_score
 
 
-class DetectorMixin(metaclass=ABCMeta):
+class DetectorMixin(ABC):
     """Mixin class for all detectors."""
 
     _estimator_type    = 'detector'
@@ -17,13 +17,9 @@ class DetectorMixin(metaclass=ABCMeta):
     def fit(self, X, y=None, **fit_params):
         """Fit the model according to the given training data."""
 
-        pass
-
     @abstractmethod
     def anomaly_score(self, X, y=None):
         """Compute anomaly scores for test samples."""
-
-        pass
 
     @construct_pandas_obj
     def detect(self, X, y=None):
@@ -66,3 +62,53 @@ class DetectorMixin(metaclass=ABCMeta):
         """
 
         return self.fit(X, y, **fit_params).detect(X, y)
+
+
+class AnalyzerMixin(ABC):
+    """Mixin class for all analyzers."""
+
+    @abstractmethod
+    def feature_wise_anomaly_score(self, X, y=None):
+        """Compute feature-wise anomaly scores for test samples."""
+
+    @construct_pandas_obj
+    def analyze(self, X, y=None):
+        """Analyze which features contribute to anomaly.
+
+        Parameters
+        ----------
+        X : array-like, shape = (n_samples, n_features)
+            Samples.
+
+        y : array-like, shape = (n_samples,), default None
+            Targets.
+
+        Returns
+        -------
+        is_outlier : array-like, shape = (n_samples, n_features)
+        """
+
+        check_is_fitted(self, 'thresholds_')
+
+        return (
+            self.feature_wise_anomaly_score(X, y) > self.thresholds_
+        ).astype(np.int32)
+
+    def fit_analyze(self, X, y=None, **fit_params):
+        """Fit the model according to the given training data and analyze which
+        features contribute to anomaly.
+
+        Parameters
+        ----------
+        X : array-like, shape = (n_samples, n_features)
+            Samples.
+
+        y : array-like, shape = (n_samples,), default None
+            Targets.
+
+        Returns
+        -------
+        is_outlier : array-like, shape = (n_samples, n_features)
+        """
+
+        return self.fit(X, y, **fit_params).analyze(X, y)
