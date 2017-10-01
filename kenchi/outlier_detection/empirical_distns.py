@@ -1,5 +1,4 @@
 import numpy as np
-from sklearn.base import BaseEstimator
 from sklearn.neighbors import NearestNeighbors
 from sklearn.utils.validation import check_array, check_is_fitted
 
@@ -7,7 +6,7 @@ from ..base import DetectorMixin
 from ..utils import assign_info_on_pandas_obj, construct_pandas_obj
 
 
-class EmpiricalOutlierDetector(BaseEstimator, DetectorMixin):
+class EmpiricalOutlierDetector(NearestNeighbors, DetectorMixin):
     """Outlier detector using the k-nearest neighbors algorithm.
 
     Parameters
@@ -32,10 +31,13 @@ class EmpiricalOutlierDetector(BaseEstimator, DetectorMixin):
     """
 
     def __init__(self, fpr=0.01, n_jobs=1, n_neighbors=5, p=2):
-        self.fpr         = fpr
-        self.n_jobs      = n_jobs
-        self.n_neighbors = n_neighbors
-        self.p           = p
+        super().__init__(
+            n_jobs      = n_jobs,
+            n_neighbors = n_neighbors,
+            p           = p
+        )
+
+        self.fpr        = fpr
 
     @assign_info_on_pandas_obj
     def fit(self, X, y=None):
@@ -54,12 +56,7 @@ class EmpiricalOutlierDetector(BaseEstimator, DetectorMixin):
 
         X               = check_array(X)
 
-        self._neigh     = NearestNeighbors(
-            metric      = 'minkowski',
-            n_jobs      = self.n_jobs,
-            n_neighbors = self.n_neighbors,
-            p           = self.p
-        ).fit(X)
+        super().fit(X)
 
         scores          = self.anomaly_score(X)
         self.threshold_ = np.percentile(scores, 100.0 * (1.0 - self.fpr))
@@ -81,12 +78,12 @@ class EmpiricalOutlierDetector(BaseEstimator, DetectorMixin):
             anomaly scores for test samples.
         """
 
-        check_is_fitted(self, '_neigh')
+        check_is_fitted(self, '_fit_method')
 
         X             = check_array(X)
         _, n_features = X.shape
 
-        dist, _       = self._neigh.kneighbors(X)
+        dist, _       = self.kneighbors(X)
         radius        = np.max(dist, axis=1)
 
         return -np.log(self.n_neighbors) + n_features * np.log(radius)
