@@ -88,10 +88,11 @@ class AnalyzerMixin(ABC):
         is_outlier : array-like, shape = (n_samples, n_features)
         """
 
-        check_is_fitted(self, 'thresholds_')
+        check_is_fitted(self, 'feature_wise_threshold_')
 
         return (
-            self.feature_wise_anomaly_score(X, y) > self.thresholds_
+            self.feature_wise_anomaly_score(X, y) \
+            > self.feature_wise_threshold_
         ).astype(np.int32)
 
     def fit_analyze(self, X, y=None, **fit_params):

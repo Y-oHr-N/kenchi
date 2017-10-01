@@ -39,7 +39,7 @@ class GaussianOutlierDetector(GraphLasso, AnalyzerMixin, DetectorMixin):
     threshold_ : float
         Threshold.
 
-    threshold_ : ndarray, shape = (n_features,)
+    feature_wise_threshold_ : ndarray, shape = (n_features,)
         Feature-wise threshold.
     """
 
@@ -72,19 +72,19 @@ class GaussianOutlierDetector(GraphLasso, AnalyzerMixin, DetectorMixin):
             Return self.
         """
 
-        X                   = check_array(X)
+        X                            = check_array(X)
 
         super().fit(X)
 
-        scores              = self.anomaly_score(X)
-        df, loc, scale      = chi2.fit(scores)
-        self.threshold_     = chi2.ppf(1.0 - self.fpr, df, loc, scale)
+        scores                       = self.anomaly_score(X)
+        df, loc, scale               = chi2.fit(scores)
+        self.threshold_              = chi2.ppf(1.0 - self.fpr, df, loc, scale)
 
-        feature_wise_scores = self.feature_wise_anomaly_score(X)
-        self.thresholds_    = np.percentile(
-            a               = feature_wise_scores,
-            q               = 100.0 * (1.0 - self.fpr),
-            axis            = 0
+        feature_wise_scores          = self.feature_wise_anomaly_score(X)
+        self.feature_wise_threshold_ = np.percentile(
+            a                        = feature_wise_scores,
+            q                        = 100.0 * (1.0 - self.fpr),
+            axis                     = 0
         )
 
         return self
