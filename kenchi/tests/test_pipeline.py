@@ -22,7 +22,7 @@ class ExtendedPipelineTest(unittest.TestCase):
         self.df    = pd.DataFrame(self.X)
         self.sut   = ExtendedPipeline([
             ('standardize', StandardScaler()),
-            ('detect',      GaussianOutlierDetector())
+            ('detect',      GaussianOutlierDetector(assume_centered=True))
         ])
 
     def test_fit(self):
@@ -41,3 +41,17 @@ class ExtendedPipelineTest(unittest.TestCase):
     def test_detect_notfitted(self):
         with self.assertRaises(NotFittedError):
             self.sut.detect(self.X)
+
+    def test_fit_analyze_ndarray(self):
+        self.assertIsInstance(self.sut.fit_analyze(self.X), np.ndarray)
+
+    def test_fit_analyze_dataframe(self):
+        self.assertIsInstance(self.sut.fit_analyze(self.df), pd.DataFrame)
+
+    def test_feature_wise_anomaly_score_notfitted(self):
+        with self.assertRaises(NotFittedError):
+            self.sut.feature_wise_anomaly_score(self.X)
+
+    def test_analyze_notfitted(self):
+        with self.assertRaises(NotFittedError):
+            self.sut.analyze(self.X)

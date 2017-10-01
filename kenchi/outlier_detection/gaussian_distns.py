@@ -1,51 +1,61 @@
 import numpy as np
 from scipy.stats import chi2
-from sklearn.base import BaseEstimator
-from sklearn.covariance import graph_lasso, MinCovDet
+from sklearn.covariance import GraphLasso
 from sklearn.utils.validation import check_array, check_is_fitted
 
-from ..base import DetectorMixin
+from ..base import AnalyzerMixin, DetectorMixin
 from ..utils import assign_info_on_pandas_obj, construct_pandas_obj
 
 
-class GaussianOutlierDetector(BaseEstimator, DetectorMixin):
+class GaussianOutlierDetector(GraphLasso, AnalyzerMixin, DetectorMixin):
     """Outlier detector in Gaussian distribution.
 
     Parameters
     ----------
+    alpha : float, default 0.01
+        Regularization parameter.
+
     assume_centered : boolean, default False
         If True, data are not centered before computation.
 
     fpr : float, default 0.01
         False positive rate. Used to compute the threshold.
 
-    random_state : integer, RandomState instance, default None
-        Seed of the pseudo random number generator to use when shuffling the
-        data.
+    max_iter : integer, default 100
+        Maximum number of iterations.
 
-    support_fraction : float, default None
-        Proportion of points to be included in the support of the raw MCD
-        estimate.
-
-    use_method_of_moments : boolean, default False
-        If True, the method of moments is used to compute the threshold.
+    tol : float, default 0.0001
+        Tolerance to declare convergence. If the dual gap goes below this
+        value, iterations are stopped.
 
     Attributes
     ----------
+    covariance_ : ndarray, shape = (n_features, n_features)
+        Estimated covariance matrix.
+
+    precision_ : ndarray, shape = (n_features, n_features)
+        Estimated pseudo inverse matrix.
+
     threshold_ : float
         Threshold.
+
+    threshold_ : ndarray, shape = (n_features,)
+        Feature-wise threshold.
     """
 
     def __init__(
-        self,                  assume_centered=False,
-        fpr=0.01,              random_state=None,
-        support_fraction=None, use_method_of_moments=False
+        self,                  alpha=0.01,
+        assume_centered=False, fpr=0.01,
+        max_iter=100,          tol=0.0001
     ):
-        self.assume_centered       = assume_centered
-        self.fpr                   = fpr
-        self.random_state          = random_state
-        self.support_fraction      = support_fraction
-        self.use_method_of_moments = use_method_of_moments
+        super().__init__(
+            alpha           = alpha,
+            assume_centered = assume_centered,
+            max_iter        = max_iter,
+            tol             = tol
+        )
+
+        self.fpr            = fpr
 
     @assign_info_on_pandas_obj
     def fit(self, X, y=None):
@@ -62,25 +72,20 @@ class GaussianOutlierDetector(BaseEstimator, DetectorMixin):
             Return self.
         """
 
-        X                    = check_array(X)
-        _, n_features        = X.shape
+        X                   = check_array(X)
 
-        self._mcd            = MinCovDet(
-            assume_centered  = self.assume_centered,
-            random_state     = self.random_state,
-            support_fraction = self.support_fraction
-        ).fit(X)
+        super().fit(X)
 
-        if self.use_method_of_moments:
-            scores           = self._mcd.dist_
-            mo1              = np.mean(scores)
-            mo2              = np.mean(scores ** 2)
-            m_mo             = 2.0 * mo1 ** 2 / (mo2 - mo1 ** 2)
-            s_mo             = 0.5 * (mo2 - mo1 ** 2) / mo1
-            self.threshold_  = chi2.ppf(1.0 - self.fpr, m_mo, scale=s_mo)
+        scores              = self.anomaly_score(X)
+        df, loc, scale      = chi2.fit(scores)
+        self.threshold_     = chi2.ppf(1.0 - self.fpr, df, loc, scale)
 
-        else:
-            self.threshold_  = chi2.ppf(1.0 - self.fpr, n_features, scale=1.0)
+        feature_wise_scores = self.feature_wise_anomaly_score(X)
+        self.thresholds_    = np.percentile(
+            a               = feature_wise_scores,
+            q               = 100.0 * (1.0 - self.fpr),
+            axis            = 0
+        )
 
         return self
 
@@ -99,110 +104,15 @@ class GaussianOutlierDetector(BaseEstimator, DetectorMixin):
             Anomaly scores for test samples.
         """
 
-        check_is_fitted(self, '_mcd')
+        check_is_fitted(self, ['covariance_', 'precision_'])
 
         X = check_array(X)
 
-        return self._mcd.mahalanobis(X)
-
-
-class GGMOutlierDetector(BaseEstimator, DetectorMixin):
-    """Outlier detector using Gaussian graphical models.
-
-    Parameters
-    ----------
-    alpha : float, default 0.01
-        Regularization parameter.
-
-    assume_centered : boolean, default False
-        If True, data are not centered before computation.
-
-    fpr : float, default 0.01
-        False positive rate. Used to compute the threshold.
-
-    max_iter : integer, default 100
-        Maximum number of iterations.
-
-    random_state : integer, RandomState instance, default None
-        Seed of the pseudo random number generator to use when shuffling the
-        data.
-
-    support_fraction : float, default None
-        Proportion of points to be included in the support of the raw MCD
-        estimate.
-
-    tol : float, default 0.0001
-        Tolerance to declare convergence. If the dual gap goes below this
-        value, iterations are stopped.
-
-    Attributes
-    ----------
-    covariance_ : ndarray, shape = (n_features, n_features)
-        Estimated covariance matrix.
-
-    precision_ : ndarray, shape = (n_features, n_features)
-        Estimated pseudo inverse matrix.
-
-    threshold_ : ndarray, shape = (n_features,)
-        Threshold.
-    """
-
-    def __init__(
-        self,                  alpha=0.01,
-        assume_centered=False, max_iter=100,
-        fpr=0.01,              random_state=None,
-        support_fraction=None, tol=0.0001
-    ):
-        self.alpha            = alpha
-        self.assume_centered  = assume_centered
-        self.max_iter         = max_iter
-        self.fpr              = fpr
-        self.random_state     = random_state
-        self.support_fraction = support_fraction
-        self.tol              = tol
-
-    @assign_info_on_pandas_obj
-    def fit(self, X, y=None):
-        """Fit the model according to the given training data.
-
-        Parameters
-        ----------
-        X : array-like, shape = (n_samples, n_features)
-            Samples.
-
-        Returns
-        -------
-        self : detector
-            Return self.
-        """
-
-        X                                 = check_array(X)
-
-        self._mcd                         = MinCovDet(
-            assume_centered               = self.assume_centered,
-            random_state                  = self.random_state,
-            support_fraction              = self.support_fraction
-        ).fit(X)
-
-        self.covariance_, self.precision_ = graph_lasso(
-            emp_cov                       = self._mcd.covariance_,
-            alpha                         = self.alpha,
-            max_iter                      = self.max_iter,
-            tol                           = self.tol
-        )
-
-        scores                            = self.anomaly_score(X)
-        self.threshold_                   = np.percentile(
-            a                             = scores,
-            q                             = 100.0 * (1.0 - self.fpr),
-            axis                          = 0
-        )
-
-        return self
+        return self.mahalanobis(X)
 
     @construct_pandas_obj
-    def anomaly_score(self, X, y=None):
-        """Compute anomaly scores for test samples.
+    def feature_wise_anomaly_score(self, X, y=None):
+        """Compute feature-wise anomaly scores for test samples.
 
         Parameters
         ----------
@@ -211,11 +121,11 @@ class GGMOutlierDetector(BaseEstimator, DetectorMixin):
 
         Returns
         -------
-        scores : array-like, shape = (n_samples, n_features)
-            Anomaly scores for test samples.
+        feature_wise_scores : array-like, shape = (n_samples, n_features)
+            Feature-wise anomaly scores for test samples.
         """
 
-        check_is_fitted(self, '_mcd')
+        check_is_fitted(self, ['covariance_', 'precision_'])
 
         X = check_array(X)
 
@@ -223,4 +133,4 @@ class GGMOutlierDetector(BaseEstimator, DetectorMixin):
             2.0 * np.pi / np.diag(self.precision_)
         ) + 0.5 / np.diag(
             self.precision_
-        ) * ((X - self._mcd.location_) @ self.precision_) ** 2
+        ) * ((X - self.location_) @ self.precision_) ** 2
