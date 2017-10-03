@@ -1,5 +1,6 @@
 import unittest
 
+import matplotlib as mpl
 import numpy as np
 import pandas as pd
 from sklearn.exceptions import NotFittedError
@@ -55,3 +56,8 @@ class ExtendedPipelineTest(unittest.TestCase):
     def test_analyze_notfitted(self):
         with self.assertRaises(NotFittedError):
             self.sut.analyze(self.X)
+
+    def test_plot_anomaly_score(self):
+        self.assertIsInstance(
+            self.sut.fit(self.X).plot_anomaly_score(self.X), mpl.axes.Axes
+        )
