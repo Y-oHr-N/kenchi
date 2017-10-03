@@ -1,9 +1,8 @@
 from sklearn.pipeline import Pipeline
 from sklearn.utils.metaestimators import if_delegate_has_method
 
-from .utils import (
-    assign_info_on_pandas_obj, construct_pandas_obj, plot_anomaly_score
-)
+from .utils import assign_info_on_pandas_obj, construct_pandas_obj
+
 
 
 class ExtendedPipeline(Pipeline):
@@ -32,10 +31,6 @@ class ExtendedPipeline(Pipeline):
         Read-only attribute to access any step parameter by user given name.
         Keys are step names and values are steps parameters.
     """
-
-    plot_anomaly_score = if_delegate_has_method(
-        delegate       = '_final_estimator'
-    )(plot_anomaly_score)
 
     @if_delegate_has_method(delegate='_final_estimator')
     @assign_info_on_pandas_obj
@@ -229,3 +224,64 @@ class ExtendedPipeline(Pipeline):
         Xt, fit_params = self._fit(X, y, **fit_params)
 
         return self._final_estimator.fit_analyze(Xt, y, **fit_params)
+
+    @if_delegate_has_method(delegate='_final_estimator')
+    def plot_anomaly_score(
+        self,             X,
+        y=None,           ax=None,
+        xlim=None,        ylim=None,
+        xlabel='Samples', ylabel='Anomaly score',
+        title=None,       grid=True,
+        **kwargs
+    ):
+        """Plot anomaly scores for test samples.
+
+        Parameters
+        ----------
+        det : detector
+            Detector.
+
+        X : array-like, shape = (n_samples, n_features)
+            Test samples.
+
+        y : array-like, shape = (n_samples,), default None
+            Targets.
+
+        ax : matplotlib Axes, default None
+            Target axes instance.
+
+        xlim : tuple, default None
+            Tuple passed to ax.xlim().
+
+        ylim : tuple, default None
+            Tuple passed to ax.ylim().
+
+        xlabel : string, default 'Samples'
+            X axis title label. To disable, pass None.
+
+        ylabel : string, default 'Anomaly score'
+            Y axis title label. To disable, pass None.
+
+        title : string, default None
+            Axes title. To disable, pass None.
+
+        grid : boolean, default True
+            If True, turn the axes grids on.
+
+        **kwargs : dictionary
+            Other keywords passed to ax.bar().
+
+        Returns
+        -------
+        ax : matplotlib Axes
+        """
+
+        Xt         = X
+
+        for _, transform in self.steps[:-1]:
+            if transform is not None:
+                Xt = transform.transform(Xt)
+
+        return self._final_estimator.plot_anomaly_score(
+            Xt, y, ax, xlim, ylim, xlabel, ylabel, title, grid, **kwargs
+        )
