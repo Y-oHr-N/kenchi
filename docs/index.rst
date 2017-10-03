@@ -1,5 +1,5 @@
 .. kenchi documentation master file, created by
-   sphinx-quickstart on Sun Sep 24 20:45:56 2017.
+   sphinx-quickstart on Wed Oct  4 01:04:10 2017.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 

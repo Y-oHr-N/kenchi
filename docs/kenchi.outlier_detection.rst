@@ -8,6 +8,7 @@ Submodules
 
    kenchi.outlier_detection.empirical_distns
    kenchi.outlier_detection.gaussian_distns
+   kenchi.outlier_detection.k_means
    kenchi.outlier_detection.mixture_distns
    kenchi.outlier_detection.vmf_distns
 
