@@ -10,12 +10,12 @@ def plot_anomaly_score(
     title=None,       grid=True,
     **kwargs
 ):
-    """Plot anomaly scores.
+    """Plot anomaly scores for test samples.
 
     Parameters
     ----------
     det : detector
-        Detector
+        Detector.
 
     X : array-like, shape = (n_samples, n_features)
         Test samples.
