@@ -4,7 +4,6 @@ from sklearn.utils.metaestimators import if_delegate_has_method
 from .utils import assign_info_on_pandas_obj, construct_pandas_obj
 
 
-
 class ExtendedPipeline(Pipeline):
     """Pipeline of transforms with a final estimator.
 
