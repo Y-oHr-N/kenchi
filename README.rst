@@ -70,7 +70,7 @@ Usage
     ...     rnd.uniform(-10.0, 10.0, size=(n_outliers, n_features))
     ... ))
     >>> # Fit the model according to the given training data
-    >>> det                       = GaussianOutlierDetector().fit(X_train)
+    >>> det          = GaussianOutlierDetector().fit(X_train)
     >>> # Detect if a particular sample is an outlier or not
     >>> det.detect(X_test)
     array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
