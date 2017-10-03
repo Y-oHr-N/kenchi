@@ -14,6 +14,12 @@ class EmpiricalOutlierDetector(NearestNeighbors, DetectorMixin):
     fpr : float, default 0.01
         False positive rate. Used to compute the threshold.
 
+    metric : string or callable, default ‘minkowski’
+        Metric to use for distance computation.
+
+    metric_params : dict, default None
+        Additional keyword arguments for the metric function.
+
     n_jobs : integer, default 1
         Number of jobs to run in parallel. If -1, then the number of jobs is
         set to the number of CPU cores. Doesn't affect fit method.
@@ -30,14 +36,21 @@ class EmpiricalOutlierDetector(NearestNeighbors, DetectorMixin):
         Threshold.
     """
 
-    def __init__(self, fpr=0.01, n_jobs=1, n_neighbors=5, p=2):
+    def __init__(
+        self,               fpr=0.01,
+        metric='minkowski', metric_params=None,
+        n_jobs=1,           n_neighbors=5,
+        p=2
+    ):
         super().__init__(
-            n_jobs      = n_jobs,
-            n_neighbors = n_neighbors,
-            p           = p
+            metric        = metric,
+            metric_params = metric_params,
+            n_jobs        = n_jobs,
+            n_neighbors   = n_neighbors,
+            p             = p
         )
 
-        self.fpr        = fpr
+        self.fpr          = fpr
 
     @assign_info_on_pandas_obj
     def fit(self, X, y=None):

@@ -57,11 +57,8 @@ class VMFOutlierDetector(BaseEstimator, DetectorMixin):
         self.mean_direction_ = mean / np.linalg.norm(mean)
 
         scores               = self.anomaly_score(X)
-        mo1                  = np.mean(scores)
-        mo2                  = np.mean(scores ** 2)
-        m_mo                 = 2.0 * mo1 ** 2 / (mo2 - mo1 ** 2)
-        s_mo                 = 0.5 * (mo2 - mo1 ** 2) / mo1
-        self.threshold_      = chi2.ppf(1.0 - self.fpr, m_mo, scale=s_mo)
+        df, loc, scale       = chi2.fit(scores)
+        self.threshold_      = chi2.ppf(1.0 - self.fpr, df, loc, scale)
 
         return self
 

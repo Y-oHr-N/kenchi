@@ -12,6 +12,9 @@ class GaussianMixtureOutlierDetector(GaussianMixture, DetectorMixin):
 
     Parameters
     ----------
+    covariance_type : {‘full’, ‘tied’, ‘diag’, ‘spherical’}, default 'full'
+        String describing the type of covariance parameters to use.
+
     fpr : float, default 0.01
         False positive rate. Used to compute the threshold.
 
@@ -33,6 +36,10 @@ class GaussianMixtureOutlierDetector(GaussianMixture, DetectorMixin):
 
     tol : float, default 1e-03
         Convergence threshold.
+
+    warm_start : boolean, default False
+        If True, the solution of the last fitting is used as initialization for
+        the next call of fit().
 
     weights_init : array-like, shape = (n_components,), default None
         User-provided initial weights.
@@ -56,19 +63,22 @@ class GaussianMixtureOutlierDetector(GaussianMixture, DetectorMixin):
     """
 
     def __init__(
-        self,              fpr=0.01,
-        max_iter=100,      means_init=None,
-        n_components=1,    precisions_init=None,
-        random_state=None, tol=1e-03,
+        self,                 covariance_type='full',
+        fpr=0.01,             max_iter=100,
+        means_init=None,      n_components=1,
+        precisions_init=None, random_state=None,
+        tol=1e-03,            warm_start=False,
         weights_init=None
     ):
         super().__init__(
+            covariance_type = covariance_type,
             max_iter        = max_iter,
             means_init      = means_init,
             n_components    = n_components,
             precisions_init = precisions_init,
             random_state    = random_state,
             tol             = tol,
+            warm_start      = warm_start,
             weights_init    = weights_init
         )
 
