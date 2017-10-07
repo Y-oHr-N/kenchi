@@ -9,8 +9,6 @@ from .utils import construct_pandas_obj, plot_anomaly_score
 class DetectorMixin(ABC):
     """Mixin class for all detectors."""
 
-    _estimator_type    = 'detector'
-
     plot_anomaly_score = plot_anomaly_score
 
     @abstractmethod
@@ -73,7 +71,7 @@ class AnalyzerMixin(ABC):
 
     @construct_pandas_obj
     def analyze(self, X, y=None):
-        """Analyze which features contribute to anomaly.
+        """Analyze which features contribute to anomalies.
 
         Parameters
         ----------
@@ -97,7 +95,7 @@ class AnalyzerMixin(ABC):
 
     def fit_analyze(self, X, y=None, **fit_params):
         """Fit the model according to the given training data and analyze which
-        features contribute to anomaly.
+        features contribute to anomalies.
 
         Parameters
         ----------
