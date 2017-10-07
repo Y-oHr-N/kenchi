@@ -4,7 +4,6 @@ from sklearn.utils.metaestimators import if_delegate_has_method
 from .utils import assign_info_on_pandas_obj, construct_pandas_obj
 
 
-
 class ExtendedPipeline(Pipeline):
     """Pipeline of transforms with a final estimator.
 
@@ -57,6 +56,51 @@ class ExtendedPipeline(Pipeline):
         """
 
         return super().fit(X, y, **fit_params)
+
+    @if_delegate_has_method(delegate='_final_estimator')
+    @construct_pandas_obj
+    def predict(self, X):
+        """Apply transforms to the data, and predict with the final estimator.
+
+        Parameters
+        ----------
+        X : array-like, shape = (n_samples, n_features)
+            Samples.
+
+        Returns
+        -------
+        y_pred : array-like, shape = (n_samples,)
+            Labels for test samples.
+        """
+
+        return super().predict(X)
+
+    @if_delegate_has_method(delegate='_final_estimator')
+    @construct_pandas_obj
+    @assign_info_on_pandas_obj
+    def fit_predict(self, X, y=None, **fit_params):
+        """Apply fit_predict of last step in pipeline after transforms.
+
+        Parameters
+        ----------
+        X : array-like, shape = (n_samples, n_features)
+            Samples.
+
+        y : array-like, shape = (n_samples,), default None
+            Targets.
+
+        **fit_params : dictionary of string -> object
+            Parameters passed to the ``fit`` method of each step, where
+            each parameter name is prefixed such that parameter ``p`` for step
+            ``s`` has key ``s__p``.
+
+        Returns
+        -------
+        y_pred : array-like, shape = (n_samples,)
+            Labels for test samples.
+        """
+
+        return super().fit_predict(X, y, **fit_params)
 
     @if_delegate_has_method(delegate='_final_estimator')
     @construct_pandas_obj
@@ -174,7 +218,7 @@ class ExtendedPipeline(Pipeline):
     @if_delegate_has_method(delegate='_final_estimator')
     @construct_pandas_obj
     def analyze(self, X, y=None):
-        """Apply transforms, and analyze which features contribute to anomaly.
+        """Apply transforms, and analyze which features contribute to anomalies.
 
         Parameters
         ----------
@@ -201,7 +245,7 @@ class ExtendedPipeline(Pipeline):
     @construct_pandas_obj
     @assign_info_on_pandas_obj
     def fit_analyze(self, X, y=None, **fit_params):
-        """Applies fit_analyze of last step in pipeline after transforms.
+        """Appliy fit_analyze of last step in pipeline after transforms.
 
         Parameters
         ----------
@@ -234,7 +278,7 @@ class ExtendedPipeline(Pipeline):
         title=None,       grid=True,
         **kwargs
     ):
-        """Plot anomaly scores for test samples.
+        """Apply transoforms, and plot anomaly scores for test samples.
 
         Parameters
         ----------
