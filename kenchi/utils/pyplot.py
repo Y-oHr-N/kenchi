@@ -56,6 +56,9 @@ def plot_anomaly_score(
 
     xlocs        = np.arange(n_samples)
     scores       = det.anomaly_score(X, y)
+    color        = np.where(
+        det.detect(X, y).astype(np.bool), '#ff2800', '#0041ff'
+    )
 
     if ax is None:
         _, ax    = plt.subplots(1, 1)
@@ -78,7 +81,7 @@ def plot_anomaly_score(
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
     ax.grid(grid)
-    ax.bar(xlocs, scores, align='center', **kwargs)
+    ax.bar(xlocs, scores, align='center', color=color, **kwargs)
     ax.hlines(det.threshold_, *xlim)
 
     return ax
