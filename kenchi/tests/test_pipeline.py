@@ -1,6 +1,6 @@
 import unittest
 
-import matplotlib as mpl
+import matplotlib
 import numpy as np
 import pandas as pd
 from sklearn.exceptions import NotFittedError
@@ -8,6 +8,8 @@ from sklearn.preprocessing import StandardScaler
 
 from kenchi.outlier_detection import GaussianOutlierDetector
 from kenchi.pipeline import ExtendedPipeline
+
+matplotlib.use('Agg')
 
 
 class ExtendedPipelineTest(unittest.TestCase):
@@ -59,5 +61,6 @@ class ExtendedPipelineTest(unittest.TestCase):
 
     def test_plot_anomaly_score(self):
         self.assertIsInstance(
-            self.sut.fit(self.X).plot_anomaly_score(self.X), mpl.axes.Axes
+            self.sut.fit(self.X).plot_anomaly_score(self.X),
+            matplotlib.axes.Axes
         )
