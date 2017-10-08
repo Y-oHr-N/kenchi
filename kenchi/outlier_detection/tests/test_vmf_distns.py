@@ -1,13 +1,11 @@
 import unittest
 
-import matplotlib
+import matplotlib as mpl
 import numpy as np
 import pandas as pd
 from sklearn.exceptions import NotFittedError
 
 from kenchi.outlier_detection import VMFOutlierDetector
-
-matplotlib.use('Agg')
 
 
 class VMFOutlierDetectorTest(unittest.TestCase):
@@ -42,6 +40,5 @@ class VMFOutlierDetectorTest(unittest.TestCase):
 
     def test_plot_anomaly_score(self):
         self.assertIsInstance(
-            self.sut.fit(self.X).plot_anomaly_score(self.X),
-            matplotlib.axes.Axes
+            self.sut.fit(self.X).plot_anomaly_score(self.X), mpl.axes.Axes
         )
