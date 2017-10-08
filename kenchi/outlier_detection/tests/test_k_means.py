@@ -8,7 +8,7 @@ from sklearn.exceptions import NotFittedError
 from kenchi.outlier_detection import KMeansOutlierDetector
 
 
-class EmpiricalOutlierDetectorTest(unittest.TestCase):
+class KMeansOutlierDetectorTest(unittest.TestCase):
     def setUp(self):
         n_samples  = 1000
         n_features = 10
