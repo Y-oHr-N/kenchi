@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.stats import multivariate_normal
 from sklearn.mixture import GaussianMixture
 from sklearn.utils.validation import check_array, check_is_fitted
 
@@ -12,7 +11,7 @@ class GaussianMixtureOutlierDetector(GaussianMixture, DetectorMixin):
 
     Parameters
     ----------
-    covariance_type : {‘full’, ‘tied’, ‘diag’, ‘spherical’}, default 'full'
+    covariance_type : [‘full’, ‘tied’, ‘diag’, ‘spherical’], default 'full'
         String describing the type of covariance parameters to use.
 
     fpr : float, default 0.01
@@ -129,12 +128,4 @@ class GaussianMixtureOutlierDetector(GaussianMixture, DetectorMixin):
 
         X = check_array(X)
 
-        return -np.log(
-            np.sum([
-                weight * multivariate_normal.pdf(
-                    X, mean=mean, cov=cov
-                ) for weight, mean, cov in zip(
-                    self.weights_, self.means_, self.covariances_
-                )
-            ], axis=0)
-        )
+        return -self.score_samples(X)
