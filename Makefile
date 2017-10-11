@@ -1,17 +1,19 @@
+PYTHON := python
+
 all: clean code-analysis test release
 
 clean:
-	python setup.py clean
+	${PYTHON} setup.py clean
 	rm -rf dist
 
 code-analysis:
 	flake8 kenchi
 
 release:
-	python setup.py sdist bdist_wheel
+	${PYTHON} setup.py sdist bdist_wheel
 
 test:
-	python setup.py test
+	${PYTHON} setup.py test
 
 upload:
 	twine upload dist/*

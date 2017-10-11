@@ -1,34 +1,30 @@
 import numpy as np
-from sklearn.neighbors import NearestNeighbors
+from sklearn.neighbors import KernelDensity
 from sklearn.utils.validation import check_array, check_is_fitted
 
 from ..base import DetectorMixin
 from ..utils import assign_info_on_pandas_obj, construct_pandas_obj
 
 
-class EmpiricalOutlierDetector(NearestNeighbors, DetectorMixin):
-    """Outlier detector using k-nearest neighbors algorithm.
+class KernelDensityOutlierDetector(KernelDensity, DetectorMixin):
+    """Outlier detector using kernel density estimation.
 
     Parameters
     ----------
+    bandwidth : float, default 1.0
+        Bandwidth of the kernel.
+
     fpr : float, default 0.01
         False positive rate. Used to compute the threshold.
+
+    kernel : string, default 'gaussian'
+        Kernel to use.
 
     metric : string or callable, default ‘minkowski’
         Metric to use for distance computation.
 
     metric_params : dict, default None
         Additional keyword arguments for the metric function.
-
-    n_jobs : integer, default 1
-        Number of jobs to run in parallel. If -1, then the number of jobs is
-        set to the number of CPU cores. Doesn't affect fit method.
-
-    n_neighbors : integer, default 5
-        Number of neighbors.
-
-    p : integer, default 2
-        Power parameter for the Minkowski metric.
 
     Attributes
     ----------
@@ -37,17 +33,15 @@ class EmpiricalOutlierDetector(NearestNeighbors, DetectorMixin):
     """
 
     def __init__(
-        self,               fpr=0.01,
-        metric='minkowski', metric_params=None,
-        n_jobs=1,           n_neighbors=5,
-        p=2
+        self,               bandwidth=1.0,
+        fpr=0.01,           kernel='gaussian',
+        metric='euclidean', metric_params=None
     ):
         super().__init__(
+            bandwidth     = bandwidth,
+            kernel        = kernel,
             metric        = metric,
-            metric_params = metric_params,
-            n_jobs        = n_jobs,
-            n_neighbors   = n_neighbors,
-            p             = p
+            metric_params = metric_params
         )
 
         self.fpr          = fpr
@@ -88,15 +82,11 @@ class EmpiricalOutlierDetector(NearestNeighbors, DetectorMixin):
         Returns
         -------
         scores : array-like, shape = (n_samples,)
-            anomaly scores for test samples.
+            Anomaly scores for test samples.
         """
 
-        check_is_fitted(self, '_fit_method')
+        check_is_fitted(self, 'tree_')
 
-        X             = check_array(X)
-        _, n_features = X.shape
+        X = check_array(X)
 
-        dist, _       = self.kneighbors(X)
-        radius        = np.max(dist, axis=1)
-
-        return -np.log(self.n_neighbors) + n_features * np.log(radius)
+        return -self.score_samples(X)

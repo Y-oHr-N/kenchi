@@ -5,10 +5,10 @@ import numpy as np
 import pandas as pd
 from sklearn.exceptions import NotFittedError
 
-from kenchi.outlier_detection import KMeansOutlierDetector
+from kenchi.outlier_detection import KernelDensityOutlierDetector
 
 
-class KMeansOutlierDetectorTest(unittest.TestCase):
+class KernelDensityOutlierDetectorTest(unittest.TestCase):
     def setUp(self):
         n_samples  = 1000
         n_features = 10
@@ -19,10 +19,12 @@ class KMeansOutlierDetectorTest(unittest.TestCase):
             size   = n_samples
         )
         self.df    = pd.DataFrame(self.X)
-        self.sut   = KMeansOutlierDetector()
+        self.sut   = KernelDensityOutlierDetector()
 
     def test_fit(self):
-        self.assertIsInstance(self.sut.fit(self.X), KMeansOutlierDetector)
+        self.assertIsInstance(
+            self.sut.fit(self.X), KernelDensityOutlierDetector
+        )
 
     def test_fit_detect_ndarray(self):
         self.assertIsInstance(self.sut.fit_detect(self.X), np.ndarray)

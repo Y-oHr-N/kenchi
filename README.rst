@@ -45,39 +45,48 @@ Usage
 
 .. code:: python
 
-    >>> import numpy as np
-    >>> from kenchi.outlier_detection import GaussianOutlierDetector
-    >>> train_size   = 1000
-    >>> test_size    = 100
-    >>> n_outliers   = 10
-    >>> n_features   = 10
-    >>> rnd          = np.random.RandomState(0)
-    >>> mean         = np.zeros(n_features)
-    >>> cov          = np.eye(n_features)
-    >>> # Generate the training data
-    >>> X_train      = rnd.multivariate_normal(
-    ...     mean     = mean,
-    ...     cov      = cov,
-    ...     size     = train_size
-    ... )
-    >>> # Generate the test data that contains outliers
-    >>> X_test       = np.concatenate((
-    ...     rnd.multivariate_normal(
-    ...         mean = mean,
-    ...         cov  = cov,
-    ...         size = test_size - n_outliers
-    ...     ),
-    ...     rnd.uniform(-10.0, 10.0, size=(n_outliers, n_features))
-    ... ))
-    >>> # Fit the model according to the given training data
-    >>> det          = GaussianOutlierDetector().fit(X_train)
-    >>> # Detect if a particular sample is an outlier or not
-    >>> det.detect(X_test)
-    array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,
-           1, 1, 1, 1, 1, 1, 1, 1], dtype=int32)
+    import matplotlib.pyplot as plt
+    import numpy as np
+    from kenchi.outlier_detection import GaussianOutlierDetector
+
+    train_size   = 1000
+    test_size    = 100
+    n_outliers   = 10
+    n_features   = 10
+    rnd          = np.random.RandomState(0)
+    mean         = np.zeros(n_features)
+    cov          = np.eye(n_features)
+
+    # Generate the training data
+    X_train      = rnd.multivariate_normal(
+        mean     = mean,
+        cov      = cov,
+        size     = train_size
+    )
+
+    # Generate the test data that contains outliers
+    X_test       = np.concatenate([
+        rnd.multivariate_normal(
+            mean = mean,
+            cov  = cov,
+            size = test_size - n_outliers
+        ),
+        rnd.uniform(
+            low  = -10.0,
+            high = 10.0,
+            size = (n_outliers, n_features)
+        )
+    ])
+
+    # Fit the model according to the given training data
+    det          = GaussianOutlierDetector().fit(X_train)
+
+    # Plot anomaly scores for test samples
+    det.plot_anomaly_score(X_test)
+
+    plt.show()
+
+.. image:: docs/images/anomaly_score.png
 
 License
 -------
