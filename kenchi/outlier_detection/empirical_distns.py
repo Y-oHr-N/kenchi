@@ -7,7 +7,7 @@ from ..utils import assign_info_on_pandas_obj, construct_pandas_obj
 
 
 class EmpiricalOutlierDetector(NearestNeighbors, DetectorMixin):
-    """Outlier detector using the k-nearest neighbors algorithm.
+    """Outlier detector using k-nearest neighbors algorithm.
 
     Parameters
     ----------

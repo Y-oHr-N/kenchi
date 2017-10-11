@@ -20,6 +20,22 @@ def assign_info_on_pandas_obj(func):
 
     @wraps(func)
     def wrapper(estimator, X, *args, **kargs):
+        """Wrapper function.
+
+        Parameters
+        ----------
+        X : array-like, shape = (n_samples, n_features)
+            Samples.
+
+        *args : tuple
+
+        **kwargs : dictionary
+
+        Returns
+        -------
+        result
+        """
+
         result                       = func(estimator, X, *args, **kargs)
 
         if isinstance(X, pd.DataFrame):
@@ -46,6 +62,22 @@ def construct_pandas_obj(func):
 
     @wraps(func)
     def wrapper(estimator, X, *args, **kargs):
+        """Wrapper function.
+
+        Parameters
+        ----------
+        X : array-like, shape = (n_samples, n_features)
+            Test samples.
+
+        *args : tuple
+
+        **kwargs : dictionary
+
+        Returns
+        -------
+        result
+        """
+
         result                = func(estimator, X, *args, **kargs)
 
         if hasattr(estimator, 'feature_names_'):
