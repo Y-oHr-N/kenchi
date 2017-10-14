@@ -9,6 +9,9 @@ clean:
 code-analysis:
 	flake8 kenchi
 
+conda:
+	conda-build conda.recipe
+
 release:
 	${PYTHON} setup.py sdist bdist_wheel
 

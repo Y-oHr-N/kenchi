@@ -13,6 +13,9 @@
 .. image:: https://badge.fury.io/py/kenchi.svg
     :target: https://badge.fury.io/py/kenchi
 
+.. image:: https://anaconda.org/Y_oHr_N/kenchi/badges/version.svg
+    :target: https://anaconda.org/Y_oHr_N/kenchi
+
 .. image:: https://readthedocs.org/projects/kenchi/badge/?version=latest
     :target: http://kenchi.readthedocs.io/en/latest/?badge=latest
 
@@ -28,17 +31,23 @@ Requirements
 -  matplotlib (>=2.0.2)
 -  numpy (>=1.11.2)
 -  pandas (>=0.20.3)
--  scipy (>=0.18.1)
 -  scikit-learn (>=0.18.0)
+-  scipy (>=0.18.1)
 
 Installation
 ------------
 
-You can install via pip.
+You can install via ``pip``
 
 ::
 
     pip install kenchi
+
+or ``conda``.
+
+::
+
+    conda install -c y_ohr_n kenchi
 
 Usage
 -----
