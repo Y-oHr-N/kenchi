@@ -12,7 +12,7 @@ from kenchi.pipeline import ExtendedPipeline
 
 class ExtendedPipelineTest(unittest.TestCase):
     def setUp(self):
-        n_samples  = 1000
+        n_samples  = 100
         n_features = 10
         rnd        = np.random.RandomState(0)
         self.X     = rnd.multivariate_normal(
