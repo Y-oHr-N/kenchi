@@ -19,19 +19,19 @@ class GaussianMixtureOutlierDetector(GaussianMixture, DetectorMixin):
     fpr : float, default 0.01
         False positive rate. Used to compute the threshold.
 
-    max_iter : integer, default 100
+    max_iter : int, default 100
         Maximum number of iterations.
 
     means_init : array-like, shape = (n_components, n_features), default None
         User-provided initial means.
 
-    n_components : integer, default 1
+    n_components : int, default 1
         Number of mixture components.
 
     precisions_init : array-like, default None
         User-provided initial precisions.
 
-    random_state : integer, RandomState instance, default None
+    random_state : int, RandomState instance, default None
         Seed of the pseudo random number generator to use when shuffling the
         data.
 

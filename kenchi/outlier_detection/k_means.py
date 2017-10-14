@@ -14,18 +14,18 @@ class KMeansOutlierDetector(KMeans, DetectorMixin):
     fpr : float, default 0.01
         False positive rate. Used to compute the threshold.
 
-    max_iter : integer, default 300
+    max_iter : int, default 300
         Maximum number of iterations.
 
-    n_clusters : integer, default 8
+    n_clusters : int, default 8
         Number of clusters to form as well as the number of centroids to
         generate.
 
-    n_jobs : integer, default 1
+    n_jobs : int, default 1
         Number of jobs to run in parallel. If -1, then the number of jobs is
         set to the number of CPU cores. Doesn't affect fit method.
 
-    random_state : integer, RandomState instance, default None
+    random_state : int, RandomState instance, default None
         Seed of the pseudo random number generator to use when shuffling the
         data.
 

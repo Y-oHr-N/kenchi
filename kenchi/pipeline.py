@@ -26,7 +26,7 @@ class ExtendedPipeline(Pipeline):
 
     Attributes
     ----------
-    named_steps : dictionary
+    named_steps : dict
         Read-only attribute to access any step parameter by user given name.
         Keys are step names and values are steps parameters.
     """
@@ -44,7 +44,7 @@ class ExtendedPipeline(Pipeline):
         y : array-like, shape = (n_samples,), default None
             Targets.
 
-        **fit_params : dictionary of string -> object
+        **fit_params : dict of str -> object
             Parameters passed to the ``fit`` method of each step, where
             each parameter name is prefixed such that parameter ``p`` for step
             ``s`` has key ``s__p``.
@@ -89,7 +89,7 @@ class ExtendedPipeline(Pipeline):
         y : array-like, shape = (n_samples,), default None
             Targets.
 
-        **fit_params : dictionary of string -> object
+        **fit_params : dict of str -> object
             Parameters passed to the ``fit`` method of each step, where
             each parameter name is prefixed such that parameter ``p`` for step
             ``s`` has key ``s__p``.
@@ -172,7 +172,7 @@ class ExtendedPipeline(Pipeline):
         y : array-like, shape = (n_samples,), default None
             Targets.
 
-        **fit_params : dictionary of string -> object
+        **fit_params : dict of str -> object
             Parameters passed to the ``fit`` method of each step, where
             each parameter name is prefixed such that parameter ``p`` for step
             ``s`` has key ``s__p``.
@@ -255,7 +255,7 @@ class ExtendedPipeline(Pipeline):
         y : array-like, shape = (n_samples,), default None
             Targets.
 
-        **fit_params : dictionary of string -> object
+        **fit_params : dict of str -> object
             Parameters passed to the ``fit`` method of each step, where
             each parameter name is prefixed such that parameter ``p`` for step
             ``s`` has key ``s__p``.
@@ -300,19 +300,19 @@ class ExtendedPipeline(Pipeline):
         ylim : tuple, default None
             Tuple passed to ax.ylim().
 
-        xlabel : string, default 'Samples'
+        xlabel : str, default 'Samples'
             X axis title label. To disable, pass None.
 
-        ylabel : string, default 'Anomaly score'
+        ylabel : str, default 'Anomaly score'
             Y axis title label. To disable, pass None.
 
-        title : string, default None
+        title : str, default None
             Axes title. To disable, pass None.
 
         grid : boolean, default True
             If True, turn the axes grids on.
 
-        **kwargs : dictionary
+        **kwargs : dict
             Other keywords passed to ax.bar().
 
         Returns

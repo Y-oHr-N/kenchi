@@ -14,20 +14,20 @@ class EmpiricalOutlierDetector(NearestNeighbors, DetectorMixin):
     fpr : float, default 0.01
         False positive rate. Used to compute the threshold.
 
-    metric : string or callable, default ‘minkowski’
+    metric : str or callable, default ‘minkowski’
         Metric to use for distance computation.
 
     metric_params : dict, default None
         Additional keyword arguments for the metric function.
 
-    n_jobs : integer, default 1
+    n_jobs : int, default 1
         Number of jobs to run in parallel. If -1, then the number of jobs is
         set to the number of CPU cores. Doesn't affect fit method.
 
-    n_neighbors : integer, default 5
+    n_neighbors : int, default 5
         Number of neighbors.
 
-    p : integer, default 2
+    p : int, default 2
         Power parameter for the Minkowski metric.
 
     Attributes

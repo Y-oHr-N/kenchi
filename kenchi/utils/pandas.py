@@ -9,7 +9,7 @@ def assign_info_on_pandas_obj(func):
 
     Parameters
     ----------
-    func : function
+    func : callable
         Wrapped function.
 
     Returns
@@ -29,7 +29,7 @@ def assign_info_on_pandas_obj(func):
 
         *args : tuple
 
-        **kwargs : dictionary
+        **kwargs : dict
 
         Returns
         -------
@@ -51,7 +51,7 @@ def construct_pandas_obj(func):
 
     Parameters
     ----------
-    func : function
+    func : callable
         Wrapped function.
 
     Returns
@@ -71,7 +71,7 @@ def construct_pandas_obj(func):
 
         *args : tuple
 
-        **kwargs : dictionary
+        **kwargs : dict
 
         Returns
         -------

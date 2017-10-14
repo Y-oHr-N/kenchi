@@ -21,7 +21,7 @@ class GaussianOutlierDetector(GraphLasso, AnalyzerMixin, DetectorMixin):
     fpr : float, default 0.01
         False positive rate. Used to compute the threshold.
 
-    max_iter : integer, default 100
+    max_iter : int, default 100
         Maximum number of iterations.
 
     tol : float, default 0.0001

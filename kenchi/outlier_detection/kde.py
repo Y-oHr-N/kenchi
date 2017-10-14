@@ -21,10 +21,10 @@ class KernelDensityOutlierDetector(KernelDensity, DetectorMixin):
     fpr : float, default 0.01
         False positive rate. Used to compute the threshold.
 
-    kernel : string, default 'gaussian'
+    kernel : str, default 'gaussian'
         Kernel to use.
 
-    metric : string or callable, default ‘minkowski’
+    metric : str or callable, default ‘minkowski’
         Metric to use for distance computation.
 
     metric_params : dict, default None
