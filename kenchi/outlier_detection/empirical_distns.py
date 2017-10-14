@@ -52,6 +52,24 @@ class EmpiricalOutlierDetector(NearestNeighbors, DetectorMixin):
 
         self.fpr          = fpr
 
+        self.check_params()
+
+    def check_params(self):
+        """Check validity of parameters and raise ValueError if not valid."""
+
+        if self.fpr < 0 or 1 < self.fpr:
+            raise ValueError(
+                'fpr must be between 0 and 1 inclusive but was {0}' % self.fpr
+            )
+
+        if self.n_neighbors <= 0:
+            raise ValueError(
+                'n_neighbors must be positive but was {0}' % self.n_neighbors
+            )
+
+        if self.p < 1:
+            raise ValueError('p must be greater than 1 but was {0}' % self.p)
+
     @assign_info_on_pandas_obj
     def fit(self, X, y=None):
         """Fit the model according to the given training data.

@@ -12,6 +12,10 @@ class DetectorMixin(ABC):
     plot_anomaly_score = plot_anomaly_score
 
     @abstractmethod
+    def check_params(self):
+        """Check validity of parameters and raise ValueError if not valid."""
+
+    @abstractmethod
     def fit(self, X, y=None, **fit_params):
         """Fit the model according to the given training data."""
 

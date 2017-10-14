@@ -5,13 +5,15 @@ from sklearn.utils.validation import check_array, check_is_fitted
 from ..base import DetectorMixin
 from ..utils import assign_info_on_pandas_obj, construct_pandas_obj
 
+VALID_COVARIANCE_TYPES = ['full', 'tied', 'diag', 'spherical']
+
 
 class GaussianMixtureOutlierDetector(GaussianMixture, DetectorMixin):
     """Outlier detector using Gaussian mixture models.
 
     Parameters
     ----------
-    covariance_type : [‘full’, ‘tied’, ‘diag’, ‘spherical’], default 'full'
+    covariance_type : ['full', 'tied', 'diag', 'spherical'], default 'full'
         String describing the type of covariance parameters to use.
 
     fpr : float, default 0.01
@@ -82,6 +84,34 @@ class GaussianMixtureOutlierDetector(GaussianMixture, DetectorMixin):
         )
 
         self.fpr            = fpr
+
+        self.check_params()
+
+    def check_params(self):
+        """Check validity of parameters and raise ValueError if not valid."""
+
+        if self.covariance_type not in VALID_COVARIANCE_TYPES:
+            raise ValueError(
+                'invalid covariance_type: {0}' % self.covariance_type
+            )
+
+        if self.fpr < 0 or 1 < self.fpr:
+            raise ValueError(
+                'fpr must be between 0 and 1 inclusive but was {0}' % self.fpr
+            )
+
+        if self.max_iter <= 0:
+            raise ValueError(
+                'max_iter must be positive but was {0}' % self.max_iter
+            )
+
+        if self.n_components <= 0:
+            raise ValueError(
+                'n_components must be positive but was {0}' % self.n_components
+            )
+
+        if self.tol < 0:
+            raise ValueError('tol must be non-negative but was {0}' % self.tol)
 
     @assign_info_on_pandas_obj
     def fit(self, X, y=None):

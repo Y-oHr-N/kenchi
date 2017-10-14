@@ -57,6 +57,30 @@ class GaussianOutlierDetector(GraphLasso, AnalyzerMixin, DetectorMixin):
 
         self.fpr            = fpr
 
+        self.check_params()
+
+    def check_params(self):
+        """Check validity of parameters and raise ValueError if not valid."""
+
+        if self.alpha < 0 or 1 < self.alpha:
+            raise ValueError(
+                'alpha must be between 0 and 1 inclusive but was {0}'
+                % self.alpha
+            )
+
+        if self.fpr < 0 or 1 < self.fpr:
+            raise ValueError(
+                'fpr must be between 0 and 1 inclusive but was {0}' % self.fpr
+            )
+
+        if self.max_iter <= 0:
+            raise ValueError(
+                'max_iter must be positive but was {0}' % self.max_iter
+            )
+
+        if self.tol < 0:
+            raise ValueError('tol must be non-negative but was {0}' % self.tol)
+
     @assign_info_on_pandas_obj
     def fit(self, X, y=None):
         """Fit the model according to the given training data.

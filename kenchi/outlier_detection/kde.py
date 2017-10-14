@@ -5,6 +5,10 @@ from sklearn.utils.validation import check_array, check_is_fitted
 from ..base import DetectorMixin
 from ..utils import assign_info_on_pandas_obj, construct_pandas_obj
 
+VALID_KERNELS = [
+    'gaussian', 'tophat', 'epanechnikov', 'exponential', 'linear', 'cosine'
+]
+
 
 class KernelDensityOutlierDetector(KernelDensity, DetectorMixin):
     """Outlier detector using kernel density estimation.
@@ -45,6 +49,24 @@ class KernelDensityOutlierDetector(KernelDensity, DetectorMixin):
         )
 
         self.fpr          = fpr
+
+        self.check_params()
+
+    def check_params(self):
+        """Check validity of parameters and raise ValueError if not valid."""
+
+        if self.bandwidth <= 0:
+            raise ValueError(
+                'bandwidth must be positive but was {0}' % self.bandwidth
+            )
+
+        if self.fpr < 0 or 1 < self.fpr:
+            raise ValueError(
+                'fpr must be between 0 and 1 inclusive but was {0}' % self.fpr
+            )
+
+        if self.kernel not in VALID_KERNELS:
+            raise ValueError('invalid kernel: {0}' % self.kernel)
 
     @assign_info_on_pandas_obj
     def fit(self, X, y=None):

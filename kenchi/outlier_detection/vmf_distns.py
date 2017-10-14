@@ -32,6 +32,16 @@ class VMFOutlierDetector(BaseEstimator, DetectorMixin):
         self.assume_normalized = assume_normalized
         self.fpr               = fpr
 
+        self.check_params()
+
+    def check_params(self):
+        """Check validity of parameters and raise ValueError if not valid."""
+
+        if self.fpr < 0 or 1 < self.fpr:
+            raise ValueError(
+                'fpr must be between 0 and 1 inclusive but was {0}' % self.fpr
+            )
+
     @assign_info_on_pandas_obj
     def fit(self, X, y=None):
         """Fit the model according to the given training data.
