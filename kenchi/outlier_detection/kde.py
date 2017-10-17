@@ -24,7 +24,7 @@ class KernelDensityOutlierDetector(KernelDensity, DetectorMixin):
     kernel : str, default 'gaussian'
         Kernel to use.
 
-    metric : str or callable, default ‘minkowski’
+    metric : str or callable, default 'minkowski'
         Metric to use for distance computation.
 
     metric_params : dict, default None
@@ -57,16 +57,20 @@ class KernelDensityOutlierDetector(KernelDensity, DetectorMixin):
 
         if self.bandwidth <= 0:
             raise ValueError(
-                'bandwidth must be positive but was {0}' % self.bandwidth
+                'bandwidth must be positive but was {0}'.format(
+                    self.bandwidth
+                )
             )
 
         if self.fpr < 0 or 1 < self.fpr:
             raise ValueError(
-                'fpr must be between 0 and 1 inclusive but was {0}' % self.fpr
+                'fpr must be between 0 and 1 inclusive but was {0}'.format(
+                    self.fpr
+                )
             )
 
         if self.kernel not in VALID_KERNELS:
-            raise ValueError('invalid kernel: {0}' % self.kernel)
+            raise ValueError('invalid kernel: {0}'.format(self.kernel))
 
     @assign_info_on_pandas_obj
     def fit(self, X, y=None):

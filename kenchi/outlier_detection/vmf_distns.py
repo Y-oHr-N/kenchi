@@ -39,7 +39,9 @@ class VMFOutlierDetector(BaseEstimator, DetectorMixin):
 
         if self.fpr < 0 or 1 < self.fpr:
             raise ValueError(
-                'fpr must be between 0 and 1 inclusive but was {0}' % self.fpr
+                'fpr must be between 0 and 1 inclusive but was {0}'.format(
+                    self.fpr
+                )
             )
 
     @assign_info_on_pandas_obj

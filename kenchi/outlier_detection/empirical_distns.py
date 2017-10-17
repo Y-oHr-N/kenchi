@@ -14,7 +14,7 @@ class EmpiricalOutlierDetector(NearestNeighbors, DetectorMixin):
     fpr : float, default 0.01
         False positive rate. Used to compute the threshold.
 
-    metric : str or callable, default ‘minkowski’
+    metric : str or callable, default 'minkowski'
         Metric to use for distance computation.
 
     metric_params : dict, default None
@@ -59,16 +59,24 @@ class EmpiricalOutlierDetector(NearestNeighbors, DetectorMixin):
 
         if self.fpr < 0 or 1 < self.fpr:
             raise ValueError(
-                'fpr must be between 0 and 1 inclusive but was {0}' % self.fpr
+                'fpr must be between 0 and 1 inclusive but was {0}'.format(
+                    self.fpr
+                )
             )
 
         if self.n_neighbors <= 0:
             raise ValueError(
-                'n_neighbors must be positive but was {0}' % self.n_neighbors
+                'n_neighbors must be positive but was {0}'.format(
+                    self.n_neighbors
+                )
             )
 
         if self.p < 1:
-            raise ValueError('p must be greater than 1 but was {0}' % self.p)
+            raise ValueError(
+                'p must be greater than or equeal to 1 but was {0}'.format(
+                    self.p
+                )
+            )
 
     @assign_info_on_pandas_obj
     def fit(self, X, y=None):
