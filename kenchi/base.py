@@ -24,7 +24,7 @@ class DetectorMixin(ABC):
         """Compute anomaly scores for test samples."""
 
     @construct_pandas_obj
-    def detect(self, X, y=None):
+    def detect(self, X, y=None, threshold=None):
         """Detect if a particular sample is an outlier or not.
 
         Parameters
@@ -35,6 +35,9 @@ class DetectorMixin(ABC):
         y : array-like, shape = (n_samples,), default None
             Targets.
 
+        threshold : float, default None
+            User-provided threshold.
+
         Returns
         -------
         is_outlier : array-like, shape = (n_samples,)
@@ -43,7 +46,10 @@ class DetectorMixin(ABC):
 
         check_is_fitted(self, 'threshold_')
 
-        return (self.anomaly_score(X, y) > self.threshold_).astype(np.int32)
+        if threshold is None:
+            threshold = self.threshold_
+
+        return (self.anomaly_score(X, y) > threshold).astype(np.int32)
 
     def fit_detect(self, X, y=None, **fit_params):
         """Fit the model according to the given training data and detect if a
@@ -74,7 +80,7 @@ class AnalyzerMixin(ABC):
         """Compute feature-wise anomaly scores for test samples."""
 
     @construct_pandas_obj
-    def analyze(self, X, y=None):
+    def analyze(self, X, y=None, feature_wise_threshold=None):
         """Analyze which features contribute to anomalies.
 
         Parameters
@@ -85,6 +91,9 @@ class AnalyzerMixin(ABC):
         y : array-like, shape = (n_samples,), default None
             Targets.
 
+        feature_wise_threshold : ndarray, shape = (n_features,), default None
+            User-provided feature-wise threshold.
+
         Returns
         -------
         is_outlier : array-like, shape = (n_samples, n_features)
@@ -92,9 +101,11 @@ class AnalyzerMixin(ABC):
 
         check_is_fitted(self, 'feature_wise_threshold_')
 
+        if feature_wise_threshold is None:
+            feature_wise_threshold = self.feature_wise_threshold_
+
         return (
-            self.feature_wise_anomaly_score(X, y) \
-            > self.feature_wise_threshold_
+            self.feature_wise_anomaly_score(X, y) > feature_wise_threshold
         ).astype(np.int32)
 
     def fit_analyze(self, X, y=None, **fit_params):

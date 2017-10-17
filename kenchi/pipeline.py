@@ -132,7 +132,7 @@ class ExtendedPipeline(Pipeline):
 
     @if_delegate_has_method(delegate='_final_estimator')
     @construct_pandas_obj
-    def detect(self, X, y=None):
+    def detect(self, X, y=None, threshold=None):
         """Apply transforms, and detect if a particular sample is an outlier or
         not.
 
@@ -144,19 +144,25 @@ class ExtendedPipeline(Pipeline):
         y : array-like, shape = (n_samples,), default None
             Targets.
 
+        threshold : float, default None
+            User-provided threshold.
+
         Returns
         -------
         is_outlier : array-like, shape = (n_samples,)
             Return 0 for inliers and 1 for outliers.
         """
 
-        Xt         = X
+        Xt             = X
 
         for _, transform in self.steps[:-1]:
             if transform is not None:
-                Xt = transform.transform(Xt)
+                Xt     = transform.transform(Xt)
 
-        return self._final_estimator.detect(Xt, y)
+        if threshold is None:
+            threshold  = self._final_estimator.threshold_
+
+        return self._final_estimator.detect(Xt, y, threshold)
 
     @if_delegate_has_method(delegate='_final_estimator')
     @construct_pandas_obj
@@ -217,7 +223,7 @@ class ExtendedPipeline(Pipeline):
 
     @if_delegate_has_method(delegate='_final_estimator')
     @construct_pandas_obj
-    def analyze(self, X, y=None):
+    def analyze(self, X, y=None, feature_wise_threshold=None):
         """Apply transforms, and analyze which features contribute to anomalies.
 
         Parameters
@@ -228,18 +234,25 @@ class ExtendedPipeline(Pipeline):
         y : array-like, shape = (n_samples,), default None
             Targets.
 
+        feature_wise_threshold : ndarray, shape = (n_features,), default None
+            User-provided feature-wise threshold.
+
         Returns
         -------
         is_outlier : array-like, shape = (n_samples, n_features)
         """
 
-        Xt         = X
+        Xt                         = X
 
         for _, transform in self.steps[:-1]:
             if transform is not None:
-                Xt = transform.transform(Xt)
+                Xt                 = transform.transform(Xt)
 
-        return self._final_estimator.analyze(Xt, y)
+        if feature_wise_threshold is None:
+            feature_wise_threshold = \
+                self._final_estimator.feature_wise_threshold_
+
+        return self._final_estimator.analyze(Xt, y, feature_wise_threshold)
 
     @if_delegate_has_method(delegate='_final_estimator')
     @construct_pandas_obj
