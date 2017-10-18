@@ -1,18 +1,23 @@
 from itertools import combinations
 
 import numpy as np
-from scipy.spatial.distance import minkowski
+from sklearn.externals.joblib import Parallel, delayed
 from sklearn.neighbors import NearestNeighbors
-from sklearn.utils.validation import check_array, check_is_fitted
+from sklearn.utils import check_array, gen_even_slices
+from sklearn.utils.validation import check_is_fitted
 
 from ..base import DetectorMixin
 from ..utils import assign_info_on_pandas_obj, construct_pandas_obj
 
 
-def _minkowski(x, y, order):
-    dist = minkowski(x, y, order)
+def _abof(fit_X, X, ind):
+    """Compute angle-based outlier factors for test samples."""
 
-    return dist if dist != 0 else np.inf
+    return np.var([[
+        (ab @ ac) / (ab @ ab) / (ac @ ac) for ab, ac in combinations(
+            fit_X[ind_a] - a, 2
+        )
+    ] for a, ind_a in zip(X, ind)], axis=1)
 
 
 class FastABOD(NearestNeighbors, DetectorMixin):
@@ -23,9 +28,15 @@ class FastABOD(NearestNeighbors, DetectorMixin):
     fpr : float, default 0.01
         False positive rate. Used to compute the threshold.
 
+    metric : str or callable, default 'minkowski'
+        Metric to use for distance computation.
+
+    metric_params : dict, default None
+        Additional keyword arguments for the metric function.
+
     n_jobs : int, default 1
         Number of jobs to run in parallel. If -1, then the number of jobs is
-        set to the number of CPU cores. Doesn't affect fit method.
+        set to the number of CPU cores.
 
     n_neighbors : int, default 5
         Number of neighbors.
@@ -37,14 +48,26 @@ class FastABOD(NearestNeighbors, DetectorMixin):
     ----------
     threshold_ : float
         Threshold.
+
+    References
+    ----------
+    H.P. Kriegel, M. Schubert and A. Zimek,
+    "Angle-based outlier detection in high-dimensional data,"
+    In Proceedings of KDD'08, pp. 444 - 452, 2008.
     """
 
-    def __init__(self, fpr=0.01, n_jobs=1, n_neighbors=5, p=2):
+    def __init__(
+        self,               fpr=0.01,
+        metric='minkowski', metric_params=None,
+        n_jobs=1,           n_neighbors=5,
+        p=2
+    ):
         super().__init__(
-            metric        = _minkowski,
-            metric_params = {'order': p},
+            metric        = metric,
+            metric_params = metric_params,
             n_jobs        = n_jobs,
-            n_neighbors   = n_neighbors
+            n_neighbors   = n_neighbors,
+            p             = p
         )
 
         self.fpr          = fpr
@@ -94,18 +117,18 @@ class FastABOD(NearestNeighbors, DetectorMixin):
 
         super().fit(X)
 
-        scores          = self.anomaly_score(X)
+        scores          = self.anomaly_score()
         self.threshold_ = np.percentile(scores, 100.0 * (1.0 - self.fpr))
 
         return self
 
     @construct_pandas_obj
-    def abof(self, X, y=None):
+    def abof(self, X=None, y=None):
         """Compute angle-based outlier factors for test samples.
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features)
+        X : array-like, shape = (n_samples, n_features), default None
             Test samples.
 
         Returns
@@ -116,24 +139,31 @@ class FastABOD(NearestNeighbors, DetectorMixin):
 
         check_is_fitted(self, '_fit_method')
 
-        X   = check_array(X)
-        ind = self.kneighbors(X, return_distance=False)
+        if X is None:
+            ind      = self.kneighbors(X, return_distance=False)
+            X        = self._fit_X
 
-        return np.var([
-            [
-                (ab @ ac) / (ab @ ab) / (ac @ ac) for ab, ac in combinations(
-                    self._fit_X[ind_a] - a, 2
-                )
-            ] for a, ind_a in zip(X, ind)
-        ], axis=1)
+        else:
+            X        = check_array(X)
+            ind      = self.kneighbors(X, return_distance=False)
+
+        n_samples, _ = X.shape
+
+        result       = Parallel(self.n_jobs)(
+            delayed(_abof)(
+                self._fit_X, X[s], ind[s]
+            ) for s in gen_even_slices(n_samples, self.n_jobs)
+        )
+
+        return np.concatenate(result)
 
     @construct_pandas_obj
-    def anomaly_score(self, X, y=None):
+    def anomaly_score(self, X=None, y=None):
         """Compute anomaly scores for test samples.
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features)
+        X : array-like, shape = (n_samples, n_features), default None
             Test samples.
 
         Returns
