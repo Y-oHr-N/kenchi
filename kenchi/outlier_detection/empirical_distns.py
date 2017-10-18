@@ -22,7 +22,7 @@ class EmpiricalOutlierDetector(NearestNeighbors, DetectorMixin):
 
     n_jobs : int, default 1
         Number of jobs to run in parallel. If -1, then the number of jobs is
-        set to the number of CPU cores. Doesn't affect fit method.
+        set to the number of CPU cores.
 
     n_neighbors : int, default 5
         Number of neighbors.
@@ -97,18 +97,18 @@ class EmpiricalOutlierDetector(NearestNeighbors, DetectorMixin):
 
         super().fit(X)
 
-        scores          = self.anomaly_score(X)
+        scores          = self.anomaly_score()
         self.threshold_ = np.percentile(scores, 100.0 * (1.0 - self.fpr))
 
         return self
 
     @construct_pandas_obj
-    def anomaly_score(self, X, y=None):
+    def anomaly_score(self, X=None, y=None):
         """Compute anomaly scores for test samples.
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features)
+        X : array-like, shape = (n_samples, n_features), default None
             Test samples.
 
         Returns
@@ -119,10 +119,14 @@ class EmpiricalOutlierDetector(NearestNeighbors, DetectorMixin):
 
         check_is_fitted(self, '_fit_method')
 
-        X             = check_array(X)
-        _, n_features = X.shape
+        if X is None:
+            _, n_features = self._fit_X.shape
 
-        dist, _       = self.kneighbors(X)
-        radius        = np.max(dist, axis=1)
+        else:
+            X             = check_array(X)
+            _, n_features = X.shape
+
+        dist, _           = self.kneighbors(X)
+        radius            = np.max(dist, axis=1)
 
         return -np.log(self.n_neighbors) + n_features * np.log(radius)

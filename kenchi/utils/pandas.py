@@ -61,7 +61,7 @@ def construct_pandas_obj(func):
     """
 
     @wraps(func)
-    def wrapper(estimator, X, *args, **kargs):
+    def wrapper(estimator, X=None, *args, **kargs):
         """Wrapper function.
 
         Parameters
@@ -81,7 +81,11 @@ def construct_pandas_obj(func):
         result                = func(estimator, X, *args, **kargs)
 
         if hasattr(estimator, 'feature_names_'):
-            index             = X.index
+            if X is None:
+                index         = None
+
+            else:
+                index         = X.index
 
             if result.ndim == 1:
                 result        = pd.Series(
