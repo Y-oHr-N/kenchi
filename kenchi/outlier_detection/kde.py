@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn.neighbors import KernelDensity
-from sklearn.utils.validation import check_array, check_is_fitted
+from sklearn.utils import check_array
+from sklearn.utils.validation import check_is_fitted
 
 from ..base import DetectorMixin
 from ..utils import assign_info_on_pandas_obj, construct_pandas_obj
@@ -78,7 +79,7 @@ class KernelDensityOutlierDetector(KernelDensity, DetectorMixin):
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features)
             Samples.
 
         Returns
@@ -102,12 +103,12 @@ class KernelDensityOutlierDetector(KernelDensity, DetectorMixin):
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features)
             Test samples.
 
         Returns
         -------
-        scores : array-like, shape = (n_samples,)
+        scores : array-like of shape (n_samples,)
             Anomaly scores for test samples.
         """
 

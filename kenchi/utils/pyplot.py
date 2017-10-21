@@ -17,10 +17,10 @@ def plot_anomaly_score(
     det : detector
         Detector.
 
-    X : array-like, shape = (n_samples, n_features)
+    X : array-like of shape (n_samples, n_features)
         Test samples.
 
-    y : array-like, shape = (n_samples,), default None
+    y : array-like of shape (n_samples,), default None
         Targets.
 
     ax : matplotlib Axes, default None

@@ -38,10 +38,10 @@ class ExtendedPipeline(Pipeline):
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features)
             Samples.
 
-        y : array-like, shape = (n_samples,), default None
+        y : array-like of shape (n_samples,), default None
             Targets.
 
         **fit_params : dict of str -> object
@@ -64,12 +64,12 @@ class ExtendedPipeline(Pipeline):
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features)
             Samples.
 
         Returns
         -------
-        y_pred : array-like, shape = (n_samples,)
+        y_pred : array-like of shape (n_samples,)
             Labels for test samples.
         """
 
@@ -83,10 +83,10 @@ class ExtendedPipeline(Pipeline):
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features)
             Samples.
 
-        y : array-like, shape = (n_samples,), default None
+        y : array-like of shape (n_samples,), default None
             Targets.
 
         **fit_params : dict of str -> object
@@ -96,7 +96,7 @@ class ExtendedPipeline(Pipeline):
 
         Returns
         -------
-        y_pred : array-like, shape = (n_samples,)
+        y_pred : array-like of shape (n_samples,)
             Labels for test samples.
         """
 
@@ -110,15 +110,15 @@ class ExtendedPipeline(Pipeline):
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features)
             Test samples.
 
-        y : array-like, shape = (n_samples,), default None
+        y : array-like of shape (n_samples,), default None
             Targets.
 
         Returns
         -------
-        scores : array-like, shape = (n_samples,)
+        scores : array-like of shape (n_samples,)
             Anomaly scores for test samples.
         """
 
@@ -138,10 +138,10 @@ class ExtendedPipeline(Pipeline):
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features)
             Test samples.
 
-        y : array-like, shape = (n_samples,), default None
+        y : array-like of shape (n_samples,), default None
             Targets.
 
         threshold : float, default None
@@ -149,7 +149,7 @@ class ExtendedPipeline(Pipeline):
 
         Returns
         -------
-        is_outlier : array-like, shape = (n_samples,)
+        is_outlier : array-like of shape (n_samples,)
             Return 0 for inliers and 1 for outliers.
         """
 
@@ -172,10 +172,10 @@ class ExtendedPipeline(Pipeline):
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features)
             Samples.
 
-        y : array-like, shape = (n_samples,), default None
+        y : array-like of shape (n_samples,), default None
             Targets.
 
         **fit_params : dict of str -> object
@@ -185,7 +185,7 @@ class ExtendedPipeline(Pipeline):
 
         Returns
         -------
-        is_outlier : array-like, shape = (n_samples,)
+        is_outlier : array-like of shape (n_samples,)
             Return 0 for inliers and 1 for outliers.
         """
 
@@ -201,15 +201,15 @@ class ExtendedPipeline(Pipeline):
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features)
             Test samples.
 
-        y : array-like, shape = (n_samples,), default None
+        y : array-like of shape (n_samples,), default None
             Targets.
 
         Returns
         -------
-        feature_wise_scores : array-like, shape = (n_samples, n_features)
+        feature_wise_scores : array-like of shape (n_samples, n_features)
             Feature-wise anomaly scores for test samples.
         """
 
@@ -228,18 +228,18 @@ class ExtendedPipeline(Pipeline):
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features)
             Test samples.
 
-        y : array-like, shape = (n_samples,), default None
+        y : array-like of shape (n_samples,), default None
             Targets.
 
-        feature_wise_threshold : ndarray, shape = (n_features,), default None
+        feature_wise_threshold : ndarray of shape (n_features,), default None
             User-provided feature-wise threshold.
 
         Returns
         -------
-        is_outlier : array-like, shape = (n_samples, n_features)
+        is_outlier : array-like of shape (n_samples, n_features)
         """
 
         Xt                         = X
@@ -262,10 +262,10 @@ class ExtendedPipeline(Pipeline):
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features)
             Samples.
 
-        y : array-like, shape = (n_samples,), default None
+        y : array-like of shape (n_samples,), default None
             Targets.
 
         **fit_params : dict of str -> object
@@ -275,7 +275,7 @@ class ExtendedPipeline(Pipeline):
 
         Returns
         -------
-        is_outlier : array-like, shape = (n_samples, n_features)
+        is_outlier : array-like of shape (n_samples, n_features)
         """
 
         Xt, fit_params = self._fit(X, y, **fit_params)
@@ -298,10 +298,10 @@ class ExtendedPipeline(Pipeline):
         det : detector
             Detector.
 
-        X : array-like, shape = (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features)
             Test samples.
 
-        y : array-like, shape = (n_samples,), default None
+        y : array-like of shape (n_samples,), default None
             Targets.
 
         ax : matplotlib Axes, default None

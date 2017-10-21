@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn.mixture import GaussianMixture
-from sklearn.utils.validation import check_array, check_is_fitted
+from sklearn.utils import check_array
+from sklearn.utils.validation import check_is_fitted
 
 from ..base import DetectorMixin
 from ..utils import assign_info_on_pandas_obj, construct_pandas_obj
@@ -22,7 +23,7 @@ class GaussianMixtureOutlierDetector(GaussianMixture, DetectorMixin):
     max_iter : int, default 100
         Maximum number of iterations.
 
-    means_init : array-like, shape = (n_components, n_features), default None
+    means_init : array-like of shape (n_components, n_features), default None
         User-provided initial means.
 
     n_components : int, default 1
@@ -42,15 +43,15 @@ class GaussianMixtureOutlierDetector(GaussianMixture, DetectorMixin):
         If True, the solution of the last fitting is used as initialization for
         the next call of fit().
 
-    weights_init : array-like, shape = (n_components,), default None
+    weights_init : array-like of shape (n_components,), default None
         User-provided initial weights.
 
     Attributes
     ----------
-    weights_ : ndarray, shape = (n_components,)
+    weights_ : ndarray of shape (n_components,)
         Weight of each mixture component.
 
-    means_ : ndarray, shape = (n_components, n_features)
+    means_ : ndarray of shape (n_components, n_features)
         Mean of each mixture component.
 
     covariances_ : ndarray
@@ -125,7 +126,7 @@ class GaussianMixtureOutlierDetector(GaussianMixture, DetectorMixin):
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features)
             Samples.
 
         Returns
@@ -149,12 +150,12 @@ class GaussianMixtureOutlierDetector(GaussianMixture, DetectorMixin):
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features)
             Test samples.
 
         Returns
         -------
-        scores : array-like, shape = (n_samples,)
+        scores : array-like of shape (n_samples,)
             Anomaly scores for test samples.
         """
 

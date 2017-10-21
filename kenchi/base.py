@@ -29,10 +29,10 @@ class DetectorMixin(ABC):
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features)
             Test samples.
 
-        y : array-like, shape = (n_samples,), default None
+        y : array-like of shape (n_samples,), default None
             Targets.
 
         threshold : float, default None
@@ -40,7 +40,7 @@ class DetectorMixin(ABC):
 
         Returns
         -------
-        is_outlier : array-like, shape = (n_samples,)
+        is_outlier : array-like of shape (n_samples,)
             Return 0 for inliers and 1 for outliers.
         """
 
@@ -57,15 +57,15 @@ class DetectorMixin(ABC):
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features)
             Samples.
 
-        y : array-like, shape = (n_samples,), default None
+        y : array-like of shape (n_samples,), default None
             Targets.
 
         Returns
         -------
-        is_outlier : array-like, shape = (n_samples,)
+        is_outlier : array-like of shape (n_samples,)
             Return 0 for inliers and 1 for outliers.
         """
 
@@ -85,18 +85,18 @@ class AnalyzerMixin(ABC):
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features)
             Samples.
 
-        y : array-like, shape = (n_samples,), default None
+        y : array-like of shape (n_samples,), default None
             Targets.
 
-        feature_wise_threshold : ndarray, shape = (n_features,), default None
+        feature_wise_threshold : ndarray of shape (n_features,), default None
             User-provided feature-wise threshold.
 
         Returns
         -------
-        is_outlier : array-like, shape = (n_samples, n_features)
+        is_outlier : array-like of shape (n_samples, n_features)
         """
 
         check_is_fitted(self, 'feature_wise_threshold_')
@@ -114,15 +114,15 @@ class AnalyzerMixin(ABC):
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features)
             Samples.
 
-        y : array-like, shape = (n_samples,), default None
+        y : array-like of shape (n_samples,), default None
             Targets.
 
         Returns
         -------
-        is_outlier : array-like, shape = (n_samples, n_features)
+        is_outlier : array-like of shape (n_samples, n_features)
         """
 
         return self.fit(X, y, **fit_params).analyze(X, y)

@@ -2,7 +2,8 @@ import numpy as np
 from scipy.stats import chi2
 from sklearn.base import BaseEstimator
 from sklearn.preprocessing import Normalizer
-from sklearn.utils.validation import check_array, check_is_fitted
+from sklearn.utils import check_array
+from sklearn.utils.validation import check_is_fitted
 
 from ..base import DetectorMixin
 from ..utils import assign_info_on_pandas_obj, construct_pandas_obj
@@ -21,7 +22,7 @@ class VMFOutlierDetector(BaseEstimator, DetectorMixin):
 
     Attributes
     ----------
-    mean_direction_ : ndarray, shape = (n_features,)
+    mean_direction_ : ndarray of shape (n_features,)
         Mean direction.
 
     threshold_ : float
@@ -50,7 +51,7 @@ class VMFOutlierDetector(BaseEstimator, DetectorMixin):
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features)
             Samples.
 
         Returns
@@ -80,12 +81,12 @@ class VMFOutlierDetector(BaseEstimator, DetectorMixin):
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features)
             Test samples.
 
         Returns
         -------
-        scores : array-like, shape = (n_samples,)
+        scores : array-like of shape (n_samples,)
             Anomaly scores for test samples.
         """
 

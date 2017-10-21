@@ -24,7 +24,7 @@ def assign_info_on_pandas_obj(func):
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features)
             Samples.
 
         *args : tuple
@@ -66,7 +66,7 @@ def construct_pandas_obj(func):
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features), default None
             Test samples.
 
         *args : tuple

@@ -9,6 +9,8 @@ from sklearn.utils.validation import check_is_fitted
 from ..base import DetectorMixin
 from ..utils import assign_info_on_pandas_obj, construct_pandas_obj
 
+__all__ = ['FastABOD']
+
 
 def _abof(fit_X, X, ind):
     """Compute angle-based outlier factors for test samples."""
@@ -104,7 +106,7 @@ class FastABOD(NearestNeighbors, DetectorMixin):
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features)
             Samples.
 
         Returns
@@ -128,12 +130,12 @@ class FastABOD(NearestNeighbors, DetectorMixin):
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features), default None
+        X : array-like of shape (n_samples, n_features), default None
             Test samples.
 
         Returns
         -------
-        foctors : array-like, shape = (n_samples,)
+        foctors : array-like of shape (n_samples,)
             Angle-based outlier factors for test samples.
         """
 
@@ -163,12 +165,12 @@ class FastABOD(NearestNeighbors, DetectorMixin):
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features), default None
+        X : array-like of shape (n_samples, n_features), default None
             Test samples.
 
         Returns
         -------
-        scores : array-like, shape = (n_samples,)
+        scores : array-like of shape (n_samples,)
             anomaly scores for test samples.
         """
 

@@ -1,7 +1,8 @@
 import numpy as np
 from scipy.stats import chi2
 from sklearn.covariance import GraphLasso
-from sklearn.utils.validation import check_array, check_is_fitted
+from sklearn.utils import check_array
+from sklearn.utils.validation import check_is_fitted
 
 from ..base import AnalyzerMixin, DetectorMixin
 from ..utils import assign_info_on_pandas_obj, construct_pandas_obj
@@ -30,16 +31,16 @@ class GaussianOutlierDetector(GraphLasso, AnalyzerMixin, DetectorMixin):
 
     Attributes
     ----------
-    covariance_ : ndarray, shape = (n_features, n_features)
+    covariance_ : ndarray of shape (n_features, n_features)
         Estimated covariance matrix.
 
-    precision_ : ndarray, shape = (n_features, n_features)
+    precision_ : ndarray of shape (n_features, n_features)
         Estimated pseudo inverse matrix.
 
     threshold_ : float
         Threshold.
 
-    feature_wise_threshold_ : ndarray, shape = (n_features,)
+    feature_wise_threshold_ : ndarray of shape (n_features,)
         Feature-wise threshold.
     """
 
@@ -94,7 +95,7 @@ class GaussianOutlierDetector(GraphLasso, AnalyzerMixin, DetectorMixin):
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features)
             Samples.
 
         Returns
@@ -126,12 +127,12 @@ class GaussianOutlierDetector(GraphLasso, AnalyzerMixin, DetectorMixin):
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features)
             Test samples.
 
         Returns
         -------
-        scores : array-like, shape = (n_samples,)
+        scores : array-like of shape (n_samples,)
             Anomaly scores for test samples.
         """
 
@@ -147,12 +148,12 @@ class GaussianOutlierDetector(GraphLasso, AnalyzerMixin, DetectorMixin):
 
         Parameters
         ----------
-        X : array-like, shape = (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features)
             Test samples.
 
         Returns
         -------
-        feature_wise_scores : array-like, shape = (n_samples, n_features)
+        feature_wise_scores : array-like of shape (n_samples, n_features)
             Feature-wise anomaly scores for test samples.
         """
 
