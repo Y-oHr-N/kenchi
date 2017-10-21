@@ -56,39 +56,37 @@ Usage
 
     import matplotlib.pyplot as plt
     import numpy as np
+    from kenchi.datasets import make_blobs_with_outliers
     from kenchi.outlier_detection import GaussianOutlierDetector
 
-    train_size   = 1000
-    test_size    = 100
-    n_outliers   = 10
-    n_features   = 10
-    rnd          = np.random.RandomState(0)
-    mean         = np.zeros(n_features)
-    cov          = np.eye(n_features)
+    train_size       = 1000
+    test_size        = 100
+    n_outliers       = 10
+    n_features       = 10
+    centers          = np.zeros((1, n_features))
+    random_state     = np.random.RandomState(0)
 
     # Generate the training data
-    X_train      = rnd.multivariate_normal(
-        mean     = mean,
-        cov      = cov,
-        size     = train_size
+    X_train, _       = make_blobs_with_outliers(
+        n_inliers    = train_size,
+        n_outliers   = 0,
+        n_features   = n_features,
+        centers      = centers,
+        random_state = random_state
     )
 
     # Generate the test data that contains outliers
-    X_test       = np.concatenate([
-        rnd.multivariate_normal(
-            mean = mean,
-            cov  = cov,
-            size = test_size - n_outliers
-        ),
-        rnd.uniform(
-            low  = -10.0,
-            high = 10.0,
-            size = (n_outliers, n_features)
-        )
-    ])
+    X_test, _        = make_blobs_with_outliers(
+        n_inliers    = test_size - n_outliers,
+        n_outliers   = n_outliers,
+        n_features   = n_features,
+        centers      = centers,
+        shuffle      = False,
+        random_state = random_state
+    )
 
     # Fit the model according to the given training data
-    det          = GaussianOutlierDetector().fit(X_train)
+    det              = GaussianOutlierDetector().fit(X_train)
 
     # Plot anomaly scores for test samples
     det.plot_anomaly_score(X_test)
