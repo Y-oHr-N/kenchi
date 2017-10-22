@@ -6,6 +6,7 @@ Subpackages
 
 .. toctree::
 
+    kenchi.datasets
     kenchi.outlier_detection
     kenchi.utils
 
