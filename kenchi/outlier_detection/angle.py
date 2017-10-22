@@ -15,11 +15,12 @@ __all__ = ['FastABOD']
 def _abof(fit_X, X, ind):
     """Compute angle-based outlier factors for test samples."""
 
-    return np.var([[
-        (ab @ ac) / (ab @ ab) / (ac @ ac) for ab, ac in combinations(
-            fit_X[ind_a] - a, 2
-        )
-    ] for a, ind_a in zip(X, ind)], axis=1)
+    with np.errstate(invalid='raise'):
+        return np.var([[
+            (ab @ ac) / (ab @ ab) / (ac @ ac) for ab, ac in combinations(
+                fit_X[ind_a] - a, 2
+            )
+        ] for a, ind_a in zip(X, ind)], axis=1)
 
 
 class FastABOD(NearestNeighbors, DetectorMixin):
@@ -119,18 +120,18 @@ class FastABOD(NearestNeighbors, DetectorMixin):
 
         super().fit(X)
 
-        scores          = self.anomaly_score()
+        scores          = self.anomaly_score(None)
         self.threshold_ = np.percentile(scores, 100.0 * (1.0 - self.fpr))
 
         return self
 
     @construct_pandas_obj
-    def abof(self, X=None, y=None):
+    def abof(self, X, y=None):
         """Compute angle-based outlier factors for test samples.
 
         Parameters
         ----------
-        X : array-like of shape (n_samples, n_features), default None
+        X : array-like of shape (n_samples, n_features)
             Test samples.
 
         Returns

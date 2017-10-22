@@ -98,18 +98,18 @@ class EmpiricalOutlierDetector(NearestNeighbors, DetectorMixin):
 
         super().fit(X)
 
-        scores          = self.anomaly_score()
+        scores          = self.anomaly_score(None)
         self.threshold_ = np.percentile(scores, 100.0 * (1.0 - self.fpr))
 
         return self
 
     @construct_pandas_obj
-    def anomaly_score(self, X=None, y=None):
+    def anomaly_score(self, X, y=None):
         """Compute anomaly scores for test samples.
 
         Parameters
         ----------
-        X : array-like of shape (n_samples, n_features), default None
+        X : array-like of shape (n_samples, n_features)
             Test samples.
 
         Returns
