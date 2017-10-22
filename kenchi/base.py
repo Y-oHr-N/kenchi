@@ -69,7 +69,11 @@ class DetectorMixin(ABC):
             Return 0 for inliers and 1 for outliers.
         """
 
-        return self.fit(X, y, **fit_params).detect(X, y)
+        if hasattr(self, '_fit_X'):
+            return self.fit(X, y, **fit_params).detect(None, y)
+
+        else:
+            return self.fit(X, y, **fit_params).detect(X, y)
 
 
 class AnalyzerMixin(ABC):
@@ -125,4 +129,8 @@ class AnalyzerMixin(ABC):
         is_outlier : array-like of shape (n_samples, n_features)
         """
 
-        return self.fit(X, y, **fit_params).analyze(X, y)
+        if hasattr(self, '_fit_X'):
+            return self.fit(X, y, **fit_params).analyze(None, y)
+
+        else:
+            return self.fit(X, y, **fit_params).analyze(X, y)
