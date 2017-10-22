@@ -40,5 +40,5 @@ class EmpiricalOutlierDetectorTest(unittest.TestCase):
 
     def test_plot_anomaly_score(self):
         self.assertIsInstance(
-            self.sut.fit(self.X).plot_anomaly_score(self.X), mpl.axes.Axes
+            self.sut.fit(self.X).plot_anomaly_score(None), mpl.axes.Axes
         )

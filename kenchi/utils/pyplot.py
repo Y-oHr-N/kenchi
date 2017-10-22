@@ -52,7 +52,11 @@ def plot_anomaly_score(
     ax : matplotlib Axes
     """
 
-    n_samples, _ = X.shape
+    if X is None:
+        n_samples, _ = det._fit_X.shape
+
+    else:
+        n_samples, _ = X.shape
 
     xlocs        = np.arange(n_samples)
     scores       = det.anomaly_score(X, y)
