@@ -143,20 +143,22 @@ class FastABOD(NearestNeighbors, DetectorMixin):
         check_is_fitted(self, '_fit_method')
 
         if X is None:
-            ind      = self.kneighbors(X, return_distance=False)
             X        = self._fit_X
-
+            ind      = self.kneighbors(None, return_distance=False)
         else:
             X        = check_array(X)
             ind      = self.kneighbors(X, return_distance=False)
 
         n_samples, _ = X.shape
 
-        result       = Parallel(self.n_jobs)(
-            delayed(_abof)(
-                self._fit_X, X[s], ind[s]
-            ) for s in gen_even_slices(n_samples, self.n_jobs)
-        )
+        try:
+            result   = Parallel(self.n_jobs)(
+                delayed(_abof)(
+                    self._fit_X, X[s], ind[s]
+                ) for s in gen_even_slices(n_samples, self.n_jobs)
+            )
+        except FloatingPointError as e:
+            raise ValueError('X must not contain training samples') from e
 
         return np.concatenate(result)
 
