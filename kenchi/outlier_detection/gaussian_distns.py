@@ -122,7 +122,7 @@ class GaussianOutlierDetector(GraphLasso, AnalyzerMixin, DetectorMixin):
         return self
 
     @construct_pandas_obj
-    def anomaly_score(self, X, y=None):
+    def anomaly_score(self, X):
         """Compute anomaly scores for test samples.
 
         Parameters
@@ -143,7 +143,7 @@ class GaussianOutlierDetector(GraphLasso, AnalyzerMixin, DetectorMixin):
         return self.mahalanobis(X)
 
     @construct_pandas_obj
-    def feature_wise_anomaly_score(self, X, y=None):
+    def feature_wise_anomaly_score(self, X):
         """Compute feature-wise anomaly scores for test samples.
 
         Parameters

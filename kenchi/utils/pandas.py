@@ -83,7 +83,6 @@ def construct_pandas_obj(func):
         if hasattr(estimator, 'feature_names_'):
             if X is None:
                 index         = None
-
             else:
                 index         = X.index
 
@@ -92,13 +91,11 @@ def construct_pandas_obj(func):
                     data      = result,
                     index     = index
                 )
-
             else:
                 _, n_features = result.shape
 
                 if estimator.feature_names_.size == n_features:
                     columns   = estimator.feature_names_
-
                 else:
                     columns   = None
 

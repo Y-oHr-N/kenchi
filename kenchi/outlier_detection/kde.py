@@ -98,7 +98,7 @@ class KernelDensityOutlierDetector(KernelDensity, DetectorMixin):
         return self
 
     @construct_pandas_obj
-    def anomaly_score(self, X, y=None):
+    def anomaly_score(self, X):
         """Compute anomaly scores for test samples.
 
         Parameters

@@ -29,7 +29,8 @@ def make_blobs_with_outliers(
         Standard deviation of the clusters.
 
     center_box : pair of floats (min, max), default (-10.0, 10.0)
-        Bounding box for each cluster center when centers are generated at random.
+        Bounding box for each cluster center when centers are generated at
+        random.
 
     shuffle : boolean, default True
         If True, shuffle samples.
@@ -43,7 +44,7 @@ def make_blobs_with_outliers(
     X : ndarray of shape (n_inliers + n_outliers, n_features)
         Generated samples.
 
-    is_outlier : ndarray of shape (n_inliers + n_outliers,)
+    y : ndarray of shape (n_inliers + n_outliers,)
         Return 0 for inliers and 1 for outliers.
     """
 
@@ -66,7 +67,7 @@ def make_blobs_with_outliers(
 
     X                = np.concatenate([X_inliers, X_outliers])
 
-    is_outlier       = np.concatenate([
+    y                = np.concatenate([
         np.zeros(n_inliers), np.ones(n_outliers)
     ])
 
@@ -76,6 +77,6 @@ def make_blobs_with_outliers(
         generator.shuffle(indices)
 
         X            = X[indices]
-        is_outlier   = is_outlier[indices]
+        y            = y[indices]
 
-    return X, is_outlier
+    return X, y

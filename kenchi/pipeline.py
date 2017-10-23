@@ -65,7 +65,7 @@ class ExtendedPipeline(Pipeline):
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features)
-            Samples.
+            Test samples.
 
         Returns
         -------
@@ -104,7 +104,7 @@ class ExtendedPipeline(Pipeline):
 
     @if_delegate_has_method(delegate='_final_estimator')
     @construct_pandas_obj
-    def anomaly_score(self, X, y=None):
+    def anomaly_score(self, X):
         """Apply transforms, and compute anomaly scores for test samples with
         the final estimator.
 
@@ -112,9 +112,6 @@ class ExtendedPipeline(Pipeline):
         ----------
         X : array-like of shape (n_samples, n_features)
             Test samples.
-
-        y : array-like of shape (n_samples,), default None
-            Targets.
 
         Returns
         -------
@@ -128,11 +125,11 @@ class ExtendedPipeline(Pipeline):
             if transform is not None:
                 Xt = transform.transform(Xt)
 
-        return self._final_estimator.anomaly_score(Xt, y)
+        return self._final_estimator.anomaly_score(Xt)
 
     @if_delegate_has_method(delegate='_final_estimator')
     @construct_pandas_obj
-    def detect(self, X, y=None, threshold=None):
+    def detect(self, X, threshold=None):
         """Apply transforms, and detect if a particular sample is an outlier or
         not.
 
@@ -141,15 +138,12 @@ class ExtendedPipeline(Pipeline):
         X : array-like of shape (n_samples, n_features)
             Test samples.
 
-        y : array-like of shape (n_samples,), default None
-            Targets.
-
         threshold : float, default None
             User-provided threshold.
 
         Returns
         -------
-        is_outlier : array-like of shape (n_samples,)
+        y_pred : array-like of shape (n_samples,)
             Return 0 for inliers and 1 for outliers.
         """
 
@@ -162,7 +156,7 @@ class ExtendedPipeline(Pipeline):
         if threshold is None:
             threshold  = self._final_estimator.threshold_
 
-        return self._final_estimator.detect(Xt, y, threshold)
+        return self._final_estimator.detect(Xt, threshold)
 
     @if_delegate_has_method(delegate='_final_estimator')
     @construct_pandas_obj
@@ -175,9 +169,6 @@ class ExtendedPipeline(Pipeline):
         X : array-like of shape (n_samples, n_features)
             Samples.
 
-        y : array-like of shape (n_samples,), default None
-            Targets.
-
         **fit_params : dict of str -> object
             Parameters passed to the ``fit`` method of each step, where
             each parameter name is prefixed such that parameter ``p`` for step
@@ -185,17 +176,17 @@ class ExtendedPipeline(Pipeline):
 
         Returns
         -------
-        is_outlier : array-like of shape (n_samples,)
+        y_pred : array-like of shape (n_samples,)
             Return 0 for inliers and 1 for outliers.
         """
 
-        Xt, fit_params = self._fit(X, y, **fit_params)
+        Xt, fit_params = self._fit(X, **fit_params)
 
-        return self._final_estimator.fit_detect(Xt, y, **fit_params)
+        return self._final_estimator.fit_detect(Xt, **fit_params)
 
     @if_delegate_has_method(delegate='_final_estimator')
     @construct_pandas_obj
-    def feature_wise_anomaly_score(self, X, y=None):
+    def feature_wise_anomaly_score(self, X):
         """Apply transforms, and compute feature-wise anomaly scores for test
         samples with the final estimator.
 
@@ -203,9 +194,6 @@ class ExtendedPipeline(Pipeline):
         ----------
         X : array-like of shape (n_samples, n_features)
             Test samples.
-
-        y : array-like of shape (n_samples,), default None
-            Targets.
 
         Returns
         -------
@@ -219,11 +207,11 @@ class ExtendedPipeline(Pipeline):
             if transform is not None:
                 Xt = transform.transform(Xt)
 
-        return self._final_estimator.feature_wise_anomaly_score(Xt, y)
+        return self._final_estimator.feature_wise_anomaly_score(Xt)
 
     @if_delegate_has_method(delegate='_final_estimator')
     @construct_pandas_obj
-    def analyze(self, X, y=None, feature_wise_threshold=None):
+    def analyze(self, X, feature_wise_threshold=None):
         """Apply transforms, and analyze which features contribute to anomalies.
 
         Parameters
@@ -231,15 +219,12 @@ class ExtendedPipeline(Pipeline):
         X : array-like of shape (n_samples, n_features)
             Test samples.
 
-        y : array-like of shape (n_samples,), default None
-            Targets.
-
         feature_wise_threshold : ndarray of shape (n_features,), default None
             User-provided feature-wise threshold.
 
         Returns
         -------
-        is_outlier : array-like of shape (n_samples, n_features)
+        y_pred : array-like of shape (n_samples, n_features)
         """
 
         Xt                         = X
@@ -252,7 +237,7 @@ class ExtendedPipeline(Pipeline):
             feature_wise_threshold = \
                 self._final_estimator.feature_wise_threshold_
 
-        return self._final_estimator.analyze(Xt, y, feature_wise_threshold)
+        return self._final_estimator.analyze(Xt, feature_wise_threshold)
 
     @if_delegate_has_method(delegate='_final_estimator')
     @construct_pandas_obj
@@ -265,9 +250,6 @@ class ExtendedPipeline(Pipeline):
         X : array-like of shape (n_samples, n_features)
             Samples.
 
-        y : array-like of shape (n_samples,), default None
-            Targets.
-
         **fit_params : dict of str -> object
             Parameters passed to the ``fit`` method of each step, where
             each parameter name is prefixed such that parameter ``p`` for step
@@ -275,21 +257,20 @@ class ExtendedPipeline(Pipeline):
 
         Returns
         -------
-        is_outlier : array-like of shape (n_samples, n_features)
+        y_pred : array-like of shape (n_samples, n_features)
         """
 
-        Xt, fit_params = self._fit(X, y, **fit_params)
+        Xt, fit_params = self._fit(X, **fit_params)
 
-        return self._final_estimator.fit_analyze(Xt, y, **fit_params)
+        return self._final_estimator.fit_analyze(Xt, **fit_params)
 
     @if_delegate_has_method(delegate='_final_estimator')
     def plot_anomaly_score(
         self,             X,
-        y=None,           ax=None,
+        ax=None,          title=None,
         xlim=None,        ylim=None,
         xlabel='Samples', ylabel='Anomaly score',
-        title=None,       grid=True,
-        **kwargs
+        grid=True,        **kwargs
     ):
         """Apply transoforms, and plot anomaly scores for test samples.
 
@@ -301,11 +282,11 @@ class ExtendedPipeline(Pipeline):
         X : array-like of shape (n_samples, n_features)
             Test samples.
 
-        y : array-like of shape (n_samples,), default None
-            Targets.
-
         ax : matplotlib Axes, default None
             Target axes instance.
+
+        title : str, default None
+            Axes title. To disable, pass None.
 
         xlim : tuple, default None
             Tuple passed to ax.xlim().
@@ -318,9 +299,6 @@ class ExtendedPipeline(Pipeline):
 
         ylabel : str, default 'Anomaly score'
             Y axis title label. To disable, pass None.
-
-        title : str, default None
-            Axes title. To disable, pass None.
 
         grid : boolean, default True
             If True, turn the axes grids on.
@@ -340,5 +318,5 @@ class ExtendedPipeline(Pipeline):
                 Xt = transform.transform(Xt)
 
         return self._final_estimator.plot_anomaly_score(
-            Xt, y, ax, xlim, ylim, xlabel, ylabel, title, grid, **kwargs
+            Xt, ax, title, xlim, ylim, xlabel, ylabel, grid, **kwargs
         )

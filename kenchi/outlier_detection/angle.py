@@ -126,7 +126,7 @@ class FastABOD(NearestNeighbors, DetectorMixin):
         return self
 
     @construct_pandas_obj
-    def abof(self, X, y=None):
+    def abof(self, X):
         """Compute angle-based outlier factors for test samples.
 
         Parameters
@@ -163,12 +163,12 @@ class FastABOD(NearestNeighbors, DetectorMixin):
         return np.concatenate(result)
 
     @construct_pandas_obj
-    def anomaly_score(self, X=None, y=None):
+    def anomaly_score(self, X):
         """Compute anomaly scores for test samples.
 
         Parameters
         ----------
-        X : array-like of shape (n_samples, n_features), default None
+        X : array-like of shape (n_samples, n_features)
             Test samples.
 
         Returns

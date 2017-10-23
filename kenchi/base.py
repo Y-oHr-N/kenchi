@@ -20,11 +20,11 @@ class DetectorMixin(ABC):
         """Fit the model according to the given training data."""
 
     @abstractmethod
-    def anomaly_score(self, X, y=None):
+    def anomaly_score(self, X):
         """Compute anomaly scores for test samples."""
 
     @construct_pandas_obj
-    def detect(self, X, y=None, threshold=None):
+    def detect(self, X, threshold=None):
         """Detect if a particular sample is an outlier or not.
 
         Parameters
@@ -32,15 +32,12 @@ class DetectorMixin(ABC):
         X : array-like of shape (n_samples, n_features)
             Test samples.
 
-        y : array-like of shape (n_samples,), default None
-            Targets.
-
         threshold : float, default None
             User-provided threshold.
 
         Returns
         -------
-        is_outlier : array-like of shape (n_samples,)
+        y_pred : array-like of shape (n_samples,)
             Return 0 for inliers and 1 for outliers.
         """
 
@@ -49,7 +46,7 @@ class DetectorMixin(ABC):
         if threshold is None:
             threshold = self.threshold_
 
-        return (self.anomaly_score(X, y) > threshold).astype(np.int32)
+        return (self.anomaly_score(X) > threshold).astype(np.int32)
 
     def fit_detect(self, X, y=None, **fit_params):
         """Fit the model according to the given training data and detect if a
@@ -60,31 +57,27 @@ class DetectorMixin(ABC):
         X : array-like of shape (n_samples, n_features)
             Samples.
 
-        y : array-like of shape (n_samples,), default None
-            Targets.
-
         Returns
         -------
-        is_outlier : array-like of shape (n_samples,)
+        y_pred : array-like of shape (n_samples,)
             Return 0 for inliers and 1 for outliers.
         """
 
         if hasattr(self, '_fit_X'):
-            return self.fit(X, y, **fit_params).detect(None, y)
-
+            return self.fit(X, **fit_params).detect(None)
         else:
-            return self.fit(X, y, **fit_params).detect(X, y)
+            return self.fit(X, **fit_params).detect(X)
 
 
 class AnalyzerMixin(ABC):
     """Mixin class for all analyzers."""
 
     @abstractmethod
-    def feature_wise_anomaly_score(self, X, y=None):
+    def feature_wise_anomaly_score(self, X):
         """Compute feature-wise anomaly scores for test samples."""
 
     @construct_pandas_obj
-    def analyze(self, X, y=None, feature_wise_threshold=None):
+    def analyze(self, X, feature_wise_threshold=None):
         """Analyze which features contribute to anomalies.
 
         Parameters
@@ -92,15 +85,12 @@ class AnalyzerMixin(ABC):
         X : array-like of shape (n_samples, n_features)
             Samples.
 
-        y : array-like of shape (n_samples,), default None
-            Targets.
-
         feature_wise_threshold : ndarray of shape (n_features,), default None
             User-provided feature-wise threshold.
 
         Returns
         -------
-        is_outlier : array-like of shape (n_samples, n_features)
+        y_pred : array-like of shape (n_samples, n_features)
         """
 
         check_is_fitted(self, 'feature_wise_threshold_')
@@ -109,7 +99,7 @@ class AnalyzerMixin(ABC):
             feature_wise_threshold = self.feature_wise_threshold_
 
         return (
-            self.feature_wise_anomaly_score(X, y) > feature_wise_threshold
+            self.feature_wise_anomaly_score(X) > feature_wise_threshold
         ).astype(np.int32)
 
     def fit_analyze(self, X, y=None, **fit_params):
@@ -121,16 +111,12 @@ class AnalyzerMixin(ABC):
         X : array-like of shape (n_samples, n_features)
             Samples.
 
-        y : array-like of shape (n_samples,), default None
-            Targets.
-
         Returns
         -------
-        is_outlier : array-like of shape (n_samples, n_features)
+        y_pred : array-like of shape (n_samples, n_features)
         """
 
         if hasattr(self, '_fit_X'):
-            return self.fit(X, y, **fit_params).analyze(None, y)
-
+            return self.fit(X, **fit_params).analyze(None)
         else:
-            return self.fit(X, y, **fit_params).analyze(X, y)
+            return self.fit(X, **fit_params).analyze(X)

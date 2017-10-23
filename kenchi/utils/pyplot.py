@@ -4,11 +4,10 @@ import numpy as np
 
 def plot_anomaly_score(
     det,              X,
-    y=None,           ax=None,
+    ax=None,          title=None,
     xlim=None,        ylim=None,
     xlabel='Samples', ylabel='Anomaly score',
-    title=None,       grid=True,
-    **kwargs
+    grid=True,        **kwargs
 ):
     """Plot anomaly scores for test samples.
 
@@ -20,11 +19,11 @@ def plot_anomaly_score(
     X : array-like of shape (n_samples, n_features)
         Test samples.
 
-    y : array-like of shape (n_samples,), default None
-        Targets.
-
     ax : matplotlib Axes, default None
         Target axes instance.
+
+    title : string, default None
+        Axes title. To disable, pass None.
 
     xlim : tuple, default None
         Tuple passed to ax.xlim().
@@ -37,9 +36,6 @@ def plot_anomaly_score(
 
     ylabel : string, default 'Anomaly score'
         Y axis title label. To disable, pass None.
-
-    title : string, default None
-        Axes title. To disable, pass None.
 
     grid : boolean, default True
         If True, turn the axes grids on.
@@ -54,14 +50,13 @@ def plot_anomaly_score(
 
     if X is None:
         n_samples, _ = det._fit_X.shape
-
     else:
         n_samples, _ = X.shape
 
     xlocs        = np.arange(n_samples)
-    scores       = det.anomaly_score(X, y)
+    scores       = det.anomaly_score(X)
     color        = np.where(
-        det.detect(X, y).astype(np.bool), '#ff2800', '#0041ff'
+        det.detect(X).astype(np.bool), '#ff2800', '#0041ff'
     )
 
     if ax is None:
