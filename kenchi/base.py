@@ -9,6 +9,9 @@ from .utils import construct_pandas_obj, plot_anomaly_score
 class DetectorMixin(ABC):
     """Mixin class for all detectors."""
 
+    # TODO: Implement score method
+    # TODO: Implement plot_roc_curve method
+
     plot_anomaly_score = plot_anomaly_score
 
     @abstractmethod

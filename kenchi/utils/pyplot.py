@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+# TODO: Implement plot_roc_curve function
+
 
 def plot_anomaly_score(
     estimator,        X,

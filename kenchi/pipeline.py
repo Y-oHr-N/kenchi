@@ -31,6 +31,8 @@ class ExtendedPipeline(Pipeline):
         Keys are step names and values are steps parameters.
     """
 
+    # TODO: Implement plot_roc_curve method
+
     @if_delegate_has_method(delegate='_final_estimator')
     @assign_info_on_pandas_obj
     def fit(self, X, y=None, **fit_params):
