@@ -105,8 +105,8 @@ class KMeansOutlierDetector(KMeans, DetectorMixin):
 
         super().fit(X)
 
-        scores          = self.anomaly_score(X)
-        self.threshold_ = np.percentile(scores, 100.0 * (1.0 - self.fpr))
+        y_score         = self.anomaly_score(X)
+        self.threshold_ = np.percentile(y_score, 100.0 * (1.0 - self.fpr))
 
         return self
 
@@ -121,7 +121,7 @@ class KMeansOutlierDetector(KMeans, DetectorMixin):
 
         Returns
         -------
-        scores : array-like of shape (n_samples,)
+        y_score : array-like of shape (n_samples,)
             anomaly scores for test samples.
         """
 

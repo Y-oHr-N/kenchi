@@ -24,6 +24,9 @@ def assign_info_on_pandas_obj(func):
 
         Parameters
         ----------
+        estimator : estimator
+            Estimator.
+
         X : array-like of shape (n_samples, n_features)
             Samples.
 
@@ -66,6 +69,9 @@ def construct_pandas_obj(func):
 
         Parameters
         ----------
+        estimator : estimator
+            Estimator.
+
         X : array-like of shape (n_samples, n_features), default None
             Test samples.
 

@@ -70,7 +70,6 @@ class ExtendedPipeline(Pipeline):
         Returns
         -------
         y_pred : array-like of shape (n_samples,)
-            Labels for test samples.
         """
 
         return super().predict(X)
@@ -97,7 +96,6 @@ class ExtendedPipeline(Pipeline):
         Returns
         -------
         y_pred : array-like of shape (n_samples,)
-            Labels for test samples.
         """
 
         return super().fit_predict(X, y, **fit_params)
@@ -115,7 +113,7 @@ class ExtendedPipeline(Pipeline):
 
         Returns
         -------
-        scores : array-like of shape (n_samples,)
+        y_score : array-like of shape (n_samples,)
             Anomaly scores for test samples.
         """
 
@@ -197,7 +195,7 @@ class ExtendedPipeline(Pipeline):
 
         Returns
         -------
-        feature_wise_scores : array-like of shape (n_samples, n_features)
+        y_score : array-like of shape (n_samples, n_features)
             Feature-wise anomaly scores for test samples.
         """
 
@@ -318,5 +316,5 @@ class ExtendedPipeline(Pipeline):
                 Xt = transform.transform(Xt)
 
         return self._final_estimator.plot_anomaly_score(
-            Xt, ax, title, xlim, ylim, xlabel, ylabel, grid, **kwargs
+            Xt, ax, grid, xlim, ylim, xlabel, ylabel, title, **kwargs
         )

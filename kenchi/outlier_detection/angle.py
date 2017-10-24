@@ -120,8 +120,8 @@ class FastABOD(NearestNeighbors, DetectorMixin):
 
         super().fit(X)
 
-        scores          = self.anomaly_score(None)
-        self.threshold_ = np.percentile(scores, 100.0 * (1.0 - self.fpr))
+        y_score         = self.anomaly_score(None)
+        self.threshold_ = np.percentile(y_score, 100.0 * (1.0 - self.fpr))
 
         return self
 
@@ -136,7 +136,7 @@ class FastABOD(NearestNeighbors, DetectorMixin):
 
         Returns
         -------
-        foctors : array-like of shape (n_samples,)
+        foctor : array-like of shape (n_samples,)
             Angle-based outlier factors for test samples.
         """
 
@@ -173,7 +173,7 @@ class FastABOD(NearestNeighbors, DetectorMixin):
 
         Returns
         -------
-        scores : array-like of shape (n_samples,)
+        y_score : array-like of shape (n_samples,)
             anomaly scores for test samples.
         """
 
