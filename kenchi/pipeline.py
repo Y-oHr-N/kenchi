@@ -267,26 +267,23 @@ class ExtendedPipeline(Pipeline):
     @if_delegate_has_method(delegate='_final_estimator')
     def plot_anomaly_score(
         self,             X,
-        ax=None,          title=None,
+        ax=None,          grid=True,
         xlim=None,        ylim=None,
         xlabel='Samples', ylabel='Anomaly score',
-        grid=True,        **kwargs
+        title=None,       **kwargs
     ):
         """Apply transoforms, and plot anomaly scores for test samples.
 
         Parameters
         ----------
-        det : detector
-            Detector.
-
         X : array-like of shape (n_samples, n_features)
             Test samples.
 
         ax : matplotlib Axes, default None
             Target axes instance.
 
-        title : str, default None
-            Axes title. To disable, pass None.
+        grid : boolean, default True
+            If True, turn the axes grids on.
 
         xlim : tuple, default None
             Tuple passed to ax.xlim().
@@ -300,8 +297,8 @@ class ExtendedPipeline(Pipeline):
         ylabel : str, default 'Anomaly score'
             Y axis title label. To disable, pass None.
 
-        grid : boolean, default True
-            If True, turn the axes grids on.
+        title : str, default None
+            Axes title. To disable, pass None.
 
         **kwargs : dict
             Other keywords passed to ax.bar().

@@ -5,7 +5,7 @@ import numpy as np
 
 
 def plot_anomaly_score(
-    estimator,        X,
+    detector,         X,
     ax=None,          grid=True,
     xlim=None,        ylim=None,
     xlabel='Samples', ylabel='Anomaly score',
@@ -15,7 +15,7 @@ def plot_anomaly_score(
 
     Parameters
     ----------
-    estimator : detector
+    detector : detector
         Detector.
 
     X : array-like of shape (n_samples, n_features)
@@ -51,24 +51,24 @@ def plot_anomaly_score(
     """
 
     if X is None:
-        n_samples, _ = estimator._fit_X.shape
+        n_samples, _ = detector._fit_X.shape
     else:
         n_samples, _ = X.shape
 
-    xlocs        = np.arange(n_samples)
-    y_score      = estimator.anomaly_score(X)
-    color        = np.where(
-        estimator.detect(X).astype(np.bool), '#ff2800', '#0041ff'
+    xlocs            = np.arange(n_samples)
+    y_score          = detector.anomaly_score(X)
+    color            = np.where(
+        detector.detect(X).astype(np.bool), '#ff2800', '#0041ff'
     )
 
     if ax is None:
-        _, ax    = plt.subplots(1, 1)
+        _, ax        = plt.subplots(1, 1)
 
     if xlim is None:
-        xlim     = (-1, n_samples)
+        xlim         = (-1, n_samples)
 
     if ylim is None:
-        ylim     = (0, 1.1 * max(max(y_score), estimator.threshold_))
+        ylim         = (0, 1.1 * max(max(y_score), detector.threshold_))
 
     if title is not None:
         ax.set_title(title)
@@ -83,6 +83,6 @@ def plot_anomaly_score(
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
     ax.bar(xlocs, y_score, align='center', color=color, **kwargs)
-    ax.hlines(estimator.threshold_, *xlim)
+    ax.hlines(detector.threshold_, *xlim)
 
     return ax
