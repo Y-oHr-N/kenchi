@@ -1,27 +1,20 @@
 import unittest
 
-import matplotlib as mpl
 import numpy as np
 import pandas as pd
 from sklearn.exceptions import NotFittedError
 from sklearn.preprocessing import StandardScaler
 
+from kenchi.datasets import make_blobs_with_outliers
 from kenchi.outlier_detection import GaussianOutlierDetector
 from kenchi.pipeline import ExtendedPipeline
 
 
 class ExtendedPipelineTest(unittest.TestCase):
     def setUp(self):
-        n_samples  = 100
-        n_features = 10
-        rnd        = np.random.RandomState(0)
-        self.X     = rnd.multivariate_normal(
-            mean   = np.zeros(n_features),
-            cov    = np.eye(n_features),
-            size   = n_samples
-        )
-        self.df    = pd.DataFrame(self.X)
-        self.sut   = ExtendedPipeline([
+        self.X, _ = make_blobs_with_outliers(n_outliers=0)
+        self.df   = pd.DataFrame(self.X)
+        self.sut  = ExtendedPipeline([
             ('standardize', StandardScaler()),
             ('detect',      GaussianOutlierDetector(assume_centered=True))
         ])
@@ -56,8 +49,3 @@ class ExtendedPipelineTest(unittest.TestCase):
     def test_analyze_notfitted(self):
         with self.assertRaises(NotFittedError):
             self.sut.analyze(self.X)
-
-    def test_plot_anomaly_score(self):
-        self.assertIsInstance(
-            self.sut.fit(self.X).plot_anomaly_score(self.X), mpl.axes.Axes
-        )

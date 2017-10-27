@@ -1,25 +1,18 @@
 import unittest
 
-import matplotlib as mpl
 import numpy as np
 import pandas as pd
 from sklearn.exceptions import NotFittedError
 
+from kenchi.datasets import make_blobs_with_outliers
 from kenchi.outlier_detection import VMFOutlierDetector
 
 
 class VMFOutlierDetectorTest(unittest.TestCase):
     def setUp(self):
-        n_samples  = 100
-        n_features = 10
-        rnd        = np.random.RandomState(0)
-        self.X     = rnd.multivariate_normal(
-            mean   = np.zeros(n_features),
-            cov    = np.eye(n_features),
-            size   = n_samples
-        )
-        self.df    = pd.DataFrame(self.X)
-        self.sut   = VMFOutlierDetector()
+        self.X, _ = make_blobs_with_outliers(n_outliers=0)
+        self.df   = pd.DataFrame(self.X)
+        self.sut  = VMFOutlierDetector()
 
     def test_fit(self):
         self.assertIsInstance(self.sut.fit(self.X), VMFOutlierDetector)
@@ -37,8 +30,3 @@ class VMFOutlierDetectorTest(unittest.TestCase):
     def test_detect_notfitted(self):
         with self.assertRaises(NotFittedError):
             self.sut.detect(self.X)
-
-    def test_plot_anomaly_score(self):
-        self.assertIsInstance(
-            self.sut.fit(self.X).plot_anomaly_score(self.X), mpl.axes.Axes
-        )
