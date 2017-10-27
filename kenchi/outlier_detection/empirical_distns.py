@@ -121,16 +121,17 @@ class EmpiricalOutlierDetector(NearestNeighbors, DetectorMixin):
         check_is_fitted(self, '_fit_method')
 
         if X is None:
-            _, n_features = self._fit_X.shape
+            X         = self._fit_X
+            dist, _   = self.kneighbors(None)
         else:
-            X             = check_array(X)
-            _, n_features = X.shape
+            X         = check_array(X)
+            dist, _   = self.kneighbors(X)
 
-        dist, _           = self.kneighbors(X)
+        _, n_features = X.shape
 
         if np.any(dist == 0.0):
             raise ValueError('X must not contain training samples')
 
-        radius            = np.max(dist, axis=1)
+        radius        = np.max(dist, axis=1)
 
         return -np.log(self.n_neighbors) + n_features * np.log(radius)
