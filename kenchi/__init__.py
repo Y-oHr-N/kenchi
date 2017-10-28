@@ -3,7 +3,7 @@ from . import datasets
 from . import outlier_detection
 from . import pipeline
 
-__version__ = '0.5.0'
+__version__ = '0.6.0'
 
 __all__     = [
     'base',
