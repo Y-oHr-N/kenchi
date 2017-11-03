@@ -42,6 +42,12 @@ class GaussianOutlierDetector(GraphLasso, AnalyzerMixin, DetectorMixin):
 
     feature_wise_threshold_ : ndarray of shape (n_features,)
         Feature-wise threshold.
+
+    References
+    ----------
+    T. Ide, C. Lozano, N. Abe and Y. Liu,
+    "Proximity-based anomaly detection using sparse structure learning,"
+    In Proceedings of SDM'09, pp. 97 - 108, 2009.
     """
 
     def __init__(
