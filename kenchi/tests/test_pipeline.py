@@ -6,7 +6,7 @@ from sklearn.exceptions import NotFittedError
 from sklearn.preprocessing import StandardScaler
 
 from kenchi.datasets import make_blobs_with_outliers
-from kenchi.outlier_detection import GaussianOutlierDetector
+from kenchi.outlier_detection.statistical import GaussianOutlierDetector
 from kenchi.pipeline import ExtendedPipeline
 
 

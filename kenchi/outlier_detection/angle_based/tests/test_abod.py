@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.exceptions import NotFittedError
 
 from kenchi.datasets import make_blobs_with_outliers
-from kenchi.outlier_detection import FastABOD
+from kenchi.outlier_detection.angle_based import FastABOD
 
 
 class FastABODTest(unittest.TestCase):

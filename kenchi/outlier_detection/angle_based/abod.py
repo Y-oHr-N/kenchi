@@ -1,14 +1,30 @@
+from itertools import combinations
+
 import numpy as np
+from sklearn.externals.joblib import Parallel, delayed
 from sklearn.neighbors import NearestNeighbors
-from sklearn.utils import check_array
+from sklearn.utils import check_array, gen_even_slices
 from sklearn.utils.validation import check_is_fitted
 
-from ..base import DetectorMixin
-from ..utils import assign_info_on_pandas_obj, construct_pandas_obj
+from ...base import DetectorMixin
+from ...utils import assign_info_on_pandas_obj, construct_pandas_obj
+
+__all__ = ['FastABOD']
 
 
-class EmpiricalOutlierDetector(NearestNeighbors, DetectorMixin):
-    """Outlier detector using k-nearest neighbors algorithm.
+def _abof(fit_X, X, ind):
+    """Compute angle-based outlier factors for test samples."""
+
+    with np.errstate(invalid='raise'):
+        return np.var([[
+            (ab @ ac) / (ab @ ab) / (ac @ ac) for ab, ac in combinations(
+                fit_X[ind_a] - a, 2
+            )
+        ] for a, ind_a in zip(X, ind)], axis=1)
+
+
+class FastABOD(NearestNeighbors, DetectorMixin):
+    """Fast angle-based outlier detector.
 
     Parameters
     ----------
@@ -35,6 +51,12 @@ class EmpiricalOutlierDetector(NearestNeighbors, DetectorMixin):
     ----------
     threshold_ : float
         Threshold.
+
+    References
+    ----------
+    H.P. Kriegel, M. Schubert and A. Zimek,
+    "Angle-based outlier detection in high-dimensional data,"
+    In Proceedings of KDD'08, pp. 444 - 452, 2008.
     """
 
     def __init__(
@@ -65,16 +87,16 @@ class EmpiricalOutlierDetector(NearestNeighbors, DetectorMixin):
                 )
             )
 
-        if self.n_neighbors <= 0:
+        if self.n_neighbors <= 1:
             raise ValueError(
-                'n_neighbors must be positive but was {0}'.format(
+                'n_neighbors must be greator than 1 but was {0}'.format(
                     self.n_neighbors
                 )
             )
 
         if self.p < 1:
             raise ValueError(
-                'p must be greater than or equeal to 1 but was {0}'.format(
+                'p must be greater than or equal to 1 but was {0}'.format(
                     self.p
                 )
             )
@@ -104,6 +126,43 @@ class EmpiricalOutlierDetector(NearestNeighbors, DetectorMixin):
         return self
 
     @construct_pandas_obj
+    def abof(self, X):
+        """Compute angle-based outlier factors for test samples.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Test samples.
+
+        Returns
+        -------
+        foctor : array-like of shape (n_samples,)
+            Angle-based outlier factors for test samples.
+        """
+
+        check_is_fitted(self, '_fit_method')
+
+        if X is None:
+            X        = self._fit_X
+            ind      = self.kneighbors(None, return_distance=False)
+        else:
+            X        = check_array(X)
+            ind      = self.kneighbors(X, return_distance=False)
+
+        n_samples, _ = X.shape
+
+        try:
+            result   = Parallel(self.n_jobs)(
+                delayed(_abof)(
+                    self._fit_X, X[s], ind[s]
+                ) for s in gen_even_slices(n_samples, self.n_jobs)
+            )
+        except FloatingPointError as e:
+            raise ValueError('X must not contain training samples') from e
+
+        return np.concatenate(result)
+
+    @construct_pandas_obj
     def anomaly_score(self, X):
         """Compute anomaly scores for test samples.
 
@@ -118,20 +177,4 @@ class EmpiricalOutlierDetector(NearestNeighbors, DetectorMixin):
             anomaly scores for test samples.
         """
 
-        check_is_fitted(self, '_fit_method')
-
-        if X is None:
-            X         = self._fit_X
-            dist, _   = self.kneighbors(None)
-        else:
-            X         = check_array(X)
-            dist, _   = self.kneighbors(X)
-
-        _, n_features = X.shape
-
-        if np.any(dist == 0.0):
-            raise ValueError('X must not contain training samples')
-
-        radius        = np.max(dist, axis=1)
-
-        return -np.log(self.n_neighbors) + n_features * np.log(radius)
+        return -self.abof(X)

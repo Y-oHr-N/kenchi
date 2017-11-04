@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.exceptions import NotFittedError
 
 from kenchi.datasets import make_blobs_with_outliers
-from kenchi.outlier_detection import KMeansOutlierDetector
+from kenchi.outlier_detection.distance_based import KMeansOutlierDetector
 
 
 class KMeansOutlierDetectorTest(unittest.TestCase):

@@ -3,8 +3,8 @@ from sklearn.mixture import GaussianMixture
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
-from ..base import DetectorMixin
-from ..utils import assign_info_on_pandas_obj, construct_pandas_obj
+from ...base import DetectorMixin
+from ...utils import assign_info_on_pandas_obj, construct_pandas_obj
 
 VALID_COVARIANCE_TYPES = ['full', 'tied', 'diag', 'spherical']
 

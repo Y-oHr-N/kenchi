@@ -4,8 +4,8 @@ from sklearn.covariance import GraphLasso
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
-from ..base import AnalyzerMixin, DetectorMixin
-from ..utils import assign_info_on_pandas_obj, construct_pandas_obj
+from ...base import AnalyzerMixin, DetectorMixin
+from ...utils import assign_info_on_pandas_obj, construct_pandas_obj
 
 
 class GaussianOutlierDetector(GraphLasso, AnalyzerMixin, DetectorMixin):

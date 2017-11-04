@@ -5,18 +5,18 @@ import pandas as pd
 from sklearn.exceptions import NotFittedError
 
 from kenchi.datasets import make_blobs_with_outliers
-from kenchi.outlier_detection import KernelDensityOutlierDetector
+from kenchi.outlier_detection.statistical import GaussianMixtureOutlierDetector
 
 
-class KernelDensityOutlierDetectorTest(unittest.TestCase):
+class GaussianMixtureOutlierDetectorTest(unittest.TestCase):
     def setUp(self):
         self.X, _ = make_blobs_with_outliers(n_outliers=0)
         self.df   = pd.DataFrame(self.X)
-        self.sut  = KernelDensityOutlierDetector()
+        self.sut  = GaussianMixtureOutlierDetector()
 
     def test_fit(self):
         self.assertIsInstance(
-            self.sut.fit(self.X), KernelDensityOutlierDetector
+            self.sut.fit(self.X), GaussianMixtureOutlierDetector
         )
 
     def test_fit_detect_ndarray(self):

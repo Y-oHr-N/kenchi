@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.exceptions import NotFittedError
 
 from kenchi.datasets import make_blobs_with_outliers
-from kenchi.outlier_detection import GaussianOutlierDetector
+from kenchi.outlier_detection.statistical import GaussianOutlierDetector
 
 
 class GaussianOutlierDetectorTest(unittest.TestCase):
