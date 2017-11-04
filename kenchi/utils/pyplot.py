@@ -1,7 +1,5 @@
-import matplotlib.pyplot as plt
 import numpy as np
-
-# TODO: Implement plot_roc_curve function
+from sklearn.metrics import auc, roc_curve
 
 
 def plot_anomaly_score(
@@ -42,13 +40,15 @@ def plot_anomaly_score(
     title : string, default None
         Axes title. To disable, pass None.
 
-    **kwargs : dictionary
+    **kwargs : dict
         Other keywords passed to ax.bar().
 
     Returns
     -------
     ax : matplotlib Axes
     """
+
+    import matplotlib.pyplot as plt
 
     if X is None:
         n_samples, _ = detector._fit_X.shape
@@ -57,9 +57,8 @@ def plot_anomaly_score(
 
     xlocs            = np.arange(n_samples)
     y_score          = detector.anomaly_score(X)
-    color            = np.where(
-        detector.detect(X).astype(np.bool), '#ff2800', '#0041ff'
-    )
+
+    align            = 'center'
 
     if ax is None:
         _, ax        = plt.subplots(1, 1)
@@ -79,10 +78,69 @@ def plot_anomaly_score(
     if ylabel is not None:
         ax.set_ylabel(ylabel)
 
-    ax.grid(grid)
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
-    ax.bar(xlocs, y_score, align='center', color=color, **kwargs)
+    ax.grid(grid)
+
+    ax.bar(xlocs, y_score, align=align, **kwargs)
     ax.hlines(detector.threshold_, *xlim)
+
+    return ax
+
+
+def plot_roc_curve(detector, X, y, ax=None, grid=True, title=None, **kwargs):
+    """Plot the Receiver Operating Characteristic (ROC) curve.
+
+    Parameters
+    ----------
+    detector : detector
+        Detector.
+
+    X : array-like of shape (n_samples, n_features)
+        Test samples.
+
+    y : array-like of shape (n_samples,)
+        Labels for test samples.
+
+    ax : matplotlib Axes, default None
+        Target axes instance.
+
+    grid : boolean, default True
+        If True, turn the axes grids on.
+
+    title : string, default None
+        Axes title. To disable, pass None.
+
+    **kwargs : dict
+        Other keywords passed to ax.plot().
+
+    Returns
+    -------
+    ax : matplotlib Axes
+    """
+
+    import matplotlib.pyplot as plt
+
+    y_score     = detector.anomaly_score(X)
+    fpr, tpr, _ = roc_curve(y, y_score)
+    roc_auc     = auc(fpr, tpr)
+
+    label       = detector.__class__.__name__ \
+        + ' (auc = {0:.3f})'.format(roc_auc)
+
+    if ax is None:
+        _, ax   = plt.subplots(1, 1)
+
+    if title is not None:
+        ax.set_title(title)
+
+    ax.set_xlabel('False Positive Rate')
+    ax.set_ylabel('True Positive Rate')
+    ax.set_xlim(-0.05, 1.00)
+    ax.set_ylim(0.00, 1.05)
+    ax.grid(grid)
+
+    ax.plot(fpr, tpr, label=label, **kwargs)
+    ax.legend()
 
     return ax

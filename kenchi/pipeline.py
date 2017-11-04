@@ -31,8 +31,6 @@ class ExtendedPipeline(Pipeline):
         Keys are step names and values are steps parameters.
     """
 
-    # TODO: Implement plot_roc_curve method
-
     @if_delegate_has_method(delegate='_final_estimator')
     @assign_info_on_pandas_obj
     def fit(self, X, y=None, **fit_params):
@@ -44,7 +42,7 @@ class ExtendedPipeline(Pipeline):
             Samples.
 
         y : array-like of shape (n_samples,), default None
-            Targets.
+            Labels.
 
         **fit_params : dict of str -> object
             Parameters passed to the ``fit`` method of each step, where
@@ -88,7 +86,7 @@ class ExtendedPipeline(Pipeline):
             Samples.
 
         y : array-like of shape (n_samples,), default None
-            Targets.
+            Labels.
 
         **fit_params : dict of str -> object
             Parameters passed to the ``fit`` method of each step, where
@@ -316,4 +314,44 @@ class ExtendedPipeline(Pipeline):
 
         return self._final_estimator.plot_anomaly_score(
             Xt, ax, grid, xlim, ylim, xlabel, ylabel, title, **kwargs
+        )
+
+    @if_delegate_has_method(delegate='_final_estimator')
+    def plot_roc_curve(self, X, y, ax=None, grid=True, title=None, **kwargs):
+        """Apply transoforms, and plot the Receiver Operating Characteristic
+        (ROC) curve.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Test samples.
+
+        y : array-like of shape (n_samples,)
+            Labels for test samples.
+
+        ax : matplotlib Axes, default None
+            Target axes instance.
+
+        grid : boolean, default True
+            If True, turn the axes grids on.
+
+        title : str, default None
+            Axes title. To disable, pass None.
+
+        **kwargs : dict
+            Other keywords passed to ax.plot().
+
+        Returns
+        -------
+        ax : matplotlib Axes
+        """
+
+        Xt         = X
+
+        for _, transform in self.steps[:-1]:
+            if transform is not None:
+                Xt = transform.transform(Xt)
+
+        return self._final_estimator.plot_roc_curve(
+            Xt, y, ax, grid, title, **kwargs
         )

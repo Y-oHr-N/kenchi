@@ -3,16 +3,16 @@ from abc import abstractmethod, ABC
 import numpy as np
 from sklearn.utils.validation import check_is_fitted
 
-from .utils import construct_pandas_obj, plot_anomaly_score
+from .utils import construct_pandas_obj, plot_anomaly_score, plot_roc_curve
 
 
 class DetectorMixin(ABC):
     """Mixin class for all detectors."""
 
     # TODO: Implement score method
-    # TODO: Implement plot_roc_curve method
 
     plot_anomaly_score = plot_anomaly_score
+    plot_roc_curve     = plot_roc_curve
 
     @abstractmethod
     def check_params(self):
