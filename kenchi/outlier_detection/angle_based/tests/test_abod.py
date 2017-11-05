@@ -1,11 +1,14 @@
 import unittest
 
+import matplotlib as mpl
 import numpy as np
 import pandas as pd
 from sklearn.exceptions import NotFittedError
 
 from kenchi.datasets import make_blobs_with_outliers
 from kenchi.outlier_detection.angle_based import FastABOD
+
+mpl.use('Agg')
 
 
 class FastABODTest(unittest.TestCase):
@@ -34,3 +37,8 @@ class FastABODTest(unittest.TestCase):
     def test_detect_notfitted(self):
         with self.assertRaises(NotFittedError):
             self.sut.detect(self.X)
+
+    def test_plot_anomaly_score(self):
+        self.assertIsInstance(
+            self.sut.fit(self.X).plot_anomaly_score(None), mpl.axes.Axes
+        )
