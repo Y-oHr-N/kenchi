@@ -1,5 +1,5 @@
 from .neighbors import KNNOutlierDetector
-from .k_means import KMeansOutlierDetector
+from .cluster import KMeansOutlierDetector
 
 __all__ = [
     'KNNOutlierDetector',

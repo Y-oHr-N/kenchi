@@ -31,7 +31,7 @@ class KMeansOutlierDetector(KMeans, DetectorMixin):
         data.
 
     tol : float, default 1e-04
-        Convergence threshold.
+        Tolerance to declare convergence.
 
     Attributes
     ----------
@@ -60,7 +60,7 @@ class KMeansOutlierDetector(KMeans, DetectorMixin):
     def check_params(self):
         """Check validity of parameters and raise ValueError if not valid."""
 
-        if self.fpr < 0 or 1 < self.fpr:
+        if self.fpr < 0.0 or 1.0 < self.fpr:
             raise ValueError(
                 'fpr must be between 0 and 1 inclusive but was {0}'.format(
                     self.fpr
@@ -122,7 +122,7 @@ class KMeansOutlierDetector(KMeans, DetectorMixin):
         Returns
         -------
         y_score : array-like of shape (n_samples,)
-            anomaly scores for test samples.
+            Anomaly scores for test samples.
         """
 
         check_is_fitted(self, 'cluster_centers_')
