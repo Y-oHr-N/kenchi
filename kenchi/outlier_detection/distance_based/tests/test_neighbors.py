@@ -6,7 +6,7 @@ import pandas as pd
 from sklearn.exceptions import NotFittedError
 
 from kenchi.datasets import make_blobs_with_outliers
-from kenchi.outlier_detection.distance_based import EmpiricalOutlierDetector
+from kenchi.outlier_detection.distance_based import KNNOutlierDetector
 
 mpl.use('Agg')
 
@@ -15,10 +15,10 @@ class EmpiricalOutlierDetectorTest(unittest.TestCase):
     def setUp(self):
         self.X, _ = make_blobs_with_outliers(n_outliers=0)
         self.df   = pd.DataFrame(self.X)
-        self.sut  = EmpiricalOutlierDetector()
+        self.sut  = KNNOutlierDetector()
 
     def test_fit(self):
-        self.assertIsInstance(self.sut.fit(self.X), EmpiricalOutlierDetector)
+        self.assertIsInstance(self.sut.fit(self.X), KNNOutlierDetector)
 
     def test_fit_detect_ndarray(self):
         self.assertIsInstance(self.sut.fit_detect(self.X), np.ndarray)

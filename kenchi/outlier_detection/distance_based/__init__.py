@@ -1,7 +1,7 @@
-from .empirical_distns import EmpiricalOutlierDetector
+from .neighbors import KNNOutlierDetector
 from .k_means import KMeansOutlierDetector
 
 __all__ = [
-    'EmpiricalOutlierDetector',
+    'KNNOutlierDetector',
     'KMeansOutlierDetector'
 ]

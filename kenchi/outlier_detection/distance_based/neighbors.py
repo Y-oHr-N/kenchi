@@ -7,7 +7,7 @@ from ...base import DetectorMixin
 from ...utils import assign_info_on_pandas_obj, construct_pandas_obj
 
 
-class EmpiricalOutlierDetector(NearestNeighbors, DetectorMixin):
+class KNNOutlierDetector(NearestNeighbors, DetectorMixin):
     """Outlier detector using k-nearest neighbors algorithm.
 
     Parameters
@@ -58,7 +58,7 @@ class EmpiricalOutlierDetector(NearestNeighbors, DetectorMixin):
     def check_params(self):
         """Check validity of parameters and raise ValueError if not valid."""
 
-        if self.fpr < 0 or 1 < self.fpr:
+        if self.fpr < 0.0 or 1.0 < self.fpr:
             raise ValueError(
                 'fpr must be between 0 and 1 inclusive but was {0}'.format(
                     self.fpr
@@ -115,23 +115,19 @@ class EmpiricalOutlierDetector(NearestNeighbors, DetectorMixin):
         Returns
         -------
         y_score : array-like of shape (n_samples,)
-            anomaly scores for test samples.
+            Anomaly scores for test samples.
         """
 
         check_is_fitted(self, '_fit_method')
 
         if X is None:
-            X         = self._fit_X
-            dist, _   = self.kneighbors(None)
+            X       = self._fit_X
+            dist, _ = self.kneighbors(None)
         else:
-            X         = check_array(X)
-            dist, _   = self.kneighbors(X)
-
-        _, n_features = X.shape
+            X       = check_array(X)
+            dist, _ = self.kneighbors(X)
 
         if np.any(dist == 0.0):
             raise ValueError('X must not contain training samples')
 
-        radius        = np.max(dist, axis=1)
-
-        return -np.log(self.n_neighbors) + n_features * np.log(radius)
+        return np.max(dist, axis=1)
