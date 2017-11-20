@@ -12,15 +12,15 @@ from ...utils import assign_info_on_pandas_obj, construct_pandas_obj
 __all__ = ['FastABOD']
 
 
-def _abof(fit_X, X, ind):
+def _abof(X, ind, fit_X):
     """Compute angle-based outlier factors for test samples."""
 
     with np.errstate(invalid='raise'):
         return np.var([[
-            (ab @ ac) / (ab @ ab) / (ac @ ac) for ab, ac in combinations(
-                fit_X[ind_a] - a, 2
+            (pa @ pb) / (pa @ pa) / (pb @ pb) for pa, pb in combinations(
+                fit_X[ind_p] - p, 2
             )
-        ] for a, ind_a in zip(X, ind)], axis=1)
+        ] for p, ind_p in zip(X, ind)], axis=1)
 
 
 class FastABOD(NearestNeighbors, DetectorMixin):
@@ -54,9 +54,9 @@ class FastABOD(NearestNeighbors, DetectorMixin):
 
     References
     ----------
-    H.P. Kriegel, M. Schubert and A. Zimek,
+    H.-P. Kriegel, M. Schubert and A. Zimek,
     "Angle-based outlier detection in high-dimensional data,"
-    In Proceedings of KDD'08, pp. 444 - 452, 2008.
+    In Proceedings of SIGKDD'08, pp. 444-452, 2008.
     """
 
     def __init__(
@@ -80,7 +80,7 @@ class FastABOD(NearestNeighbors, DetectorMixin):
     def check_params(self):
         """Check validity of parameters and raise ValueError if not valid."""
 
-        if self.fpr < 0 or 1 < self.fpr:
+        if self.fpr < 0.0 or 1.0 < self.fpr:
             raise ValueError(
                 'fpr must be between 0 and 1 inclusive but was {0}'.format(
                     self.fpr
@@ -136,7 +136,7 @@ class FastABOD(NearestNeighbors, DetectorMixin):
 
         Returns
         -------
-        foctor : array-like of shape (n_samples,)
+        factor : array-like of shape (n_samples,)
             Angle-based outlier factors for test samples.
         """
 
@@ -154,7 +154,7 @@ class FastABOD(NearestNeighbors, DetectorMixin):
         try:
             result   = Parallel(self.n_jobs)(
                 delayed(_abof)(
-                    self._fit_X, X[s], ind[s]
+                    X[s], ind[s], self._fit_X
                 ) for s in gen_even_slices(n_samples, self.n_jobs)
             )
         except FloatingPointError as e:
@@ -174,7 +174,7 @@ class FastABOD(NearestNeighbors, DetectorMixin):
         Returns
         -------
         y_score : array-like of shape (n_samples,)
-            anomaly scores for test samples.
+            Anomaly scores for test samples.
         """
 
         return -self.abof(X)
