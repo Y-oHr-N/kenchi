@@ -35,6 +35,12 @@ class KNNOutlierDetector(NearestNeighbors, DetectorMixin):
     ----------
     threshold_ : float
         Threshold.
+
+    References
+    ----------
+    S. Ramaswamy, R. Rastogi and K. Shim,
+    "Efficient algorithms for mining outliers from large data sets,"
+    In Proceedings of SIGMOD'00, pp. 427-438, 2000.
     """
 
     def __init__(
