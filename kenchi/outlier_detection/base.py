@@ -3,7 +3,7 @@ from abc import abstractmethod, ABC
 import numpy as np
 from sklearn.utils.validation import check_is_fitted
 
-from .utils import construct_pandas_obj, plot_anomaly_score, plot_roc_curve
+from ..utils import construct_pandas_obj, plot_anomaly_score, plot_roc_curve
 
 
 class DetectorMixin(ABC):

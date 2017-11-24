@@ -7,7 +7,7 @@ from sklearn.preprocessing import Normalizer
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
-from ...base import AnalyzerMixin, DetectorMixin
+from ..base import AnalyzerMixin, DetectorMixin
 from ...utils import assign_info_on_pandas_obj, construct_pandas_obj
 
 VALID_COVARIANCE_TYPES = ['full', 'tied', 'diag', 'spherical']
