@@ -1,7 +1,9 @@
-from .gaussian_distns import GaussianOutlierDetector
-from .kde import KernelDensityOutlierDetector
-from .mixture_distns import GaussianMixtureOutlierDetector
-from .vmf_distns import VMFOutlierDetector
+from .parametric import (
+    GaussianMixtureOutlierDetector,
+    GaussianOutlierDetector,
+    VMFOutlierDetector
+)
+from .nonparametric import KernelDensityOutlierDetector
 
 __all__ = [
     'GaussianOutlierDetector',
