@@ -21,7 +21,7 @@ class GaussianOutlierDetector(GraphLasso, AnalyzerMixin, DetectorMixin):
     alpha : float, default 0.01
         Regularization parameter.
 
-    assume_centered : boolean, default False
+    assume_centered : bool, default False
         If True, data are not centered before computation.
 
     fpr : float, default 0.01
@@ -209,7 +209,7 @@ class GaussianMixtureOutlierDetector(GaussianMixture, DetectorMixin):
     tol : float, default 1e-03
         Convergence threshold.
 
-    warm_start : boolean, default False
+    warm_start : bool, default False
         If True, the solution of the last fitting is used as initialization for
         the next call of fit().
 
@@ -343,7 +343,7 @@ class VMFOutlierDetector(BaseEstimator, DetectorMixin):
 
     Parameters
     ----------
-    assume_normalized : boolean, default False
+    assume_normalized : bool, default False
         If False, data are normalized before computation.
 
     fpr : float, default 0.01
