@@ -12,6 +12,10 @@ class KNNOutlierDetector(NearestNeighbors, DetectorMixin):
 
     Parameters
     ----------
+    aggregate : bool, default False
+        If True, anomaly score is the sum of the distances from k nearest
+        neighbors.
+
     fpr : float, default 0.01
         False positive rate. Used to compute the threshold.
 
@@ -41,13 +45,17 @@ class KNNOutlierDetector(NearestNeighbors, DetectorMixin):
     S. Ramaswamy, R. Rastogi and K. Shim,
     "Efficient algorithms for mining outliers from large data sets,"
     In Proceedings of SIGMOD'00, pp. 427-438, 2000.
+
+    F. Angiulli and C. Pizzuti,
+    "Fast outlier detection in high dimensional spaces,"
+    In Proceedings of PKDD'02, pp. 15-27, 2002.
     """
 
     def __init__(
-        self,               fpr=0.01,
-        metric='minkowski', metric_params=None,
-        n_jobs=1,           n_neighbors=5,
-        p=2
+        self,               aggregate=True,
+        fpr=0.01,           metric='minkowski',
+        metric_params=None, n_jobs=1,
+        n_neighbors=5,      p=2
     ):
         super().__init__(
             metric        = metric,
@@ -57,6 +65,7 @@ class KNNOutlierDetector(NearestNeighbors, DetectorMixin):
             p             = p
         )
 
+        self.aggregate    = aggregate
         self.fpr          = fpr
 
         self.check_params()
@@ -136,4 +145,7 @@ class KNNOutlierDetector(NearestNeighbors, DetectorMixin):
         if np.any(dist == 0.0):
             raise ValueError('X must not contain training samples')
 
-        return np.max(dist, axis=1)
+        if self.aggregate:
+            return np.sum(dist, axis=1)
+        else:
+            return np.max(dist, axis=1)
