@@ -92,18 +92,20 @@ class KernelDensityOutlierDetector(KernelDensity, DetectorMixin):
 
         super().fit(X)
 
-        y_score         = self.anomaly_score(X)
-        self.threshold_ = np.percentile(y_score, 100.0 * (1.0 - self.fpr))
+        self.y_score_   = self.anomaly_score(X)
+        self.threshold_ = np.percentile(
+            self.y_score_, 100.0 * (1.0 - self.fpr)
+        )
 
         return self
 
     @construct_pandas_obj
-    def anomaly_score(self, X):
+    def anomaly_score(self, X=None):
         """Compute anomaly scores for test samples.
 
         Parameters
         ----------
-        X : array-like of shape (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features), default None
             Test samples.
 
         Returns
@@ -114,6 +116,9 @@ class KernelDensityOutlierDetector(KernelDensity, DetectorMixin):
 
         check_is_fitted(self, 'tree_')
 
-        X = check_array(X)
+        if X is None:
+            return self.y_score_
+        else:
+            X = check_array(X)
 
-        return -self.score_samples(X)
+            return -self.score_samples(X)

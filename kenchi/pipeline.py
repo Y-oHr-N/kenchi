@@ -102,7 +102,7 @@ class ExtendedPipeline(Pipeline):
 
     @if_delegate_has_method(delegate='_final_estimator')
     @construct_pandas_obj
-    def anomaly_score(self, X):
+    def anomaly_score(self, X=None):
         """Apply transforms, and compute anomaly scores for test samples with
         the final estimator.
 
@@ -117,13 +117,16 @@ class ExtendedPipeline(Pipeline):
             Anomaly scores for test samples.
         """
 
-        Xt         = X
+        if X is None:
+            return self._final_estimator.y_score_
+        else:
+            Xt         = X
 
-        for _, transform in self.steps[:-1]:
-            if transform is not None:
-                Xt = transform.transform(Xt)
+            for _, transform in self.steps[:-1]:
+                if transform is not None:
+                    Xt = transform.transform(Xt)
 
-        return self._final_estimator.anomaly_score(Xt)
+            return self._final_estimator.anomaly_score(Xt)
 
     @if_delegate_has_method(delegate='_final_estimator')
     @construct_pandas_obj
@@ -159,13 +162,16 @@ class ExtendedPipeline(Pipeline):
     @if_delegate_has_method(delegate='_final_estimator')
     @construct_pandas_obj
     @assign_info_on_pandas_obj
-    def fit_detect(self, X, y=None, **fit_params):
+    def fit_detect(self, X, y=None, threshold=None, **fit_params):
         """Applies fit_detect of last step in pipeline after transforms.
 
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features)
             Samples.
+
+        threshold : float, default None
+            User-provided threshold.
 
         **fit_params : dict of str -> object
             Parameters passed to the ``fit`` method of each step, where
@@ -180,7 +186,9 @@ class ExtendedPipeline(Pipeline):
 
         Xt, fit_params = self._fit(X, **fit_params)
 
-        return self._final_estimator.fit_detect(Xt, **fit_params)
+        return self._final_estimator.fit_detect(
+            Xt, threshold=threshold, **fit_params
+        )
 
     @if_delegate_has_method(delegate='_final_estimator')
     @construct_pandas_obj

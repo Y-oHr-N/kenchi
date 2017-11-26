@@ -64,7 +64,7 @@ def construct_pandas_obj(func):
     """
 
     @wraps(func)
-    def wrapper(estimator, X, *args, **kargs):
+    def wrapper(estimator, X=None, *args, **kargs):
         """Wrapper function.
 
         Parameters

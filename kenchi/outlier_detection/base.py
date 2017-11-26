@@ -23,16 +23,16 @@ class DetectorMixin(ABC):
         """Fit the model according to the given training data."""
 
     @abstractmethod
-    def anomaly_score(self, X):
+    def anomaly_score(self, X=None):
         """Compute anomaly scores for test samples."""
 
     @construct_pandas_obj
-    def detect(self, X, threshold=None):
+    def detect(self, X=None, threshold=None):
         """Detect if a particular sample is an outlier or not.
 
         Parameters
         ----------
-        X : array-like of shape (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features), default None
             Test samples.
 
         threshold : float, default None
@@ -51,7 +51,7 @@ class DetectorMixin(ABC):
 
         return (self.anomaly_score(X) > threshold).astype(np.int32)
 
-    def fit_detect(self, X, y=None, **fit_params):
+    def fit_detect(self, X, y=None, threshold=None, **fit_params):
         """Fit the model according to the given training data and detect if a
         particular sample is an outlier or not.
 
@@ -60,16 +60,16 @@ class DetectorMixin(ABC):
         X : array-like of shape (n_samples, n_features)
             Samples.
 
+        threshold : float, default None
+            User-provided threshold.
+
         Returns
         -------
         y_pred : array-like of shape (n_samples,)
             Return 0 for inliers and 1 for outliers.
         """
 
-        if hasattr(self, '_fit_X'):
-            return self.fit(X, **fit_params).detect(None)
-        else:
-            return self.fit(X, **fit_params).detect(X)
+        return self.fit(X, **fit_params).detect(threshold=threshold)
 
 
 class AnalyzerMixin(ABC):

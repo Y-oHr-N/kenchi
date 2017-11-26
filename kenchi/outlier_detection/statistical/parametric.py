@@ -119,8 +119,8 @@ class GaussianOutlierDetector(GraphLasso, AnalyzerMixin, DetectorMixin):
 
         super().fit(X)
 
-        y_score                      = self.anomaly_score(X)
-        df, loc, scale               = chi2.fit(y_score)
+        self.y_score_                = self.anomaly_score(X)
+        df, loc, scale               = chi2.fit(self.y_score_)
         self.threshold_              = chi2.ppf(1.0 - self.fpr, df, loc, scale)
 
         y_score                      = self.feature_wise_anomaly_score(X)
@@ -133,12 +133,12 @@ class GaussianOutlierDetector(GraphLasso, AnalyzerMixin, DetectorMixin):
         return self
 
     @construct_pandas_obj
-    def anomaly_score(self, X):
+    def anomaly_score(self, X=None):
         """Compute anomaly scores for test samples.
 
         Parameters
         ----------
-        X : array-like of shape (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features), default None
             Test samples.
 
         Returns
@@ -149,9 +149,12 @@ class GaussianOutlierDetector(GraphLasso, AnalyzerMixin, DetectorMixin):
 
         check_is_fitted(self, ['covariance_', 'precision_'])
 
-        X = check_array(X)
+        if X is None:
+            return self.y_score_
+        else:
+            X = check_array(X)
 
-        return self.mahalanobis(X)
+            return self.mahalanobis(X)
 
     @construct_pandas_obj
     def feature_wise_anomaly_score(self, X):
@@ -309,18 +312,20 @@ class GaussianMixtureOutlierDetector(GaussianMixture, DetectorMixin):
 
         super().fit(X)
 
-        y_score         = self.anomaly_score(X)
-        self.threshold_ = np.percentile(y_score, 100.0 * (1.0 - self.fpr))
+        self.y_score_   = self.anomaly_score(X)
+        self.threshold_ = np.percentile(
+            self.y_score_, 100.0 * (1.0 - self.fpr)
+        )
 
         return self
 
     @construct_pandas_obj
-    def anomaly_score(self, X):
+    def anomaly_score(self, X=None):
         """Compute anomaly scores for test samples.
 
         Parameters
         ----------
-        X : array-like of shape (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features), default None
             Test samples.
 
         Returns
@@ -333,9 +338,12 @@ class GaussianMixtureOutlierDetector(GaussianMixture, DetectorMixin):
             self, ['weights_', 'means_', 'covariances_', 'precisions_']
         )
 
-        X = check_array(X)
+        if X is None:
+            return self.y_score_
+        else:
+            X = check_array(X)
 
-        return -self.score_samples(X)
+            return -self.score_samples(X)
 
 
 class VMFOutlierDetector(BaseEstimator, DetectorMixin):
@@ -398,19 +406,19 @@ class VMFOutlierDetector(BaseEstimator, DetectorMixin):
         mean                 = np.mean(X, axis=0)
         self.mean_direction_ = mean / np.linalg.norm(mean)
 
-        y_score              = self.anomaly_score(X)
-        df, loc, scale       = chi2.fit(y_score)
+        self.y_score_        = self.anomaly_score(X)
+        df, loc, scale       = chi2.fit(self.y_score_)
         self.threshold_      = chi2.ppf(1.0 - self.fpr, df, loc, scale)
 
         return self
 
     @construct_pandas_obj
-    def anomaly_score(self, X):
+    def anomaly_score(self, X=None):
         """Compute anomaly scores for test samples.
 
         Parameters
         ----------
-        X : array-like of shape (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features), default None
             Test samples.
 
         Returns
@@ -421,9 +429,12 @@ class VMFOutlierDetector(BaseEstimator, DetectorMixin):
 
         check_is_fitted(self, 'mean_direction_')
 
-        X     = check_array(X)
+        if X is None:
+            return self.y_score_
+        else:
+            X     = check_array(X)
 
-        if not self.assume_normalized:
-            X = self._normalizer.transform(X)
+            if not self.assume_normalized:
+                X = self._normalizer.transform(X)
 
-        return 1.0 - X @ self.mean_direction_
+            return 1.0 - X @ self.mean_direction_

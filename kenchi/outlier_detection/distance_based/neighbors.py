@@ -113,18 +113,20 @@ class KNNOutlierDetector(NearestNeighbors, DetectorMixin):
 
         super().fit(X)
 
-        y_score         = self.anomaly_score(None)
-        self.threshold_ = np.percentile(y_score, 100.0 * (1.0 - self.fpr))
+        self.y_score_   = self.anomaly_score()
+        self.threshold_ = np.percentile(
+            self.y_score_, 100.0 * (1.0 - self.fpr)
+        )
 
         return self
 
     @construct_pandas_obj
-    def anomaly_score(self, X):
+    def anomaly_score(self, X=None):
         """Compute anomaly scores for test samples.
 
         Parameters
         ----------
-        X : array-like of shape (n_samples, n_features)
+        X : array-like of shape (n_samples, n_features), default None
             Test samples.
 
         Returns

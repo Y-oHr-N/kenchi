@@ -26,10 +26,6 @@ class FastABODTest(unittest.TestCase):
     def test_fit_detect_dataframe(self):
         self.assertIsInstance(self.sut.fit_detect(self.df), pd.Series)
 
-    def test_abof_notfitted(self):
-        with self.assertRaises(NotFittedError):
-            self.sut.abof(self.X)
-
     def test_anomaly_score_notfitted(self):
         with self.assertRaises(NotFittedError):
             self.sut.anomaly_score(self.X)
