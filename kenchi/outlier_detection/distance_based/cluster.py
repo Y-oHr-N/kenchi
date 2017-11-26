@@ -55,9 +55,7 @@ class KMeansOutlierDetector(KMeans, DetectorMixin):
 
         self.fpr         = fpr
 
-        self.check_params()
-
-    def check_params(self):
+    def check_params(self, X):
         """Check validity of parameters and raise ValueError if not valid."""
 
         if self.fpr < 0.0 or 1.0 < self.fpr:
@@ -102,6 +100,8 @@ class KMeansOutlierDetector(KMeans, DetectorMixin):
         """
 
         X               = check_array(X)
+
+        self.check_params(X)
 
         super().fit(X)
 

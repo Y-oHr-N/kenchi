@@ -51,9 +51,7 @@ class KernelDensityOutlierDetector(KernelDensity, DetectorMixin):
 
         self.fpr          = fpr
 
-        self.check_params()
-
-    def check_params(self):
+    def check_params(self, X):
         """Check validity of parameters and raise ValueError if not valid."""
 
         if self.bandwidth <= 0:
@@ -89,6 +87,8 @@ class KernelDensityOutlierDetector(KernelDensity, DetectorMixin):
         """
 
         X               = check_array(X)
+
+        self.check_params(X)
 
         super().fit(X)
 
