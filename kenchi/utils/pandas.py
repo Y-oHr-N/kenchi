@@ -14,7 +14,7 @@ def assign_info_on_pandas_obj(func):
 
     Returns
     -------
-    wrapper : function
+    wrapper : callable
         Wrapper function.
     """
 
@@ -36,7 +36,7 @@ def assign_info_on_pandas_obj(func):
 
         Returns
         -------
-        result
+        result : estimator
         """
 
         result                       = func(estimator, X, *args, **kargs)
@@ -59,7 +59,7 @@ def construct_pandas_obj(func):
 
     Returns
     -------
-    wrapper : function
+    wrapper : callable
         Wrapper function.
     """
 
@@ -81,7 +81,7 @@ def construct_pandas_obj(func):
 
         Returns
         -------
-        result
+        result : array-like
         """
 
         result                = func(estimator, X, *args, **kargs)
