@@ -41,7 +41,7 @@ class DetectorMixin(ABC):
         Returns
         -------
         y_pred : array-like of shape (n_samples,)
-            Return 0 for inliers and 1 for outliers.
+            Return 1 for inliers and -1 for outliers.
         """
 
         check_is_fitted(self, 'threshold_')
@@ -49,7 +49,7 @@ class DetectorMixin(ABC):
         if threshold is None:
             threshold = self.threshold_
 
-        return (self.anomaly_score(X) > threshold).astype(np.int32)
+        return np.where(self.anomaly_score(X) > threshold, -1, 1)
 
     def fit_detect(self, X, y=None, threshold=None, **fit_params):
         """Fit the model according to the given training data and detect if a
@@ -66,7 +66,7 @@ class DetectorMixin(ABC):
         Returns
         -------
         y_pred : array-like of shape (n_samples,)
-            Return 0 for inliers and 1 for outliers.
+            Return 1 for inliers and -1 for outliers.
         """
 
         return self.fit(X, **fit_params).detect(threshold=threshold)

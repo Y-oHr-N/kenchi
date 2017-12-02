@@ -67,9 +67,9 @@ def make_blobs_with_outliers(
 
     X                = np.concatenate([X_inliers, X_outliers])
 
-    y                = np.concatenate([
-        np.zeros(n_inliers), np.ones(n_outliers)
-    ])
+    y                = np.empty(n_inliers + n_outliers, dtype=np.int64)
+    y[:n_inliers]    = 1
+    y[n_inliers:]    = -1
 
     if shuffle:
         indices      = np.arange(n_inliers + n_outliers)
