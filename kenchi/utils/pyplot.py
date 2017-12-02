@@ -3,11 +3,11 @@ from sklearn.metrics import auc, roc_curve
 
 
 def plot_anomaly_score(
-    detector,         X,
-    ax=None,          grid=True,
+    detector,         X=None,
+    ax=None,          title=None,
     xlim=None,        ylim=None,
     xlabel='Samples', ylabel='Anomaly score',
-    title=None,       **kwargs
+    grid=True,        **kwargs
 ):
     """Plot anomaly scores for test samples.
 
@@ -16,14 +16,14 @@ def plot_anomaly_score(
     detector : detector
         Detector.
 
-    X : array-like of shape (n_samples, n_features)
+    X : array-like of shape (n_samples, n_features), default None
         Test samples.
 
     ax : matplotlib Axes, default None
         Target axes instance.
 
-    grid : boolean, default True
-        If True, turn the axes grids on.
+    title : string, default None
+        Axes title. To disable, pass None.
 
     xlim : tuple, default None
         Tuple passed to ax.xlim().
@@ -37,8 +37,8 @@ def plot_anomaly_score(
     ylabel : string, default 'Anomaly score'
         Y axis title label. To disable, pass None.
 
-    title : string, default None
-        Axes title. To disable, pass None.
+    grid : boolean, default True
+        If True, turn the axes grids on.
 
     **kwargs : dict
         Other keywords passed to ax.bar().
@@ -50,24 +50,22 @@ def plot_anomaly_score(
 
     import matplotlib.pyplot as plt
 
-    if X is None:
-        n_samples, _ = detector._fit_X.shape
-    else:
-        n_samples, _ = X.shape
+    y_score    = detector.anomaly_score(X)
 
-    xlocs            = np.arange(n_samples)
-    y_score          = detector.anomaly_score(X)
+    n_samples, = y_score.shape
+    xlocs      = np.arange(n_samples)
 
-    align            = 'center'
+    align      = 'center'
+    label      = detector.__class__.__name__
 
     if ax is None:
-        _, ax        = plt.subplots(1, 1)
+        _, ax  = plt.subplots()
 
     if xlim is None:
-        xlim         = (-1, n_samples)
+        xlim   = (-1, n_samples)
 
     if ylim is None:
-        ylim         = (0, 1.1 * max(max(y_score), detector.threshold_))
+        ylim   = (0, 1.1 * max(max(y_score), detector.threshold_))
 
     if title is not None:
         ax.set_title(title)
@@ -82,8 +80,10 @@ def plot_anomaly_score(
     ax.set_ylim(ylim)
     ax.grid(grid)
 
-    ax.bar(xlocs, y_score, align=align, **kwargs)
-    ax.hlines(detector.threshold_, *xlim)
+    ax.bar(xlocs, y_score, align=align, label=label, **kwargs)
+    ax.hlines(detector.threshold_, xlim[0], xlim[1])
+
+    ax.legend()
 
     return ax
 
