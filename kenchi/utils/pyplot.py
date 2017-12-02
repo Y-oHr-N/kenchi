@@ -88,7 +88,7 @@ def plot_anomaly_score(
     return ax
 
 
-def plot_roc_curve(detector, X, y, ax=None, grid=True, title=None, **kwargs):
+def plot_roc_curve(detector, X, y, ax=None, title=None, grid=True, **kwargs):
     """Plot the Receiver Operating Characteristic (ROC) curve.
 
     Parameters
@@ -105,11 +105,11 @@ def plot_roc_curve(detector, X, y, ax=None, grid=True, title=None, **kwargs):
     ax : matplotlib Axes, default None
         Target axes instance.
 
-    grid : boolean, default True
-        If True, turn the axes grids on.
-
     title : string, default None
         Axes title. To disable, pass None.
+
+    grid : boolean, default True
+        If True, turn the axes grids on.
 
     **kwargs : dict
         Other keywords passed to ax.plot().
@@ -117,6 +117,8 @@ def plot_roc_curve(detector, X, y, ax=None, grid=True, title=None, **kwargs):
     Returns
     -------
     ax : matplotlib Axes
+
+    roc_auc : float
     """
 
     import matplotlib.pyplot as plt
@@ -125,11 +127,10 @@ def plot_roc_curve(detector, X, y, ax=None, grid=True, title=None, **kwargs):
     fpr, tpr, _ = roc_curve(y, y_score)
     roc_auc     = auc(fpr, tpr)
 
-    label       = detector.__class__.__name__ \
-        + ' (auc = {0:.3f})'.format(roc_auc)
+    label       = detector.__class__.__name__
 
     if ax is None:
-        _, ax   = plt.subplots(1, 1)
+        _, ax   = plt.subplots()
 
     if title is not None:
         ax.set_title(title)
@@ -143,4 +144,4 @@ def plot_roc_curve(detector, X, y, ax=None, grid=True, title=None, **kwargs):
     ax.plot(fpr, tpr, label=label, **kwargs)
     ax.legend()
 
-    return ax
+    return ax, roc_auc
