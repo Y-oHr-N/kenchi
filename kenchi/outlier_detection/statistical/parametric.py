@@ -69,7 +69,9 @@ class GaussianOutlierDetector(GraphLasso, AnalyzerMixin, DetectorMixin):
 
         self.fpr            = fpr
 
-    def check_params(self, X):
+        self.check_params()
+
+    def check_params(self):
         """Check validity of parameters and raise ValueError if not valid."""
 
         if self.alpha < 0 or 1 < self.alpha:
@@ -114,8 +116,6 @@ class GaussianOutlierDetector(GraphLasso, AnalyzerMixin, DetectorMixin):
         """
 
         X                            = check_array(X)
-
-        self.check_params(X)
 
         super().fit(X)
 
@@ -259,7 +259,9 @@ class GaussianMixtureOutlierDetector(GaussianMixture, DetectorMixin):
 
         self.fpr            = fpr
 
-    def check_params(self, X):
+        self.check_params()
+
+    def check_params(self):
         """Check validity of parameters and raise ValueError if not valid."""
 
         if self.covariance_type not in VALID_COVARIANCE_TYPES:
@@ -307,8 +309,6 @@ class GaussianMixtureOutlierDetector(GaussianMixture, DetectorMixin):
         """
 
         X               = check_array(X)
-
-        self.check_params(X)
 
         super().fit(X)
 
@@ -370,7 +370,9 @@ class VMFOutlierDetector(BaseEstimator, DetectorMixin):
         self.assume_normalized = assume_normalized
         self.fpr               = fpr
 
-    def check_params(self, X):
+        self.check_params()
+
+    def check_params(self):
         """Check validity of parameters and raise ValueError if not valid."""
 
         if self.fpr < 0 or 1 < self.fpr:
@@ -396,8 +398,6 @@ class VMFOutlierDetector(BaseEstimator, DetectorMixin):
         """
 
         X                    = check_array(X)
-
-        self.check_params(X)
 
         if not self.assume_normalized:
             self._normalizer = Normalizer().fit(X)

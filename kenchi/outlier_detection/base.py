@@ -15,7 +15,7 @@ class DetectorMixin(ABC):
     plot_roc_curve     = plot_roc_curve
 
     @abstractmethod
-    def check_params(self, X):
+    def check_params(self):
         """Check validity of parameters and raise ValueError if not valid."""
 
     @abstractmethod
