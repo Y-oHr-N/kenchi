@@ -6,7 +6,7 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.utils import check_array, gen_even_slices
 from sklearn.utils.validation import check_is_fitted
 
-from ..base import DetectorMixin
+from ..base import BaseDetector
 from ...utils import assign_info_on_pandas_obj, construct_pandas_obj
 
 __all__ = ['FastABOD']
@@ -23,7 +23,7 @@ def _abof(X, ind, fit_X):
         ] for p, ind_p in zip(X, ind)], axis=1)
 
 
-class FastABOD(NearestNeighbors, DetectorMixin):
+class FastABOD(BaseDetector):
     """Fast angle-based outlier detector.
 
     Parameters
@@ -65,15 +65,12 @@ class FastABOD(NearestNeighbors, DetectorMixin):
         n_jobs=1,           n_neighbors=5,
         p=2
     ):
-        super().__init__(
-            metric        = metric,
-            metric_params = metric_params,
-            n_jobs        = n_jobs,
-            n_neighbors   = n_neighbors,
-            p             = p
-        )
-
-        self.fpr          = fpr
+        self.fpr           = fpr
+        self.metric        = metric
+        self.metric_params = metric_params
+        self.n_jobs        = n_jobs
+        self.n_neighbors   = n_neighbors
+        self.p             = p
 
         self.check_params()
 
@@ -116,12 +113,18 @@ class FastABOD(NearestNeighbors, DetectorMixin):
             Return self.
         """
 
-        X               = check_array(X)
+        X                 = check_array(X)
 
-        super().fit(X)
+        self._knn         = NearestNeighbors(
+            metric        = self.metric,
+            metric_params = self.metric_params,
+            n_jobs        = self.n_jobs,
+            n_neighbors   = self.n_neighbors,
+            p             = self.p
+        ).fit(X)
 
-        self.y_score_   = self.anomaly_score()
-        self.threshold_ = np.percentile(
+        self.y_score_     = self.anomaly_score()
+        self.threshold_   = np.percentile(
             self.y_score_, 100.0 * (1.0 - self.fpr)
         )
 
@@ -142,21 +145,21 @@ class FastABOD(NearestNeighbors, DetectorMixin):
             Anomaly scores for test samples.
         """
 
-        check_is_fitted(self, '_fit_method')
+        check_is_fitted(self, '_knn')
 
         if X is None:
-            X        = self._fit_X
-            ind      = self.kneighbors(None, return_distance=False)
+            X        = self._knn._fit_X
+            ind      = self._knn.kneighbors(None, return_distance=False)
         else:
             X        = check_array(X)
-            ind      = self.kneighbors(X, return_distance=False)
+            ind      = self._knn.kneighbors(X, return_distance=False)
 
         n_samples, _ = X.shape
 
         try:
             result   = Parallel(self.n_jobs)(
                 delayed(_abof)(
-                    X[s], ind[s], self._fit_X
+                    X[s], ind[s], self._knn._fit_X
                 ) for s in gen_even_slices(n_samples, self.n_jobs)
             )
         except FloatingPointError as e:

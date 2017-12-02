@@ -3,7 +3,7 @@ from sklearn.neighbors import KernelDensity
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
-from ..base import DetectorMixin
+from ..base import BaseDetector
 from ...utils import assign_info_on_pandas_obj, construct_pandas_obj
 
 VALID_KERNELS = [
@@ -11,7 +11,7 @@ VALID_KERNELS = [
 ]
 
 
-class KernelDensityOutlierDetector(KernelDensity, DetectorMixin):
+class KernelDensityOutlierDetector(BaseDetector):
     """Outlier detector using kernel density estimation.
 
     Parameters
@@ -42,21 +42,18 @@ class KernelDensityOutlierDetector(KernelDensity, DetectorMixin):
         fpr=0.01,           kernel='gaussian',
         metric='euclidean', metric_params=None
     ):
-        super().__init__(
-            bandwidth     = bandwidth,
-            kernel        = kernel,
-            metric        = metric,
-            metric_params = metric_params
-        )
-
-        self.fpr          = fpr
+        self.bandwidth     = bandwidth
+        self.fpr           = fpr
+        self.kernel        = kernel
+        self.metric        = metric
+        self.metric_params = metric_params
 
         self.check_params()
 
     def check_params(self):
         """Check validity of parameters and raise ValueError if not valid."""
 
-        if self.bandwidth <= 0:
+        if self.bandwidth <= 0.0:
             raise ValueError(
                 'bandwidth must be positive but was {0}'.format(
                     self.bandwidth
@@ -88,12 +85,17 @@ class KernelDensityOutlierDetector(KernelDensity, DetectorMixin):
             Return self.
         """
 
-        X               = check_array(X)
+        X                 = check_array(X)
 
-        super().fit(X)
+        self._kde         = KernelDensity(
+            bandwidth     = self.bandwidth,
+            kernel        = self.kernel,
+            metric        = self.metric,
+            metric_params = self.metric_params
+        ).fit(X)
 
-        self.y_score_   = self.anomaly_score(X)
-        self.threshold_ = np.percentile(
+        self.y_score_     = self.anomaly_score(X)
+        self.threshold_   = np.percentile(
             self.y_score_, 100.0 * (1.0 - self.fpr)
         )
 
@@ -114,11 +116,11 @@ class KernelDensityOutlierDetector(KernelDensity, DetectorMixin):
             Anomaly scores for test samples.
         """
 
-        check_is_fitted(self, 'tree_')
+        check_is_fitted(self, '_kde')
 
         if X is None:
             return self.y_score_
         else:
             X = check_array(X)
 
-            return -self.score_samples(X)
+            return -self._kde.score_samples(X)

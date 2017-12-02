@@ -3,11 +3,11 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
-from ..base import DetectorMixin
+from ..base import BaseDetector
 from ...utils import assign_info_on_pandas_obj, construct_pandas_obj
 
 
-class KNNOutlierDetector(NearestNeighbors, DetectorMixin):
+class KNNOutlierDetector(BaseDetector):
     """Outlier detector using k-nearest neighbors algorithm.
 
     Parameters
@@ -57,16 +57,13 @@ class KNNOutlierDetector(NearestNeighbors, DetectorMixin):
         metric_params=None, n_jobs=1,
         n_neighbors=5,      p=2
     ):
-        super().__init__(
-            metric        = metric,
-            metric_params = metric_params,
-            n_jobs        = n_jobs,
-            n_neighbors   = n_neighbors,
-            p             = p
-        )
-
-        self.aggregate    = aggregate
-        self.fpr          = fpr
+        self.aggregate     = aggregate
+        self.fpr           = fpr
+        self.metric        = metric
+        self.metric_params = metric_params
+        self.n_jobs        = n_jobs
+        self.n_neighbors   = n_neighbors
+        self.p             = p
 
         self.check_params()
 
@@ -109,12 +106,18 @@ class KNNOutlierDetector(NearestNeighbors, DetectorMixin):
             Return self.
         """
 
-        X               = check_array(X)
+        X                 = check_array(X)
 
-        super().fit(X)
+        self._knn         = NearestNeighbors(
+            metric        = self.metric,
+            metric_params = self.metric_params,
+            n_jobs        = self.n_jobs,
+            n_neighbors   = self.n_neighbors,
+            p             = self.p
+        ).fit(X)
 
-        self.y_score_   = self.anomaly_score()
-        self.threshold_ = np.percentile(
+        self.y_score_     = self.anomaly_score()
+        self.threshold_   = np.percentile(
             self.y_score_, 100.0 * (1.0 - self.fpr)
         )
 
@@ -135,14 +138,14 @@ class KNNOutlierDetector(NearestNeighbors, DetectorMixin):
             Anomaly scores for test samples.
         """
 
-        check_is_fitted(self, '_fit_method')
+        check_is_fitted(self, '_knn')
 
         if X is None:
-            X       = self._fit_X
-            dist, _ = self.kneighbors(None)
+            X       = self._knn._fit_X
+            dist, _ = self._knn.kneighbors(None)
         else:
             X       = check_array(X)
-            dist, _ = self.kneighbors(X)
+            dist, _ = self._knn.kneighbors(X)
 
         if np.any(dist == 0.0):
             raise ValueError('X must not contain training samples')

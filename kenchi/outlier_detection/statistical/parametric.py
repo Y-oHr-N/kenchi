@@ -1,19 +1,18 @@
 import numpy as np
 from scipy.stats import chi2
-from sklearn.base import BaseEstimator
 from sklearn.covariance import GraphLasso
 from sklearn.mixture import GaussianMixture
 from sklearn.preprocessing import Normalizer
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
-from ..base import AnalyzerMixin, DetectorMixin
+from ..base import AnalyzerMixin, BaseDetector
 from ...utils import assign_info_on_pandas_obj, construct_pandas_obj
 
 VALID_COVARIANCE_TYPES = ['full', 'tied', 'diag', 'spherical']
 
 
-class GaussianOutlierDetector(GraphLasso, AnalyzerMixin, DetectorMixin):
+class GaussianOutlierDetector(BaseDetector, AnalyzerMixin):
     """Outlier detector in Gaussian distribution.
 
     Parameters
@@ -36,12 +35,6 @@ class GaussianOutlierDetector(GraphLasso, AnalyzerMixin, DetectorMixin):
 
     Attributes
     ----------
-    covariance_ : ndarray of shape (n_features, n_features)
-        Estimated covariance matrix.
-
-    precision_ : ndarray of shape (n_features, n_features)
-        Estimated pseudo inverse matrix.
-
     threshold_ : float
         Threshold.
 
@@ -60,14 +53,11 @@ class GaussianOutlierDetector(GraphLasso, AnalyzerMixin, DetectorMixin):
         assume_centered=False, fpr=0.01,
         max_iter=100,          tol=0.0001
     ):
-        super().__init__(
-            alpha           = alpha,
-            assume_centered = assume_centered,
-            max_iter        = max_iter,
-            tol             = tol
-        )
-
-        self.fpr            = fpr
+        self.alpha           = alpha
+        self.assume_centered = assume_centered
+        self.fpr             = fpr
+        self.max_iter        = max_iter
+        self.tol             = tol
 
         self.check_params()
 
@@ -117,7 +107,12 @@ class GaussianOutlierDetector(GraphLasso, AnalyzerMixin, DetectorMixin):
 
         X                            = check_array(X)
 
-        super().fit(X)
+        self._glasso                 = GraphLasso(
+            alpha                    = self.alpha,
+            assume_centered          = self.assume_centered,
+            max_iter                 = self.max_iter,
+            tol                      = self.tol
+        ).fit(X)
 
         self.y_score_                = self.anomaly_score(X)
         df, loc, scale               = chi2.fit(self.y_score_)
@@ -147,14 +142,14 @@ class GaussianOutlierDetector(GraphLasso, AnalyzerMixin, DetectorMixin):
             Anomaly scores for test samples.
         """
 
-        check_is_fitted(self, ['covariance_', 'precision_'])
+        check_is_fitted(self, ['_glasso'])
 
         if X is None:
             return self.y_score_
         else:
             X = check_array(X)
 
-            return self.mahalanobis(X)
+            return self._glasso.mahalanobis(X)
 
     @construct_pandas_obj
     def feature_wise_anomaly_score(self, X):
@@ -171,18 +166,18 @@ class GaussianOutlierDetector(GraphLasso, AnalyzerMixin, DetectorMixin):
             Feature-wise anomaly scores for test samples.
         """
 
-        check_is_fitted(self, ['covariance_', 'precision_'])
+        check_is_fitted(self, ['_glasso'])
 
         X = check_array(X)
 
         return 0.5 * np.log(
-            2.0 * np.pi / np.diag(self.precision_)
+            2.0 * np.pi / np.diag(self._glasso.precision_)
         ) + 0.5 / np.diag(
-            self.precision_
-        ) * ((X - self.location_) @ self.precision_) ** 2
+            self._glasso.precision_
+        ) * ((X - self._glasso.location_) @ self._glasso.precision_) ** 2
 
 
-class GaussianMixtureOutlierDetector(GaussianMixture, DetectorMixin):
+class GaussianMixtureOutlierDetector(BaseDetector):
     """Outlier detector using Gaussian mixture models.
 
     Parameters
@@ -221,18 +216,6 @@ class GaussianMixtureOutlierDetector(GaussianMixture, DetectorMixin):
 
     Attributes
     ----------
-    weights_ : ndarray of shape (n_components,)
-        Weight of each mixture component.
-
-    means_ : ndarray of shape (n_components, n_features)
-        Mean of each mixture component.
-
-    covariances_ : ndarray
-        Covariance of each mixture component.
-
-    precisions_ : ndarray
-        Precision matrix of each mixture component.
-
     threshold_ : float
         Threshold.
     """
@@ -245,19 +228,16 @@ class GaussianMixtureOutlierDetector(GaussianMixture, DetectorMixin):
         tol=1e-03,            warm_start=False,
         weights_init=None
     ):
-        super().__init__(
-            covariance_type = covariance_type,
-            max_iter        = max_iter,
-            means_init      = means_init,
-            n_components    = n_components,
-            precisions_init = precisions_init,
-            random_state    = random_state,
-            tol             = tol,
-            warm_start      = warm_start,
-            weights_init    = weights_init
-        )
-
-        self.fpr            = fpr
+        self.covariance_type = covariance_type
+        self.fpr             = fpr
+        self.max_iter        = max_iter
+        self.means_init      = means_init
+        self.n_components    = n_components
+        self.precisions_init = precisions_init
+        self.random_state    = random_state
+        self.tol             = tol
+        self.warm_start      = warm_start
+        self.weights_init    = weights_init
 
         self.check_params()
 
@@ -308,12 +288,22 @@ class GaussianMixtureOutlierDetector(GaussianMixture, DetectorMixin):
             Return self.
         """
 
-        X               = check_array(X)
+        X                   = check_array(X)
 
-        super().fit(X)
+        self._gmm           = GaussianMixture(
+            covariance_type = self.covariance_type,
+            max_iter        = self.max_iter,
+            means_init      = self.means_init,
+            n_components    = self.n_components,
+            precisions_init = self.precisions_init,
+            random_state    = self.random_state,
+            tol             = self.tol,
+            warm_start      = self.warm_start,
+            weights_init    = self.weights_init
+        ).fit(X)
 
-        self.y_score_   = self.anomaly_score(X)
-        self.threshold_ = np.percentile(
+        self.y_score_       = self.anomaly_score(X)
+        self.threshold_     = np.percentile(
             self.y_score_, 100.0 * (1.0 - self.fpr)
         )
 
@@ -334,19 +324,17 @@ class GaussianMixtureOutlierDetector(GaussianMixture, DetectorMixin):
             Anomaly scores for test samples.
         """
 
-        check_is_fitted(
-            self, ['weights_', 'means_', 'covariances_', 'precisions_']
-        )
+        check_is_fitted(self, '_gmm')
 
         if X is None:
             return self.y_score_
         else:
             X = check_array(X)
 
-            return -self.score_samples(X)
+            return -self._gmm.score_samples(X)
 
 
-class VMFOutlierDetector(BaseEstimator, DetectorMixin):
+class VMFOutlierDetector(BaseDetector):
     """Outlier detector in Von Mises–Fisher distribution.
 
     Parameters
@@ -427,7 +415,7 @@ class VMFOutlierDetector(BaseEstimator, DetectorMixin):
             Anomaly scores for test samples.
         """
 
-        check_is_fitted(self, 'mean_direction_')
+        check_is_fitted(self, '_normalizer')
 
         if X is None:
             return self.y_score_

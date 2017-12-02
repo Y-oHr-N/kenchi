@@ -3,11 +3,11 @@ from sklearn.cluster import KMeans
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
-from ..base import DetectorMixin
+from ..base import BaseDetector
 from ...utils import assign_info_on_pandas_obj, construct_pandas_obj
 
 
-class KMeansOutlierDetector(KMeans, DetectorMixin):
+class KMeansOutlierDetector(BaseDetector):
     """Outlier detector using k-means clustering.
 
     Parameters
@@ -45,15 +45,12 @@ class KMeansOutlierDetector(KMeans, DetectorMixin):
         n_jobs=1,     random_state=None,
         tol=1e-04
     ):
-        super().__init__(
-            max_iter     = max_iter,
-            n_clusters   = n_clusters,
-            n_jobs       = n_jobs,
-            random_state = random_state,
-            tol          = tol
-        )
-
-        self.fpr         = fpr
+        self.fpr          = fpr
+        self.max_iter     = max_iter
+        self.n_clusters   = n_clusters
+        self.n_jobs       = n_jobs
+        self.random_state = random_state
+        self.tol          = tol
 
         self.check_params()
 
@@ -101,12 +98,18 @@ class KMeansOutlierDetector(KMeans, DetectorMixin):
             Return self.
         """
 
-        X               = check_array(X)
+        X                = check_array(X)
 
-        super().fit(X)
+        self._kmeans     = KMeans(
+            max_iter     = self.max_iter,
+            n_clusters   = self.n_clusters,
+            n_jobs       = self.n_jobs,
+            random_state = self.random_state,
+            tol          = self.tol
+        ).fit(X)
 
-        self.y_score_   = self.anomaly_score(X)
-        self.threshold_ = np.percentile(
+        self.y_score_    = self.anomaly_score(X)
+        self.threshold_  = np.percentile(
             self.y_score_, 100.0 * (1.0 - self.fpr)
         )
 
@@ -127,11 +130,11 @@ class KMeansOutlierDetector(KMeans, DetectorMixin):
             Anomaly scores for test samples.
         """
 
-        check_is_fitted(self, 'cluster_centers_')
+        check_is_fitted(self, '_kmeans')
 
         if X is None:
             return self.y_score_
         else:
             X  = check_array(X)
 
-            return np.min(self.transform(X), axis=1)
+            return np.min(self._kmeans.transform(X), axis=1)

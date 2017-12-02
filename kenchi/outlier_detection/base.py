@@ -1,15 +1,18 @@
 from abc import abstractmethod, ABC
 
 import numpy as np
+from sklearn.base import BaseEstimator
 from sklearn.utils.validation import check_is_fitted
 
 from ..utils import construct_pandas_obj, plot_anomaly_score, plot_roc_curve
 
 
-class DetectorMixin(ABC):
-    """Mixin class for all detectors."""
+class BaseDetector(BaseEstimator, ABC):
+    """Base class for all detectors."""
 
     # TODO: Implement score method
+
+    _estimator_type    = 'detector'
 
     plot_anomaly_score = plot_anomaly_score
     plot_roc_curve     = plot_roc_curve
