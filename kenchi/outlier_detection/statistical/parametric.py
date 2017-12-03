@@ -64,14 +64,14 @@ class GaussianOutlierDetector(BaseDetector, AnalyzerMixin):
     def check_params(self):
         """Check validity of parameters and raise ValueError if not valid."""
 
-        if self.alpha < 0 or 1 < self.alpha:
+        if self.alpha < 0.0 or 1.0 < self.alpha:
             raise ValueError(
                 'alpha must be between 0 and 1 inclusive but was {0}'.format(
                     self.alpha
                 )
             )
 
-        if self.fpr < 0 or 1 < self.fpr:
+        if self.fpr < 0.0 or 1.0 < self.fpr:
             raise ValueError(
                 'fpr must be between 0 and 1 inclusive but was {0}'.format(
                     self.fpr
@@ -85,7 +85,7 @@ class GaussianOutlierDetector(BaseDetector, AnalyzerMixin):
                 )
             )
 
-        if self.tol < 0:
+        if self.tol < 0.0:
             raise ValueError(
                 'tol must be non-negative but was {0}'.format(self.tol)
             )
@@ -118,9 +118,9 @@ class GaussianOutlierDetector(BaseDetector, AnalyzerMixin):
         df, loc, scale               = chi2.fit(self.y_score_)
         self.threshold_              = chi2.ppf(1.0 - self.fpr, df, loc, scale)
 
-        y_score                      = self.feature_wise_anomaly_score(X)
+        self.Y_score_                = self.feature_wise_anomaly_score(X)
         self.feature_wise_threshold_ = np.percentile(
-            a                        = y_score,
+            a                        = self.Y_score_,
             q                        = 100.0 * (1.0 - self.fpr),
             axis                     = 0
         )
@@ -168,13 +168,16 @@ class GaussianOutlierDetector(BaseDetector, AnalyzerMixin):
 
         check_is_fitted(self, ['_glasso'])
 
-        X = check_array(X)
+        if X is None:
+            return self.Y_score_
+        else:
+            X = check_array(X)
 
-        return 0.5 * np.log(
-            2.0 * np.pi / np.diag(self._glasso.precision_)
-        ) + 0.5 / np.diag(
-            self._glasso.precision_
-        ) * ((X - self._glasso.location_) @ self._glasso.precision_) ** 2
+            return 0.5 * np.log(
+                2.0 * np.pi / np.diag(self._glasso.precision_)
+            ) + 0.5 / np.diag(
+                self._glasso.precision_
+            ) * ((X - self._glasso.location_) @ self._glasso.precision_) ** 2
 
 
 class GaussianMixtureOutlierDetector(BaseDetector):
@@ -249,7 +252,7 @@ class GaussianMixtureOutlierDetector(BaseDetector):
                 'invalid covariance_type: {0}'.format(self.covariance_type)
             )
 
-        if self.fpr < 0 or 1 < self.fpr:
+        if self.fpr < 0.0 or 1.0 < self.fpr:
             raise ValueError(
                 'fpr must be between 0 and 1 inclusive but was {0}'.format(
                     self.fpr
@@ -268,7 +271,7 @@ class GaussianMixtureOutlierDetector(BaseDetector):
                 )
             )
 
-        if self.tol < 0:
+        if self.tol < 0.0:
             raise ValueError(
                 'tol must be non-negative but was {0}'.format(self.tol)
             )
@@ -363,7 +366,7 @@ class VMFOutlierDetector(BaseDetector):
     def check_params(self):
         """Check validity of parameters and raise ValueError if not valid."""
 
-        if self.fpr < 0 or 1 < self.fpr:
+        if self.fpr < 0.0 or 1.0 < self.fpr:
             raise ValueError(
                 'fpr must be between 0 and 1 inclusive but was {0}'.format(
                     self.fpr
