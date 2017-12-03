@@ -10,8 +10,6 @@ from ..utils import construct_pandas_obj, plot_anomaly_score, plot_roc_curve
 class BaseDetector(BaseEstimator, ABC):
     """Base class for all detectors."""
 
-    # TODO: Implement score method
-
     _estimator_type    = 'detector'
 
     plot_anomaly_score = plot_anomaly_score
@@ -52,7 +50,7 @@ class BaseDetector(BaseEstimator, ABC):
         if threshold is None:
             threshold = self.threshold_
 
-        return np.where(self.anomaly_score(X) > threshold, -1, 1)
+        return np.where(self.anomaly_score(X) <= threshold, 1, -1)
 
     def fit_detect(self, X, y=None, threshold=None, **fit_params):
         """Fit the model according to the given training data and detect if a
@@ -73,6 +71,25 @@ class BaseDetector(BaseEstimator, ABC):
         """
 
         return self.fit(X, **fit_params).detect(threshold=threshold)
+
+    def score(X, y, threshold=None):
+        """Return the F1 score on the given test data and labels.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Test samples.
+
+        y : array-like of shape (n_samples,)
+            True labels for test samples.
+
+        Returns
+        -------
+        score : float
+            F1 score.
+        """
+
+        return f1_score(y, self.detect(X, threshold=threshold))
 
 
 class AnalyzerMixin:
