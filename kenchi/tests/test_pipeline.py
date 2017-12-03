@@ -6,7 +6,7 @@ import pandas as pd
 from sklearn.exceptions import NotFittedError
 from sklearn.preprocessing import StandardScaler
 
-from kenchi.datasets import make_blobs_with_outliers
+from kenchi.datasets import make_blobs
 from kenchi.outlier_detection.statistical import GaussianOutlierDetector
 from kenchi.pipeline import ExtendedPipeline
 
@@ -15,7 +15,7 @@ mpl.use('Agg')
 
 class ExtendedPipelineTest(unittest.TestCase):
     def setUp(self):
-        self.X, _ = make_blobs_with_outliers(n_outliers=0)
+        self.X, _ = make_blobs(n_outliers=0)
         self.df   = pd.DataFrame(self.X)
         self.sut  = ExtendedPipeline([
             ('standardize', StandardScaler()),

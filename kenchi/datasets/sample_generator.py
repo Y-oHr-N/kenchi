@@ -1,9 +1,9 @@
 import numpy as np
-from sklearn.datasets import make_blobs
+from sklearn import datasets
 from sklearn.utils import check_random_state
 
 
-def make_blobs_with_outliers(
+def make_blobs(
     n_inliers=90,    n_outliers=10,
     n_features=2,    centers=3,
     cluster_std=1.0, center_box=(-10, 10),
@@ -50,7 +50,7 @@ def make_blobs_with_outliers(
 
     generator        = check_random_state(random_state)
 
-    X_inliers, _     = make_blobs(
+    X_inliers, _     = datasets.make_blobs(
         n_samples    = n_inliers,
         n_features   = n_features,
         centers      = centers,

@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from sklearn.exceptions import NotFittedError
 
-from kenchi.datasets import make_blobs_with_outliers
+from kenchi.datasets import make_blobs
 from kenchi.outlier_detection.statistical import (
     GaussianOutlierDetector,
     GaussianMixtureOutlierDetector,
@@ -17,7 +17,7 @@ mpl.use('Agg')
 
 class GaussianOutlierDetectorTest(unittest.TestCase):
     def setUp(self):
-        self.X, _ = make_blobs_with_outliers(n_outliers=0)
+        self.X, _ = make_blobs(n_outliers=0)
         self.df   = pd.DataFrame(self.X)
         self.sut  = GaussianOutlierDetector()
 
@@ -54,13 +54,13 @@ class GaussianOutlierDetectorTest(unittest.TestCase):
 
     def test_plot_anomaly_score(self):
         self.assertIsInstance(
-            self.sut.fit(self.X).plot_anomaly_score(self.X), mpl.axes.Axes
+            self.sut.fit(self.X).plot_anomaly_score(), mpl.axes.Axes
         )
 
 
 class GaussianMixtureOutlierDetectorTest(unittest.TestCase):
     def setUp(self):
-        self.X, _ = make_blobs_with_outliers(n_outliers=0)
+        self.X, _ = make_blobs(n_outliers=0)
         self.df   = pd.DataFrame(self.X)
         self.sut  = GaussianMixtureOutlierDetector()
 
@@ -85,13 +85,13 @@ class GaussianMixtureOutlierDetectorTest(unittest.TestCase):
 
     def test_plot_anomaly_score(self):
         self.assertIsInstance(
-            self.sut.fit(self.X).plot_anomaly_score(self.X), mpl.axes.Axes
+            self.sut.fit(self.X).plot_anomaly_score(), mpl.axes.Axes
         )
 
 
 class VMFOutlierDetectorTest(unittest.TestCase):
     def setUp(self):
-        self.X, _ = make_blobs_with_outliers(n_outliers=0)
+        self.X, _ = make_blobs(n_outliers=0)
         self.df   = pd.DataFrame(self.X)
         self.sut  = VMFOutlierDetector()
 
@@ -114,5 +114,5 @@ class VMFOutlierDetectorTest(unittest.TestCase):
 
     def test_plot_anomaly_score(self):
         self.assertIsInstance(
-            self.sut.fit(self.X).plot_anomaly_score(self.X), mpl.axes.Axes
+            self.sut.fit(self.X).plot_anomaly_score(), mpl.axes.Axes
         )
