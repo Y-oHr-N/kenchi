@@ -279,6 +279,9 @@ class SparseStructureLearning(BaseDetector):
     fpr : float, default 0.01
         False positive rate. Used to compute the threshold.
 
+    cluster_params : dict, default None
+        Additional keyword arguments for affinity propagation.
+
     kwargs : dict
         All other keyword arguments are passed to covariance.GraphLasso.
 
@@ -350,13 +353,23 @@ class SparseStructureLearning(BaseDetector):
         """Return the label of each feature."""
 
         # cluster using affinity propagation
-        _, labels = cluster.affinity_propagation(self.partial_corrcoef_)
+        _, labels = cluster.affinity_propagation(
+            self.partial_corrcoef_, **self.cluster_params
+        )
 
         return labels
 
-    def __init__(self, fpr: float=0.01, **kwargs) -> None:
-        self.fpr     = fpr
-        self._glasso = covariance.GraphLasso(**kwargs)
+    def __init__(
+        self, fpr: float=0.01, cluster_params: dict=None, **kwargs
+    ) -> None:
+        self.fpr                = fpr
+
+        if cluster_params is None:
+            self.cluster_params = {}
+        else:
+            self.cluster_params = cluster_params
+
+        self._glasso            = covariance.GraphLasso(**kwargs)
 
         self.check_params()
 
