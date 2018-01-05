@@ -2,7 +2,7 @@ import numpy as np
 from sklearn import cluster
 from sklearn.utils import check_array
 
-from .base import BaseDetector, OneDimArray, TwoDimArray
+from .base import timeit, BaseDetector, OneDimArray, TwoDimArray
 
 __all__ = ['MiniBatchKMeans']
 
@@ -14,6 +14,9 @@ class MiniBatchKMeans(BaseDetector):
     ----------
     fpr : float, default 0.01
         False positive rate. Used to compute the threshold.
+
+    verbose : bool, default False
+        Enable verbose output.
 
     kwargs : dict
         All other keyword arguments are passed to cluster.MiniBatchKMeans().
@@ -48,8 +51,14 @@ class MiniBatchKMeans(BaseDetector):
     def labels_(self) -> OneDimArray:
         return self._kmeans.labels_
 
-    def __init__(self, fpr: float = 0.01, **kwargs) -> None:
+    def __init__(
+        self,
+        fpr:     float = 0.01,
+        verbose: bool  = False,
+        **kwargs
+    ) -> None:
         self.fpr     = fpr
+        self.verbose = verbose
         self._kmeans = cluster.MiniBatchKMeans(**kwargs)
 
         self.check_params()
@@ -62,6 +71,7 @@ class MiniBatchKMeans(BaseDetector):
                 f'fpr must be between 0.0 and 1.0 inclusive but was {self.fpr}'
             )
 
+    @timeit
     def fit(self, X: TwoDimArray, y: OneDimArray = None) -> 'MiniBatchKMeans':
         """Fit the model according to the given training data.
 

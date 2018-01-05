@@ -4,7 +4,7 @@ from sklearn import cluster, covariance, mixture, neighbors
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
-from .base import BaseDetector, OneDimArray, TwoDimArray
+from .base import timeit, BaseDetector, OneDimArray, TwoDimArray
 
 __all__ = ['GMM', 'KDE', 'SparseStructureLearning']
 
@@ -16,6 +16,9 @@ class GMM(BaseDetector):
     ----------
     fpr : float, default 0.01
         False positive rate. Used to compute the threshold.
+
+    verbose : bool, default False
+        Enable verbose output.
 
     kwargs : dict
         All other keyword arguments are passed to mixture.GaussianMixture().
@@ -86,9 +89,15 @@ class GMM(BaseDetector):
     def weights_(self) -> OneDimArray:
         return self._gmm.weights_
 
-    def __init__(self, fpr: float = 0.01, **kwargs) -> None:
-        self.fpr  = fpr
-        self._gmm = mixture.GaussianMixture(**kwargs)
+    def __init__(
+        self,
+        fpr:     float = 0.01,
+        verbose: bool  = False,
+        **kwargs
+    ) -> None:
+        self.fpr     = fpr
+        self.verbose = verbose
+        self._gmm    = mixture.GaussianMixture(**kwargs)
 
         self.check_params()
 
@@ -100,6 +109,7 @@ class GMM(BaseDetector):
                 f'fpr must be between 0.0 and 1.0 inclusive but was {self.fpr}'
             )
 
+    @timeit
     def fit(self, X: TwoDimArray, y: OneDimArray = None) -> 'GMM':
         """Fit the model according to the given training data.
 
@@ -171,6 +181,9 @@ class KDE(BaseDetector):
     fpr : float, default 0.01
         False positive rate. Used to compute the threshold.
 
+    verbose : bool, default False
+        Enable verbose output.
+
     kwargs : dict
         All other keyword arguments are passed to neighbors.KernelDensity().
 
@@ -187,9 +200,15 @@ class KDE(BaseDetector):
     def X_(self) -> TwoDimArray:
         return self._kde.tree_.data
 
-    def __init__(self, fpr: float = 0.01, **kwargs) -> None:
-        self.fpr  = fpr
-        self._kde = neighbors.KernelDensity(**kwargs)
+    def __init__(
+        self,
+        fpr:     float = 0.01,
+        verbose: bool  = False,
+        **kwargs
+    ) -> None:
+        self.fpr     = fpr
+        self.verbose = verbose
+        self._kde    = neighbors.KernelDensity(**kwargs)
 
         self.check_params()
 
@@ -201,6 +220,7 @@ class KDE(BaseDetector):
                 f'fpr must be between 0.0 and 1.0 inclusive but was {self.fpr}'
             )
 
+    @timeit
     def fit(self, X: TwoDimArray, y: OneDimArray = None) -> 'KDE':
         """Fit the model according to the given training data.
 
@@ -274,6 +294,9 @@ class SparseStructureLearning(BaseDetector):
 
     cluster_params : dict, default None
         Additional keyword arguments for affinity propagation().
+
+    verbose : bool, default False
+        Enable verbose output.
 
     kwargs : dict
         All other keyword arguments are passed to covariance.GraphLasso().
@@ -353,10 +376,15 @@ class SparseStructureLearning(BaseDetector):
         return self._glasso.precision_
 
     def __init__(
-        self, fpr: float = 0.01, cluster_params: dict = None, **kwargs
+        self,
+        fpr:            float = 0.01,
+        cluster_params: dict  = None,
+        verbose:        bool  = False,
+        **kwargs
     ) -> None:
         self.fpr            = fpr
         self.cluster_params = {} if cluster_params is None else cluster_params
+        self.verbose        = verbose
         self._glasso        = covariance.GraphLasso(**kwargs)
 
         self.check_params()
@@ -369,8 +397,11 @@ class SparseStructureLearning(BaseDetector):
                 f'fpr must be between 0.0 and 1.0 inclusive but was {self.fpr}'
             )
 
+    @timeit
     def fit(
-        self, X: TwoDimArray, y: OneDimArray = None
+        self,
+        X: TwoDimArray,
+        y: OneDimArray = None
     ) -> 'SparseStructureLearning':
         """Fit the model according to the given training data.
 

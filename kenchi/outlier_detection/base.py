@@ -1,4 +1,6 @@
+import time
 from abc import abstractmethod, ABC
+from functools import wraps
 from typing import Union
 
 import numpy as np
@@ -8,6 +10,40 @@ from sklearn.utils.validation import check_is_fitted
 
 OneDimArray = Union[np.ndarray, pd.Series]
 TwoDimArray = Union[np.ndarray, pd.DataFrame]
+
+
+def timeit(func):
+    """Return the wrapper function that measures the elapsed time.
+
+    Parameters
+    ----------
+    func : callable
+        Wrapped function.
+
+    Returns
+    -------
+    wrapper : callable
+        Wrapper function.
+    """
+
+    @wraps(func)
+    def wrapper(estimator, *args, **kwargs):
+        def short_format_time(t: float) -> str:
+            if t > 60.:
+                return f'{t / 60.:5.1f} min'
+            else:
+                return f'{t:5.1f} sec'
+
+        start   = time.time()
+        result  = func(estimator, *args, **kwargs)
+        elapsed = time.time() - start
+
+        if estimator.verbose:
+            print(f'elaplsed: {short_format_time(elapsed)}')
+
+        return result
+
+    return wrapper
 
 
 class BaseDetector(BaseEstimator, ABC):

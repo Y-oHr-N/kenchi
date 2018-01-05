@@ -5,13 +5,15 @@ from sklearn import neighbors
 from sklearn.externals.joblib import delayed, Parallel
 from sklearn.utils import gen_even_slices
 
-from .base import BaseDetector, OneDimArray, TwoDimArray
+from .base import timeit, BaseDetector, OneDimArray, TwoDimArray
 
 __all__ = ['FastABOD']
 
 
 def _abof(
-    X_train: TwoDimArray, X: TwoDimArray, ind: TwoDimArray
+    X_train: TwoDimArray,
+    X:       TwoDimArray,
+    ind:     TwoDimArray
 ) -> OneDimArray:
     """Compute the angle-based outlier factor for each sample."""
 
@@ -35,6 +37,9 @@ class FastABOD(BaseDetector):
         Number of jobs to run in parallel. If -1, then the number of jobs is
         set to the number of CPU cores.
 
+    verbose : bool, default False
+        Enable verbose output.
+
     kwargs : dict
         All other keyword arguments are passed to neighbors.NearestNeighbors().
 
@@ -57,10 +62,17 @@ class FastABOD(BaseDetector):
     def X_(self) -> OneDimArray:
         return self._knn._fit_X
 
-    def __init__(self, fpr: float = 0.01, n_jobs: int = 1, **kwargs) -> None:
-        self.fpr    = fpr
-        self.n_jobs = n_jobs
-        self._knn   = neighbors.NearestNeighbors(**kwargs)
+    def __init__(
+        self,
+        fpr:     float = 0.01,
+        n_jobs:  int   = 1,
+        verbose: bool  = False,
+        **kwargs
+    ) -> None:
+        self.fpr     = fpr
+        self.n_jobs  = n_jobs
+        self.verbose = verbose
+        self._knn    = neighbors.NearestNeighbors(**kwargs)
 
         self.check_params()
 
@@ -72,6 +84,7 @@ class FastABOD(BaseDetector):
                 f'fpr must be between 0.0 and 1.0 inclusive but was {self.fpr}'
             )
 
+    @timeit
     def fit(self, X: TwoDimArray, y: OneDimArray = None) -> 'FastABOD':
         """Fit the model according to the given training data.
 
@@ -117,7 +130,7 @@ class FastABOD(BaseDetector):
         n_samples, _ = X.shape
 
         try:
-            result   = Parallel(self.n_jobs)(
+            result   = Parallel(n_jobs=self.n_jobs)(
                 delayed(_abof)(
                     self.X_, X[s], ind[s]
                 ) for s in gen_even_slices(n_samples, self.n_jobs)

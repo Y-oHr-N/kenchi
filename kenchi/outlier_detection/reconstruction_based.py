@@ -2,7 +2,7 @@ import numpy as np
 from sklearn import decomposition
 from sklearn.utils import check_array
 
-from .base import BaseDetector, OneDimArray, TwoDimArray
+from .base import timeit, BaseDetector, OneDimArray, TwoDimArray
 
 __all__ = ['PCA']
 
@@ -14,6 +14,9 @@ class PCA(BaseDetector):
     ----------
     fpr : float, default 0.01
         False positive rate. Used to compute the threshold.
+
+    verbose : bool, default False
+        Enable verbose output.
 
     kwargs : dict
         All other keyword arguments are passed to decomposition.PCA().
@@ -78,9 +81,15 @@ class PCA(BaseDetector):
     def singular_values_(self) -> OneDimArray:
         return self._pca.singular_values_
 
-    def __init__(self, fpr: float = 0.01, **kwargs) -> None:
-        self.fpr  = fpr
-        self._pca = decomposition.PCA(**kwargs)
+    def __init__(
+        self,
+        fpr:     float = 0.01,
+        verbose: bool  = False,
+        **kwargs
+    ) -> None:
+        self.fpr     = fpr
+        self.verbose = verbose
+        self._pca    = decomposition.PCA(**kwargs)
 
         self.check_params()
 
@@ -92,6 +101,7 @@ class PCA(BaseDetector):
                 f'fpr must be between 0.0 and 1.0 inclusive but was {self.fpr}'
             )
 
+    @timeit
     def fit(self, X: TwoDimArray, y: OneDimArray = None) -> 'PCA':
         """Fit the model according to the given training data.
 

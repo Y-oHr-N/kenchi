@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn import neighbors
 
-from .base import BaseDetector, OneDimArray, TwoDimArray
+from .base import timeit, BaseDetector, OneDimArray, TwoDimArray
 
 __all__ = ['KNN']
 
@@ -13,6 +13,9 @@ class KNN(BaseDetector):
     ----------
     fpr : float, default 0.01
         False positive rate. Used to compute the threshold.
+
+    verbose : bool, default False
+        Enable verbose output.
 
     weight : bool, default False
         If True, anomaly score is the sum of the distances from k nearest
@@ -45,11 +48,16 @@ class KNN(BaseDetector):
         return self._knn._fit_X
 
     def __init__(
-        self, fpr: float = 0.01, weight: bool = True, **kwargs
+        self,
+        fpr:     float = 0.01,
+        verbose: bool  = False,
+        weight:  bool  = False,
+        **kwargs
     ) -> None:
-        self.fpr    = fpr
-        self.weight = weight
-        self._knn   = neighbors.NearestNeighbors(**kwargs)
+        self.fpr     = fpr
+        self.verbose = verbose
+        self.weight  = weight
+        self._knn    = neighbors.NearestNeighbors(**kwargs)
 
         self.check_params()
 
@@ -61,6 +69,7 @@ class KNN(BaseDetector):
                 f'fpr must be between 0.0 and 1.0 inclusive but was {self.fpr}'
             )
 
+    @timeit
     def fit(self, X: TwoDimArray, y: OneDimArray = None) -> 'KNN':
         """Fit the model according to the given training data.
 
