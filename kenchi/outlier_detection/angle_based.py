@@ -2,27 +2,29 @@ from itertools import combinations
 
 import numpy as np
 from sklearn import neighbors
-from sklearn.externals.joblib import Parallel, delayed
+from sklearn.externals.joblib import delayed, Parallel
 from sklearn.utils import gen_even_slices
 
-from .base import ArrayLike, BaseDetector
+from .base import BaseDetector, OneDimArray, TwoDimArray
 
 __all__ = ['FastABOD']
 
 
-def _abof(X: np.ndarray, ind: np.ndarray, fit_X: np.ndarray) -> np.ndarray:
+def _abof(
+    X_train: TwoDimArray, X: TwoDimArray, ind: TwoDimArray
+) -> OneDimArray:
     """Compute the angle-based outlier factor for each sample."""
 
     with np.errstate(invalid='raise'):
         return np.var([[
             (pa @ pb) / (pa @ pa) / (pb @ pb) for pa, pb in combinations(
-                fit_X[ind_p] - p, 2
+                X_train[ind_p] - p, 2
             )
         ] for p, ind_p in zip(X, ind)], axis=1)
 
 
 class FastABOD(BaseDetector):
-    """Fast angle-based outlier detector.
+    """Fast Angle-Based Outlier Detector (FastABOD).
 
     Parameters
     ----------
@@ -33,13 +35,16 @@ class FastABOD(BaseDetector):
         Number of jobs to run in parallel. If -1, then the number of jobs is
         set to the number of CPU cores.
 
+    kwargs : dict
+        All other keyword arguments are passed to neighbors.NearestNeighbors().
+
     Attributes
     ----------
-    anomaly_score_ : np.ndarray of shape (n_samples,)
-        Anomaly score for each training sample.
-
     threshold_ : float
         Threshold.
+
+    X_ : array-like of shape (n_samples, n_features)
+        Training data.
 
     References
     ----------
@@ -48,7 +53,11 @@ class FastABOD(BaseDetector):
     In Proceedings of SIGKDD'08, pp. 444-452, 2008.
     """
 
-    def __init__(self, fpr: float=0.01, n_jobs: int=1, **kwargs) -> None:
+    @property
+    def X_(self) -> OneDimArray:
+        return self._knn._fit_X
+
+    def __init__(self, fpr: float = 0.01, n_jobs: int = 1, **kwargs) -> None:
         self.fpr    = fpr
         self.n_jobs = n_jobs
         self._knn   = neighbors.NearestNeighbors(**kwargs)
@@ -63,7 +72,7 @@ class FastABOD(BaseDetector):
                 f'fpr must be between 0.0 and 1.0 inclusive but was {self.fpr}'
             )
 
-    def fit(self, X: ArrayLike, y: None=None) -> 'FastABOD':
+    def fit(self, X: TwoDimArray, y: OneDimArray = None) -> 'FastABOD':
         """Fit the model according to the given training data.
 
         Parameters
@@ -71,8 +80,7 @@ class FastABOD(BaseDetector):
         X : array-like of shape (n_samples, n_features)
             Training data.
 
-        y : None
-            Ignored.
+        y : ignored
 
         Returns
         -------
@@ -82,14 +90,12 @@ class FastABOD(BaseDetector):
 
         self._knn.fit(X)
 
-        self.anomaly_score_ = self.anomaly_score()
-        self.threshold_     = np.percentile(
-            self.anomaly_score_, 100.0 * (1.0 - self.fpr)
-        )
+        anomaly_score   = self.anomaly_score()
+        self.threshold_ = np.percentile(anomaly_score, 100. * (1. - self.fpr))
 
         return self
 
-    def anomaly_score(self, X: ArrayLike=None) -> np.ndarray:
+    def anomaly_score(self, X: TwoDimArray = None) -> OneDimArray:
         """Compute the anomaly score for each sample.
 
         Parameters
@@ -106,14 +112,14 @@ class FastABOD(BaseDetector):
         ind          = self._knn.kneighbors(X, return_distance=False)
 
         if X is None:
-            X        = self._knn._fit_X
+            X        = self.X_
 
         n_samples, _ = X.shape
 
         try:
             result   = Parallel(self.n_jobs)(
                 delayed(_abof)(
-                    X[s], ind[s], self._knn._fit_X
+                    self.X_, X[s], ind[s]
                 ) for s in gen_even_slices(n_samples, self.n_jobs)
             )
         except FloatingPointError as e:
@@ -121,7 +127,7 @@ class FastABOD(BaseDetector):
 
         return -np.concatenate(result)
 
-    def score(X: ArrayLike, y: None=None) -> float:
+    def score(X: TwoDimArray, y: OneDimArray = None) -> float:
         """Compute the mean log-likelihood of the given data."""
 
         raise NotImplementedError()

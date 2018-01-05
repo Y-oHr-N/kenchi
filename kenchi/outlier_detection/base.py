@@ -6,7 +6,8 @@ import pandas as pd
 from sklearn.base import BaseEstimator
 from sklearn.utils.validation import check_is_fitted
 
-ArrayLike = Union[np.ndarray, pd.DataFrame]
+OneDimArray = Union[np.ndarray, pd.Series]
+TwoDimArray = Union[np.ndarray, pd.DataFrame]
 
 
 class BaseDetector(BaseEstimator, ABC):
@@ -24,18 +25,22 @@ class BaseDetector(BaseEstimator, ABC):
         """Check validity of parameters and raise ValueError if not valid."""
 
     @abstractmethod
-    def fit(self, X: ArrayLike, y: None=None, **fit_params) -> 'BaseDetector':
+    def fit(
+        self, X: TwoDimArray, y: OneDimArray = None, **fit_params
+    ) -> 'BaseDetector':
         """Fit the model according to the given training data."""
 
     @abstractmethod
-    def anomaly_score(self, X: ArrayLike=None) -> np.ndarray:
+    def anomaly_score(self, X: TwoDimArray = None) -> OneDimArray:
         """Compute the anomaly score for each sample."""
 
     @abstractmethod
-    def score(self, X: ArrayLike, y: None=None) -> float:
+    def score(self, X: TwoDimArray, y: OneDimArray = None) -> float:
         """Compute the mean log-likelihood of the given data."""
 
-    def predict(self, X: ArrayLike=None, threshold: float=None) -> np.ndarray:
+    def predict(
+        self, X: TwoDimArray = None, threshold: float = None
+    ) -> OneDimArray:
         """Predict if a particular sample is an outlier or not.
 
         Parameters
@@ -48,7 +53,7 @@ class BaseDetector(BaseEstimator, ABC):
 
         Returns
         -------
-        y_pred : ndarray of shape (n_samples,)
+        y_pred : array-like of shape (n_samples,)
             Return 1 for inliers and -1 for outliers.
         """
 
@@ -60,8 +65,9 @@ class BaseDetector(BaseEstimator, ABC):
         return np.where(self.anomaly_score(X) <= threshold, 1, -1)
 
     def fit_predict(
-        self, X: ArrayLike, y: None=None, threshold: float=None, **fit_params
-    ) -> np.ndarray:
+        self, X: TwoDimArray, y: OneDimArray = None, threshold: float = None,
+        **fit_params
+    ) -> OneDimArray:
         """Fit the model according to the given training data and predict if a
         particular sample is an outlier or not.
 
@@ -70,8 +76,7 @@ class BaseDetector(BaseEstimator, ABC):
         X : array-like of shape (n_samples, n_features)
             Training Data.
 
-        y : None
-            Ignored.
+        y : ignored
 
         threshold : float, default None
             User-provided threshold.

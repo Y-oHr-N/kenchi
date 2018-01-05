@@ -1,7 +1,7 @@
 import numpy as np
 from sklearn import neighbors
 
-from .base import ArrayLike, BaseDetector
+from .base import BaseDetector, OneDimArray, TwoDimArray
 
 __all__ = ['KNN']
 
@@ -19,15 +19,15 @@ class KNN(BaseDetector):
         neighbors.
 
     kwargs : dict
-        All other keyword arguments are passed to neighbors.NearestNeighbors.
+        All other keyword arguments are passed to neighbors.NearestNeighbors().
 
     Attributes
     ----------
-    anomaly_score_ : ndarray of shape (n_samples,)
-        Anoamly score for each training sample.
-
     threshold_ : float
         Threshold.
+
+    X_ : array-like of shape (n_samples, n_features)
+        Training data.
 
     References
     ----------
@@ -40,7 +40,13 @@ class KNN(BaseDetector):
     In Proceedings of PKDD'02, pp. 15-27, 2002.
     """
 
-    def __init__(self, fpr: float=0.01, weight: bool=True, **kwargs) -> None:
+    @property
+    def X_(self) -> TwoDimArray:
+        return self._knn._fit_X
+
+    def __init__(
+        self, fpr: float = 0.01, weight: bool = True, **kwargs
+    ) -> None:
         self.fpr    = fpr
         self.weight = weight
         self._knn   = neighbors.NearestNeighbors(**kwargs)
@@ -55,7 +61,7 @@ class KNN(BaseDetector):
                 f'fpr must be between 0.0 and 1.0 inclusive but was {self.fpr}'
             )
 
-    def fit(self, X: ArrayLike, y: None=None) -> 'KNN':
+    def fit(self, X: TwoDimArray, y: OneDimArray = None) -> 'KNN':
         """Fit the model according to the given training data.
 
         Parameters
@@ -63,8 +69,7 @@ class KNN(BaseDetector):
         X : array-like of shape (n_samples, n_features)
             Training Data.
 
-        y : None
-            Ignored.
+        y : ignored
 
         Returns
         -------
@@ -74,14 +79,12 @@ class KNN(BaseDetector):
 
         self._knn.fit(X)
 
-        self.anomaly_score_ = self.anomaly_score()
-        self.threshold_     = np.percentile(
-            self.anomaly_score_, 100. * (1. - self.fpr)
-        )
+        anomaly_score   = self.anomaly_score()
+        self.threshold_ = np.percentile(anomaly_score, 100. * (1. - self.fpr))
 
         return self
 
-    def anomaly_score(self, X: ArrayLike=None) -> np.ndarray:
+    def anomaly_score(self, X: TwoDimArray = None) -> OneDimArray:
         """Compute the anomaly score for each sample.
 
         Parameters
@@ -91,21 +94,18 @@ class KNN(BaseDetector):
 
         Returns
         -------
-        anomaly_score : ndarray of shape (n_samples,)
+        anomaly_score : array-like of shape (n_samples,)
             Anomaly score for each sample.
         """
 
-        if X is None:
-            dist, _ = self._knn.kneighbors()
-        else:
-            dist, _ = self._knn.kneighbors(X)
+        dist, _ = self._knn.kneighbors(X)
 
         if self.weight:
             return np.sum(dist, axis=1)
         else:
             return np.max(dist, axis=1)
 
-    def score(X: ArrayLike, y: None=None) -> float:
+    def score(X: TwoDimArray, y: OneDimArray = None) -> float:
         """Compute the mean log-likelihood of the given data."""
 
         raise NotImplementedError()

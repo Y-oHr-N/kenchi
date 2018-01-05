@@ -1,17 +1,16 @@
-from typing import Union
-
 import numpy as np
 import scipy as sp
-from sklearn import covariance, cluster, mixture, neighbors
+from sklearn import cluster, covariance, mixture, neighbors
+from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
-from .base import ArrayLike, BaseDetector
+from .base import BaseDetector, OneDimArray, TwoDimArray
 
 __all__ = ['GMM', 'KDE', 'SparseStructureLearning']
 
 
 class GMM(BaseDetector):
-    """Outlier detector using Gaussian mixture models.
+    """Outlier detector using Gaussian Mixture Models (GMMs).
 
     Parameters
     ----------
@@ -19,40 +18,40 @@ class GMM(BaseDetector):
         False positive rate. Used to compute the threshold.
 
     kwargs : dict
-        All other keyword arguments are passed to mixture.GaussianMixture.
+        All other keyword arguments are passed to mixture.GaussianMixture().
 
     Attributes
     ----------
     converged_ : bool
         True when convergence was reached in fit(), False otherwise.
 
-    covariances_ : ndarray
+    covariances_ : array-like
         Covariance of each mixture component.
 
     lower_bound_ : float
         Log-likelihood of the best fit of EM.
 
-    means_ : ndarray of shape (n_components, n_features)
+    means_ : array-like of shape (n_components, n_features)
         Mean of each mixture component.
 
     n_iter_ : int
         Number of step used by the best fit of EM to reach the convergence.
 
-    precisions_ : ndarray
+    precisions_ : array-like
         Precision matrices for each component in the mixture.
 
-    precisions_cholesky_ : ndarray
+    precisions_cholesky_ : array-like
         Cholesky decomposition of the precision matrices of each mixture
         component.
 
-    weights_ : ndarray of shape (n_components,)
-        Weights of each mixture components.
-
-    anomaly_score_ : ndarray of shape (n_samples,)
-        Anomaly score for each training sample.
-
     threshold_ : float
         Threshold.
+
+    weights_ : array-like of shape (n_components,)
+        Weights of each mixture components.
+
+    X_ : array-like of shape (n_samples, n_features)
+        Training data.
     """
 
     @property
@@ -60,7 +59,7 @@ class GMM(BaseDetector):
         return self._gmm.converged_
 
     @property
-    def covariances_(self) -> np.ndarray:
+    def covariances_(self) -> OneDimArray:
         return self._gmm.covariances_
 
     @property
@@ -68,7 +67,7 @@ class GMM(BaseDetector):
         return self._gmm.lower_bound_
 
     @property
-    def means_(self) -> np.ndarray:
+    def means_(self) -> OneDimArray:
         return self._gmm.means_
 
     @property
@@ -76,18 +75,18 @@ class GMM(BaseDetector):
         return self._gmm.n_iter_
 
     @property
-    def precisions_(self) -> np.ndarray:
+    def precisions_(self) -> OneDimArray:
         return self._gmm.precisions_
 
     @property
-    def precisions_cholesky_(self) -> np.ndarray:
+    def precisions_cholesky_(self) -> OneDimArray:
         return self._gmm.precisions_cholesky_
 
     @property
-    def weights_(self) -> np.ndarray:
+    def weights_(self) -> OneDimArray:
         return self._gmm.weights_
 
-    def __init__(self, fpr=0.01, **kwargs) -> None:
+    def __init__(self, fpr: float = 0.01, **kwargs) -> None:
         self.fpr  = fpr
         self._gmm = mixture.GaussianMixture(**kwargs)
 
@@ -101,7 +100,7 @@ class GMM(BaseDetector):
                 f'fpr must be between 0.0 and 1.0 inclusive but was {self.fpr}'
             )
 
-    def fit(self, X: ArrayLike, y: None=None) -> 'GMM':
+    def fit(self, X: TwoDimArray, y: OneDimArray = None) -> 'GMM':
         """Fit the model according to the given training data.
 
         Parameters
@@ -109,8 +108,7 @@ class GMM(BaseDetector):
         X : array-like of shape (n_samples, n_features)
             Training data.
 
-        y : None
-            Ignored.
+        y : ignored
 
         Returns
         -------
@@ -118,16 +116,16 @@ class GMM(BaseDetector):
             Return self.
         """
 
-        self._gmm.fit(X)
+        self.X_         = check_array(X)
 
-        self.anomaly_score_ = self.anomaly_score(X)
-        self.threshold_     = np.percentile(
-            self.anomaly_score_, 100. * (1. - self.fpr)
-        )
+        self._gmm.fit(self.X_)
+
+        anomaly_score   = self.anomaly_score()
+        self.threshold_ = np.percentile(anomaly_score, 100. * (1. - self.fpr))
 
         return self
 
-    def anomaly_score(self, X: ArrayLike=None) -> np.ndarray:
+    def anomaly_score(self, X: TwoDimArray = None) -> OneDimArray:
         """Compute the anomaly score for each sample.
 
         Parameters
@@ -142,11 +140,11 @@ class GMM(BaseDetector):
         """
 
         if X is None:
-            return self.anomaly_score_
-        else:
-            return -self._gmm.score_samples(X)
+            X = self.X_
 
-    def score(self, X: ArrayLike, y: None=None) -> float:
+        return -self._gmm.score_samples(X)
+
+    def score(self, X: TwoDimArray, y: OneDimArray = None) -> float:
         """Compute the mean log-likelihood of the given data.
 
         Parameters
@@ -154,8 +152,7 @@ class GMM(BaseDetector):
         X : array-like of shape (n_samples, n_features)
             Data.
 
-        y : None
-            Ignored.
+        y : ignored.
 
         Returns
         -------
@@ -167,7 +164,7 @@ class GMM(BaseDetector):
 
 
 class KDE(BaseDetector):
-    """Outlier detector using kernel density estimation.
+    """Outlier detector using Kernel Density Estimation (KDE).
 
     Parameters
     ----------
@@ -175,22 +172,22 @@ class KDE(BaseDetector):
         False positive rate. Used to compute the threshold.
 
     kwargs : dict
-        All other keyword arguments are passed to neighbors.KernelDensity.
+        All other keyword arguments are passed to neighbors.KernelDensity().
 
     Attributes
     ----------
-    anomaly_score_ : ndarray of shape (n_samples,)
-        Anomaly score for each training sample.
-
     threshold_ : float
         Threshold.
+
+    X_ : array-like of shape (n_samples, n_features)
+        Training data.
     """
 
     @property
-    def tree_(self) -> Union[neighbors.BallTree, neighbors.KDTree]:
-        self._kde.tree_
+    def X_(self) -> TwoDimArray:
+        return self._kde.tree_.data
 
-    def __init__(self, fpr: float=0.01, **kwargs) -> None:
+    def __init__(self, fpr: float = 0.01, **kwargs) -> None:
         self.fpr  = fpr
         self._kde = neighbors.KernelDensity(**kwargs)
 
@@ -204,7 +201,7 @@ class KDE(BaseDetector):
                 f'fpr must be between 0.0 and 1.0 inclusive but was {self.fpr}'
             )
 
-    def fit(self, X: ArrayLike, y: None=None) -> 'KDE':
+    def fit(self, X: TwoDimArray, y: OneDimArray = None) -> 'KDE':
         """Fit the model according to the given training data.
 
         Parameters
@@ -212,8 +209,7 @@ class KDE(BaseDetector):
         X : array-like of shape (n_samples, n_features)
             Training data.
 
-        y : None
-            Ignored.
+        y : ignored
 
         Returns
         -------
@@ -223,14 +219,12 @@ class KDE(BaseDetector):
 
         self._kde.fit(X)
 
-        self.anomaly_score_ = self.anomaly_score(X)
-        self.threshold_     = np.percentile(
-            self.anomaly_score_, 100. * (1. - self.fpr)
-        )
+        anomaly_score   = self.anomaly_score()
+        self.threshold_ = np.percentile(anomaly_score, 100. * (1. - self.fpr))
 
         return self
 
-    def anomaly_score(self, X: ArrayLike=None) -> np.ndarray:
+    def anomaly_score(self, X: TwoDimArray = None) -> OneDimArray:
         """Compute the anomaly score for each sample.
 
         Parameters
@@ -240,18 +234,18 @@ class KDE(BaseDetector):
 
         Returns
         -------
-        anomaly_score : ndarray of shape (n_samples,)
+        anomaly_score : array-like of shape (n_samples,)
             Anomaly score for each sample.
         """
 
-        check_is_fitted(self, 'tree_')
+        check_is_fitted(self, 'X_')
 
         if X is None:
-            return self.anomaly_score_
-        else:
-            return -self._kde.score_samples(X)
+            X = self.X_
 
-    def score(self, X: ArrayLike, y: None=None) -> float:
+        return -self._kde.score_samples(X)
+
+    def score(self, X: TwoDimArray, y: OneDimArray = None) -> float:
         """Compute the mean log-likelihood of the given data.
 
         Parameters
@@ -259,8 +253,7 @@ class KDE(BaseDetector):
         X : array-like of shape (n_samples, n_features)
             Data.
 
-        y : None
-            Ignored.
+        y : ignored
 
         Returns
         -------
@@ -280,36 +273,36 @@ class SparseStructureLearning(BaseDetector):
         False positive rate. Used to compute the threshold.
 
     cluster_params : dict, default None
-        Additional keyword arguments for affinity propagation.
+        Additional keyword arguments for affinity propagation().
 
     kwargs : dict
-        All other keyword arguments are passed to covariance.GraphLasso.
+        All other keyword arguments are passed to covariance.GraphLasso().
 
     Attributes
     ----------
-    covariance_ : ndarray of shape (n_features, n_features)
+    covariance_ : array-like of shape (n_features, n_features)
         Estimated covariance matrix.
+
+    labels_ : array-like of shape (n_features,)
+        Label of each feature.
+
+    location_ : array-like of shape (n_features,)
+        Estimated location.
 
     n_iter_ : int
         Number of iterations run.
 
-    precision_ : ndarray of shape (n_features, n_features)
-        Estimated pseudo inverse matrix.
-
-    partial_corrcoef_ : ndarray of shape (n_features, n_features)
+    partial_corrcoef_ : array-like of shape (n_features, n_features)
         Partial correlation coefficient matrix.
 
-    labels_ : ndarray of shape (n_features,)
-        Label of each feature.
-
-    anomaly_score_ : ndarray of shape (n_samples,)
-        Anomaly score for each training sample.
-
-    feature_wise_anomaly_score_ : ndarray of shape (n_samples, n_features)
-        Feature-wise anomaly score for each training sample.
+    precision_ : array-like of shape (n_features, n_features)
+        Estimated pseudo inverse matrix.
 
     threshold_ : float
         Threshold.
+
+    X_ : array-like of shape (n_samples, n_features)
+        Training data.
 
     References
     ----------
@@ -322,11 +315,22 @@ class SparseStructureLearning(BaseDetector):
     # TODO: Implement plot_graphical_model method
 
     @property
-    def covariance_(self) -> np.ndarray:
+    def covariance_(self) -> OneDimArray:
         return self._glasso.covariance_
 
     @property
-    def location_(self) -> np.ndarray:
+    def labels_(self) -> OneDimArray:
+        """Return the label of each feature."""
+
+        # cluster using affinity propagation
+        _, labels = cluster.affinity_propagation(
+            self.partial_corrcoef_, **self.cluster_params
+        )
+
+        return labels
+
+    @property
+    def location_(self) -> OneDimArray:
         return self._glasso.location_
 
     @property
@@ -334,11 +338,7 @@ class SparseStructureLearning(BaseDetector):
         return self._glasso.n_iter_
 
     @property
-    def precision_(self) -> np.ndarray:
-        return self._glasso.precision_
-
-    @property
-    def partial_corrcoef_(self) -> np.ndarray:
+    def partial_corrcoef_(self) -> OneDimArray:
         """Return the partial correlation coefficient matrix."""
 
         _, n_features    = self.precision_.shape
@@ -349,27 +349,15 @@ class SparseStructureLearning(BaseDetector):
         return partial_corrcoef
 
     @property
-    def labels_(self) -> np.ndarray:
-        """Return the label of each feature."""
-
-        # cluster using affinity propagation
-        _, labels = cluster.affinity_propagation(
-            self.partial_corrcoef_, **self.cluster_params
-        )
-
-        return labels
+    def precision_(self) -> OneDimArray:
+        return self._glasso.precision_
 
     def __init__(
-        self, fpr: float=0.01, cluster_params: dict=None, **kwargs
+        self, fpr: float = 0.01, cluster_params: dict = None, **kwargs
     ) -> None:
-        self.fpr                = fpr
-
-        if cluster_params is None:
-            self.cluster_params = {}
-        else:
-            self.cluster_params = cluster_params
-
-        self._glasso            = covariance.GraphLasso(**kwargs)
+        self.fpr            = fpr
+        self.cluster_params = {} if cluster_params is None else cluster_params
+        self._glasso        = covariance.GraphLasso(**kwargs)
 
         self.check_params()
 
@@ -381,7 +369,9 @@ class SparseStructureLearning(BaseDetector):
                 f'fpr must be between 0.0 and 1.0 inclusive but was {self.fpr}'
             )
 
-    def fit(self, X: ArrayLike, y: None=None) -> 'SparseStructureLearning':
+    def fit(
+        self, X: TwoDimArray, y: OneDimArray = None
+    ) -> 'SparseStructureLearning':
         """Fit the model according to the given training data.
 
         Parameters
@@ -389,8 +379,7 @@ class SparseStructureLearning(BaseDetector):
         X : array-like of shape (n_samples, n_features)
             Training Data.
 
-        y : None
-            Ignored.
+        y : ignored
 
         Returns
         -------
@@ -398,17 +387,17 @@ class SparseStructureLearning(BaseDetector):
             Return self.
         """
 
-        self._glasso.fit(X)
+        self.X_         = check_array(X)
 
-        self.anomaly_score_ = self.anomaly_score(X)
-        df, loc, scale      = sp.stats.chi2.fit(self.anomaly_score_)
-        self.threshold_     = sp.stats.chi2.ppf(1.0 - self.fpr, df, loc, scale)
+        self._glasso.fit(self.X_)
 
-        self.feature_wise_anomaly_score_ = self.feature_wise_anomaly_score(X)
+        anomaly_score   = self.anomaly_score()
+        df, loc, scale  = sp.stats.chi2.fit(anomaly_score)
+        self.threshold_ = sp.stats.chi2.ppf(1.0 - self.fpr, df, loc, scale)
 
         return self
 
-    def anomaly_score(self, X: ArrayLike=None) -> np.ndarray:
+    def anomaly_score(self, X: TwoDimArray = None) -> OneDimArray:
         """Compute thre anomaly score for each sample.
 
         Parameters
@@ -418,18 +407,18 @@ class SparseStructureLearning(BaseDetector):
 
         Returns
         -------
-        anomaly_score : ndarray of shape (n_samples,)
+        anomaly_score : array-like of shape (n_samples,)
             Anomaly score for each sample.
         """
 
-        check_is_fitted(self, ['covariance_', 'n_iter_', 'precision_'])
+        check_is_fitted(self, 'X_')
 
         if X is None:
-            return self.anomaly_score_
-        else:
-            return self._glasso.mahalanobis(X)
+            X = self.X_
 
-    def feature_wise_anomaly_score(self, X: ArrayLike=None) -> np.ndarray:
+        return self._glasso.mahalanobis(X)
+
+    def feature_wise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
         """Compute the feature-wise anomaly score for each sample.
 
         Parameters
@@ -439,22 +428,22 @@ class SparseStructureLearning(BaseDetector):
 
         Returns
         -------
-        feature_wise_anomaly_score : ndarray of shape (n_samples, n_features)
+        anomaly_score : array-like of shape (n_samples, n_features)
             Feature-wise anomaly score for each sample.
         """
 
-        check_is_fitted(self, ['covariance_', 'n_iter_', 'precision_'])
+        check_is_fitted(self, 'X_')
 
         if X is None:
-            return self.feature_wise_anomaly_score_
-        else:
-            return .5 * np.log(
-                2. * np.pi / np.diag(self.precision_)
-            ) + .5 / np.diag(
-                self.precision_
-            ) * ((X - self.location_) @ self.precision_) ** 2
+            X = self.X_
 
-    def score(self, X: ArrayLike, y: None=None) -> float:
+        return 0.5 * np.log(
+            2. * np.pi / np.diag(self.precision_)
+        ) + 0.5 / np.diag(
+            self.precision_
+        ) * ((X - self.location_) @ self.precision_) ** 2
+
+    def score(self, X: TwoDimArray, y: OneDimArray = None) -> float:
         """Compute the mean log-likelihood of the given data.
 
         Parameters
@@ -462,8 +451,7 @@ class SparseStructureLearning(BaseDetector):
         X : array-like of shape (n_samples, n_features)
             Data.
 
-        y : None
-            Ignored.
+        y : ignored
 
         Returns
         -------

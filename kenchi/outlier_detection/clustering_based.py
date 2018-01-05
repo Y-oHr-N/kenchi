@@ -1,13 +1,14 @@
 import numpy as np
 from sklearn import cluster
+from sklearn.utils import check_array
 
-from .base import ArrayLike, BaseDetector
+from .base import BaseDetector, OneDimArray, TwoDimArray
 
 __all__ = ['MiniBatchKMeans']
 
 
 class MiniBatchKMeans(BaseDetector):
-    """Outlier detector using k-means clustering.
+    """Outlier detector using K-means clustering.
 
     Parameters
     ----------
@@ -15,39 +16,39 @@ class MiniBatchKMeans(BaseDetector):
         False positive rate. Used to compute the threshold.
 
     kwargs : dict
-        All other keyword arguments are passed to cluster.MiniBatchKMeans.
+        All other keyword arguments are passed to cluster.MiniBatchKMeans().
 
     Attributes
     ----------
-    cluster_centers_ : ndarray of shape (n_clusters, n_features)
+    cluster_centers_ : array-like of shape (n_clusters, n_features)
         Coordinates of cluster centers.
-
-    labels_ : ndarray of shape (n_samples,)
-        Labels of each point.
 
     inertia_ : float
         Value of the inertia criterion associated with the chosen partition.
 
-    anomaly_score_ : ndarray of shape (n_samples,)
-        Anomaly score for each training sample.
+    labels_ : array-like of shape (n_samples,)
+        Label of each point.
 
     threshold_ : float
         Threshold.
+
+    X_ : array-like of shape (n_samples, n_features)
+        Training data.
     """
 
     @property
-    def cluster_centers_(self) -> np.ndarray:
+    def cluster_centers_(self) -> OneDimArray:
         return self._kmeans.cluster_centers_
-
-    @property
-    def labels_(self) -> np.ndarray:
-        return self._kmeans.labels_
 
     @property
     def inertia_(self) -> float:
         return self._kmeans.inertia_
 
-    def __init__(self, fpr: float=0.01, **kwargs) -> None:
+    @property
+    def labels_(self) -> OneDimArray:
+        return self._kmeans.labels_
+
+    def __init__(self, fpr: float = 0.01, **kwargs) -> None:
         self.fpr     = fpr
         self._kmeans = cluster.MiniBatchKMeans(**kwargs)
 
@@ -61,7 +62,7 @@ class MiniBatchKMeans(BaseDetector):
                 f'fpr must be between 0.0 and 1.0 inclusive but was {self.fpr}'
             )
 
-    def fit(self, X: ArrayLike, y: None=None) -> 'MiniBatchKMeans':
+    def fit(self, X: TwoDimArray, y: OneDimArray = None) -> 'MiniBatchKMeans':
         """Fit the model according to the given training data.
 
         Parameters
@@ -69,8 +70,7 @@ class MiniBatchKMeans(BaseDetector):
         X : array-like of shape (n_samples, n_features)
             Training data.
 
-        y : None
-            Ignored.
+        y : ignored
 
         Returns
         -------
@@ -78,16 +78,16 @@ class MiniBatchKMeans(BaseDetector):
             Return self.
         """
 
-        self._kmeans.fit(X)
+        self.X_         = check_array(X)
 
-        self.anomaly_score_ = self.anomaly_score(X)
-        self.threshold_     = np.percentile(
-            self.anomaly_score_, 100. * (1. - self.fpr)
-        )
+        self._kmeans.fit(self.X_)
+
+        anomaly_score   = self.anomaly_score()
+        self.threshold_ = np.percentile(anomaly_score, 100. * (1. - self.fpr))
 
         return self
 
-    def anomaly_score(self, X: ArrayLike=None) -> np.ndarray:
+    def anomaly_score(self, X: TwoDimArray = None) -> OneDimArray:
         """Compute the anomaly score for each sample.
 
         Parameters
@@ -97,16 +97,16 @@ class MiniBatchKMeans(BaseDetector):
 
         Returns
         -------
-        anomaly_score : ndarray of shape (n_samples,)
+        anomaly_score : array-like of shape (n_samples,)
             Anomaly score for each sample.
         """
 
         if X is None:
-            return self.anomaly_score_
-        else:
-            return np.min(self._kmeans.transform(X), axis=1)
+            X = self.X_
 
-    def score(self, X: ArrayLike, y: None=None) -> float:
+        return np.min(self._kmeans.transform(X), axis=1)
+
+    def score(self, X: TwoDimArray, y: OneDimArray = None) -> float:
         """Compute the opposite value of the given data on the K-means
         objective.
 
@@ -115,8 +115,7 @@ class MiniBatchKMeans(BaseDetector):
         X : array-like of shape (n_samples, n_features)
             Data.
 
-        y : None
-            Ignored.
+        y : ignored
 
         Returns
         -------
