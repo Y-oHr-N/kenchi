@@ -1,6 +1,6 @@
 from .angle_based import FastABOD
 from .clustering_based import MiniBatchKMeans
-from .distance_based import KNN
+from .distance_based import KNN, OneTimeSampling
 from .reconstruction_based import PCA
 from .statistical import GMM, KDE, SparseStructureLearning
 
@@ -12,7 +12,6 @@ from .statistical import GMM, KDE, SparseStructureLearning
 # TODO: Implement density_based.LoOP class
 # TODO: Implement density_based.LOCI class
 # TODO: Implement distance_based.IterativeSampling class
-# TODO: Implement distance_based.OneTimeSampling class
 # TODO: Implement distance_based.ROF class
 # TODO: Implement statistical.KLIEP class
 # TODO: Implement statistical.ULSIF class
@@ -21,6 +20,7 @@ __all__ = [
     'FastABOD',
     'MiniBatchKMeans',
     'KNN',
+    'OneTimeSampling',
     'PCA',
     'GMM',
     'KDE',

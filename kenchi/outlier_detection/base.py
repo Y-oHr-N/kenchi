@@ -10,6 +10,7 @@ from sklearn.utils.validation import check_is_fitted
 
 OneDimArray = Union[np.ndarray, pd.Series]
 TwoDimArray = Union[np.ndarray, pd.DataFrame]
+RandomState = Union[int, np.random.RandomState]
 
 
 def timeit(func):
@@ -75,7 +76,9 @@ class BaseDetector(BaseEstimator, ABC):
         """Compute the mean log-likelihood of the given data."""
 
     def predict(
-        self, X: TwoDimArray = None, threshold: float = None
+        self,
+        X:         TwoDimArray = None,
+        threshold: float       = None
     ) -> OneDimArray:
         """Predict if a particular sample is an outlier or not.
 
@@ -101,7 +104,10 @@ class BaseDetector(BaseEstimator, ABC):
         return np.where(self.anomaly_score(X) <= threshold, 1, -1)
 
     def fit_predict(
-        self, X: TwoDimArray, y: OneDimArray = None, threshold: float = None,
+        self,
+        X:         TwoDimArray,
+        y:         OneDimArray = None,
+        threshold: float       = None,
         **fit_params
     ) -> OneDimArray:
         """Fit the model according to the given training data and predict if a
