@@ -1,6 +1,7 @@
 import numpy as np
-from sklearn import decomposition
+from sklearn.decomposition import PCA as SKLearnPCA
 from sklearn.utils import check_array
+from sklearn.utils.validation import check_is_fitted
 
 from .base import timeit, BaseDetector, OneDimArray, TwoDimArray
 
@@ -19,7 +20,7 @@ class PCA(BaseDetector):
         Enable verbose output.
 
     kwargs : dict
-        All other keyword arguments are passed to decomposition.PCA().
+        All other keyword arguments are passed to sklearn.decomposition.PCA().
 
     Attributes
     ----------
@@ -89,7 +90,7 @@ class PCA(BaseDetector):
     ) -> None:
         self.fpr     = fpr
         self.verbose = verbose
-        self._pca    = decomposition.PCA(**kwargs)
+        self._pca    = SKLearnPCA(**kwargs)
 
         self.check_params()
 
@@ -118,10 +119,9 @@ class PCA(BaseDetector):
             Return self.
         """
 
+        self._pca.fit(X)
+
         self.X_         = check_array(X)
-
-        self._pca.fit(self.X_)
-
         anomaly_score   = self.anomaly_score()
         self.threshold_ = np.percentile(anomaly_score, 100. * (1. - self.fpr))
 
@@ -143,6 +143,27 @@ class PCA(BaseDetector):
 
         return self._pca.inverse_transform(self._pca.transform(X))
 
+    def feature_wise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
+        """Compute the feature-wise anomaly score for each sample.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features), default None
+            Data.
+
+        Returns
+        -------
+        anomaly_score : array-like of shape (n_samples, n_features)
+            Feature-wise anomaly score for each sample.
+        """
+
+        check_is_fitted(self, 'X_')
+
+        if X is None:
+            X = self.X_
+
+        return (X - self.reconstruct(X)) ** 2
+
     def anomaly_score(self, X: TwoDimArray = None) -> OneDimArray:
         """Compute the anomaly score for each sample.
 
@@ -157,10 +178,7 @@ class PCA(BaseDetector):
             Anomaly score for each sample.
         """
 
-        if X is None:
-            X = self.X_
-
-        return np.sqrt(np.sum((X - self.reconstruct(X)) ** 2, axis=1))
+        return np.sqrt(np.sum(self.feature_wise_anomaly_score(X), axis=1))
 
     def score(self, X: TwoDimArray, y: OneDimArray = None) -> float:
         """Compute the mean log-likelihood of the given data.
