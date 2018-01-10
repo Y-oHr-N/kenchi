@@ -116,6 +116,11 @@ class MiniBatchKMeans(BaseDetector):
 
         return np.min(self._kmeans.transform(X), axis=1)
 
+    def feature_wise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
+        """Compute the feature-wise anomaly score for each sample."""
+
+        raise NotImplementedError()
+
     def score(self, X: TwoDimArray, y: OneDimArray = None) -> float:
         """Compute the opposite value of the given data on the K-means
         objective.

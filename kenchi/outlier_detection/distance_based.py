@@ -117,6 +117,11 @@ class KNN(BaseDetector):
         else:
             return np.max(dist, axis=1)
 
+    def feature_wise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
+        """Compute the feature-wise anomaly score for each sample."""
+
+        raise NotImplementedError()
+
     def score(X: TwoDimArray, y: OneDimArray = None) -> float:
         """Compute the mean log-likelihood of the given data."""
 
@@ -257,6 +262,11 @@ class OneTimeSampling(BaseDetector):
         dist  = self._metric.pairwise(X, self.X_sub_)
 
         return np.min(dist, axis=1)
+
+    def feature_wise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
+        """Compute the feature-wise anomaly score for each sample."""
+
+        raise NotImplementedError()
 
     def score(X: TwoDimArray, y: OneDimArray = None) -> float:
         """Compute the mean log-likelihood of the given data."""

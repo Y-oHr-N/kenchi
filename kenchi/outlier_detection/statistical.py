@@ -157,6 +157,11 @@ class GMM(BaseDetector):
 
         return -self._gmm.score_samples(X)
 
+    def feature_wise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
+        """Compute the feature-wise anomaly score for each sample."""
+
+        raise NotImplementedError()
+
     def score(self, X: TwoDimArray, y: OneDimArray = None) -> float:
         """Compute the mean log-likelihood of the given data.
 
@@ -268,6 +273,11 @@ class KDE(BaseDetector):
             X = self.X_
 
         return -self._kde.score_samples(X)
+
+    def feature_wise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
+        """Compute the feature-wise anomaly score for each sample."""
+
+        raise NotImplementedError()
 
     def score(self, X: TwoDimArray, y: OneDimArray = None) -> float:
         """Compute the mean log-likelihood of the given data.
