@@ -63,7 +63,10 @@ class BaseDetector(BaseEstimator, ABC):
 
     @abstractmethod
     def fit(
-        self, X: TwoDimArray, y: OneDimArray = None, **fit_params
+        self,
+        X: TwoDimArray,
+        y: OneDimArray = None,
+        **fit_params
     ) -> 'BaseDetector':
         """Fit the model according to the given training data."""
 

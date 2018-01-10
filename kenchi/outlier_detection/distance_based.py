@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn import neighbors
+from sklearn.neighbors import DistanceMetric, NearestNeighbors
 from sklearn.utils import check_array, check_random_state
 from sklearn.utils.validation import check_is_fitted
 
@@ -24,7 +24,8 @@ class KNN(BaseDetector):
         neighbors.
 
     kwargs : dict
-        All other keyword arguments are passed to neighbors.NearestNeighbors().
+        All other keyword arguments are passed to
+        sklearn.neighbors.NearestNeighbors().
 
     Attributes
     ----------
@@ -59,7 +60,7 @@ class KNN(BaseDetector):
         self.fpr     = fpr
         self.verbose = verbose
         self.weight  = weight
-        self._knn    = neighbors.NearestNeighbors(**kwargs)
+        self._knn    = NearestNeighbors(**kwargs)
 
         self.check_params()
 
@@ -123,7 +124,7 @@ class KNN(BaseDetector):
 
 
 class OneTimeSampling(BaseDetector):
-    """ One-time sampling.
+    """One-time sampling.
 
     Parameters
     ----------
@@ -183,9 +184,7 @@ class OneTimeSampling(BaseDetector):
         self.n_subsamples = n_subsamples
         self.random_state = check_random_state(random_state)
         self.verbose      = verbose
-        self._metric      = neighbors.DistanceMetric.get_metric(
-            metric, **kwargs
-        )
+        self._metric      = DistanceMetric.get_metric(metric, **kwargs)
 
         self.check_params()
 

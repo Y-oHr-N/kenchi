@@ -1,7 +1,7 @@
 from itertools import combinations
 
 import numpy as np
-from sklearn import neighbors
+from sklearn.neighbors import NearestNeighbors
 from sklearn.externals.joblib import delayed, Parallel
 from sklearn.utils import gen_even_slices
 
@@ -11,8 +11,8 @@ __all__ = ['FastABOD']
 
 
 def _abof(
-    X_train: TwoDimArray,
     X:       TwoDimArray,
+    X_train: TwoDimArray,
     ind:     TwoDimArray
 ) -> OneDimArray:
     """Compute the angle-based outlier factor for each sample."""
@@ -41,7 +41,8 @@ class FastABOD(BaseDetector):
         Enable verbose output.
 
     kwargs : dict
-        All other keyword arguments are passed to neighbors.NearestNeighbors().
+        All other keyword arguments are passed to
+        sklearn.neighbors.NearestNeighbors().
 
     Attributes
     ----------
@@ -72,7 +73,7 @@ class FastABOD(BaseDetector):
         self.fpr     = fpr
         self.n_jobs  = n_jobs
         self.verbose = verbose
-        self._knn    = neighbors.NearestNeighbors(**kwargs)
+        self._knn    = NearestNeighbors(**kwargs)
 
         self.check_params()
 
@@ -132,7 +133,7 @@ class FastABOD(BaseDetector):
         try:
             result   = Parallel(n_jobs=self.n_jobs)(
                 delayed(_abof)(
-                    self.X_, X[s], ind[s]
+                    X[s], self.X_, ind[s]
                 ) for s in gen_even_slices(n_samples, self.n_jobs)
             )
         except FloatingPointError as e:

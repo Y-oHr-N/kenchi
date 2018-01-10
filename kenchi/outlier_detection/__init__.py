@@ -9,6 +9,8 @@ from .statistical import GMM, KDE, SparseStructureLearning
 # TODO: Implement angle_based.FastVOA class
 # TODO: Implement density_based.COF class
 # TODO: Implement density_based.INFLO class
+# TODO: Implement density_based.LDF class
+# TODO: Implement density_based.LDOF class
 # TODO: Implement density_based.LoOP class
 # TODO: Implement density_based.LOCI class
 # TODO: Implement distance_based.IterativeSampling class

@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn import cluster
+from sklearn.cluster import MiniBatchKMeans as SKLearnMiniBatchKMeans
 from sklearn.utils import check_array
 
 from .base import timeit, BaseDetector, OneDimArray, TwoDimArray
@@ -19,7 +19,8 @@ class MiniBatchKMeans(BaseDetector):
         Enable verbose output.
 
     kwargs : dict
-        All other keyword arguments are passed to cluster.MiniBatchKMeans().
+        All other keyword arguments are passed to
+        sklearn.cluster.MiniBatchKMeans().
 
     Attributes
     ----------
@@ -59,7 +60,7 @@ class MiniBatchKMeans(BaseDetector):
     ) -> None:
         self.fpr     = fpr
         self.verbose = verbose
-        self._kmeans = cluster.MiniBatchKMeans(**kwargs)
+        self._kmeans = SKLearnMiniBatchKMeans(**kwargs)
 
         self.check_params()
 
@@ -88,10 +89,9 @@ class MiniBatchKMeans(BaseDetector):
             Return self.
         """
 
+        self._kmeans.fit(X)
+
         self.X_         = check_array(X)
-
-        self._kmeans.fit(self.X_)
-
         anomaly_score   = self.anomaly_score()
         self.threshold_ = np.percentile(anomaly_score, 100. * (1. - self.fpr))
 

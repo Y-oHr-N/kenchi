@@ -1,6 +1,9 @@
 import numpy as np
 import scipy as sp
-from sklearn import cluster, covariance, mixture, neighbors
+from sklearn.cluster import affinity_propagation
+from sklearn.covariance import GraphLasso
+from sklearn.mixture import GaussianMixture
+from sklearn.neighbors import KernelDensity
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
@@ -21,7 +24,8 @@ class GMM(BaseDetector):
         Enable verbose output.
 
     kwargs : dict
-        All other keyword arguments are passed to mixture.GaussianMixture().
+        All other keyword arguments are passed to
+        sklearn.mixture.GaussianMixture().
 
     Attributes
     ----------
@@ -97,7 +101,7 @@ class GMM(BaseDetector):
     ) -> None:
         self.fpr     = fpr
         self.verbose = verbose
-        self._gmm    = mixture.GaussianMixture(**kwargs)
+        self._gmm    = GaussianMixture(**kwargs)
 
         self.check_params()
 
@@ -126,10 +130,9 @@ class GMM(BaseDetector):
             Return self.
         """
 
+        self._gmm.fit(X)
+
         self.X_         = check_array(X)
-
-        self._gmm.fit(self.X_)
-
         anomaly_score   = self.anomaly_score()
         self.threshold_ = np.percentile(anomaly_score, 100. * (1. - self.fpr))
 
@@ -185,7 +188,8 @@ class KDE(BaseDetector):
         Enable verbose output.
 
     kwargs : dict
-        All other keyword arguments are passed to neighbors.KernelDensity().
+        All other keyword arguments are passed to
+        sklearn.neighbors.KernelDensity().
 
     Attributes
     ----------
@@ -208,7 +212,7 @@ class KDE(BaseDetector):
     ) -> None:
         self.fpr     = fpr
         self.verbose = verbose
-        self._kde    = neighbors.KernelDensity(**kwargs)
+        self._kde    = KernelDensity(**kwargs)
 
         self.check_params()
 
@@ -293,13 +297,15 @@ class SparseStructureLearning(BaseDetector):
         False positive rate. Used to compute the threshold.
 
     cluster_params : dict, default None
-        Additional keyword arguments for affinity propagation().
+        Additional keyword arguments for
+        sklearn.cluster.affinity_propagation().
 
     verbose : bool, default False
         Enable verbose output.
 
     kwargs : dict
-        All other keyword arguments are passed to covariance.GraphLasso().
+        All other keyword arguments are passed to
+        sklearn.covariance.GraphLasso().
 
     Attributes
     ----------
@@ -338,7 +344,7 @@ class SparseStructureLearning(BaseDetector):
     # TODO: Implement plot_graphical_model method
 
     @property
-    def covariance_(self) -> OneDimArray:
+    def covariance_(self) -> TwoDimArray:
         return self._glasso.covariance_
 
     @property
@@ -346,7 +352,7 @@ class SparseStructureLearning(BaseDetector):
         """Return the label of each feature."""
 
         # cluster using affinity propagation
-        _, labels = cluster.affinity_propagation(
+        _, labels = affinity_propagation(
             self.partial_corrcoef_, **self.cluster_params
         )
 
@@ -361,7 +367,7 @@ class SparseStructureLearning(BaseDetector):
         return self._glasso.n_iter_
 
     @property
-    def partial_corrcoef_(self) -> OneDimArray:
+    def partial_corrcoef_(self) -> TwoDimArray:
         """Return the partial correlation coefficient matrix."""
 
         _, n_features    = self.precision_.shape
@@ -372,7 +378,7 @@ class SparseStructureLearning(BaseDetector):
         return partial_corrcoef
 
     @property
-    def precision_(self) -> OneDimArray:
+    def precision_(self) -> TwoDimArray:
         return self._glasso.precision_
 
     def __init__(
@@ -385,7 +391,7 @@ class SparseStructureLearning(BaseDetector):
         self.fpr            = fpr
         self.cluster_params = {} if cluster_params is None else cluster_params
         self.verbose        = verbose
-        self._glasso        = covariance.GraphLasso(**kwargs)
+        self._glasso        = GraphLasso(**kwargs)
 
         self.check_params()
 
@@ -418,10 +424,9 @@ class SparseStructureLearning(BaseDetector):
             Return self.
         """
 
+        self._glasso.fit(X)
+
         self.X_         = check_array(X)
-
-        self._glasso.fit(self.X_)
-
         anomaly_score   = self.anomaly_score()
         df, loc, scale  = sp.stats.chi2.fit(anomaly_score)
         self.threshold_ = sp.stats.chi2.ppf(1.0 - self.fpr, df, loc, scale)
