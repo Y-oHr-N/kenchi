@@ -7,8 +7,9 @@ from sklearn.neighbors import KernelDensity
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
-from .base import timeit, BaseDetector, OneDimArray, TwoDimArray
-from ..utils import plot_partial_corrcoef
+from .base import BaseDetector
+from ..utils import timeit, OneDimArray, TwoDimArray
+from ..visualization import plot_partial_corrcoef
 
 __all__ = ['GMM', 'KDE', 'SparseStructureLearning']
 

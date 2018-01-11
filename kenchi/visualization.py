@@ -1,16 +1,11 @@
-from typing import Tuple, Union
-
 import numpy as np
-import pandas as pd
 from matplotlib.axes import Axes
 from matplotlib.colors import Colormap
 from sklearn.metrics import auc, roc_curve
 
-__all__     = ['plot_anomaly_score', 'plot_roc_curve', 'plot_partial_corrcoef']
+from .utils import Limits, OneDimArray, TwoDimArray
 
-OneDimArray = Union[np.ndarray, pd.Series]
-TwoDimArray = Union[np.ndarray, pd.DataFrame]
-Limits      = Tuple[float, float]
+__all__     = ['plot_anomaly_score', 'plot_roc_curve', 'plot_partial_corrcoef']
 
 
 def plot_anomaly_score(
