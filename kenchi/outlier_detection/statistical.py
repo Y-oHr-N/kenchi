@@ -8,6 +8,7 @@ from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
 from .base import timeit, BaseDetector, OneDimArray, TwoDimArray
+from ..utils import plot_partial_corrcoef
 
 __all__ = ['GMM', 'KDE', 'SparseStructureLearning']
 
@@ -350,8 +351,9 @@ class SparseStructureLearning(BaseDetector):
     In Proceedings of SDM'09, pp. 97-108, 2009.
     """
 
-    # TODO: Implement plot_partial_corrcoef method
     # TODO: Implement plot_graphical_model method
+
+    plot_partial_corrcoef = plot_partial_corrcoef
 
     @property
     def covariance_(self) -> TwoDimArray:

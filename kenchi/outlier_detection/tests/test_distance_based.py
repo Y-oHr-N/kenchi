@@ -1,5 +1,6 @@
 import unittest
 
+import matplotlib.axes
 import numpy as np
 from sklearn.exceptions import NotFittedError
 
@@ -26,6 +27,11 @@ class KNNTest(unittest.TestCase):
         with self.assertRaises(NotFittedError):
             self.sut.predict(self.X)
 
+    def test_plot_anomaly_score(self):
+        self.assertIsInstance(
+            self.sut.fit(self.X).plot_anomaly_score(), matplotlib.axes.Axes
+        )
+
 
 class OneTimeSamplingTest(unittest.TestCase):
     def setUp(self):
@@ -45,3 +51,8 @@ class OneTimeSamplingTest(unittest.TestCase):
     def test_predict_notfitted(self):
         with self.assertRaises(NotFittedError):
             self.sut.predict(self.X)
+
+    def test_plot_anomaly_score(self):
+        self.assertIsInstance(
+            self.sut.fit(self.X).plot_anomaly_score(), matplotlib.axes.Axes
+        )

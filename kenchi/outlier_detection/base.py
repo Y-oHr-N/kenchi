@@ -8,6 +8,8 @@ import pandas as pd
 from sklearn.base import BaseEstimator
 from sklearn.utils.validation import check_is_fitted
 
+from ..utils import plot_anomaly_score, plot_roc_curve
+
 OneDimArray = Union[np.ndarray, pd.Series]
 TwoDimArray = Union[np.ndarray, pd.DataFrame]
 RandomState = Union[int, np.random.RandomState]
@@ -50,8 +52,8 @@ def timeit(func):
 class BaseDetector(BaseEstimator, ABC):
     """Base class for all outlier detectors."""
 
-    # TODO: Implement plot_anomaly_score method
-    # TODO: Implement plot_roc_curve method
+    plot_anomaly_score = plot_anomaly_score
+    plot_roc_curve     = plot_roc_curve
 
     @abstractmethod
     def __init__(self, **params) -> None:

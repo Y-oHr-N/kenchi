@@ -1,15 +1,32 @@
+from typing import Tuple, Union
+
 import numpy as np
+import pandas as pd
+from matplotlib.axes import Axes
+from matplotlib.colors import Colormap
 from sklearn.metrics import auc, roc_curve
+
+__all__     = ['plot_anomaly_score', 'plot_roc_curve', 'plot_partial_corrcoef']
+
+OneDimArray = Union[np.ndarray, pd.Series]
+TwoDimArray = Union[np.ndarray, pd.DataFrame]
+Limits      = Tuple[float, float]
 
 
 def plot_anomaly_score(
-    detector,         X=None,
-    ax=None,          title=None,
-    xlim=None,        ylim=None,
-    xlabel='Samples', ylabel='Anomaly score',
-    grid=True,        **kwargs
-):
-    """Plot anomaly scores for test samples.
+    detector,
+    X:        TwoDimArray = None,
+    ax:       Axes        = None,
+    title:    str         = None,
+    xlim:     Limits      = None,
+    ylim:     Limits      = None,
+    xlabel:   str         = 'Samples',
+    ylabel:   str         = 'Anomaly score',
+    grid:     bool        = True,
+    filepath: str         = None,
+    **kwargs
+) -> Axes:
+    """Plot the anomaly score for eadh sample.
 
     Parameters
     ----------
@@ -17,7 +34,7 @@ def plot_anomaly_score(
         Detector.
 
     X : array-like of shape (n_samples, n_features), default None
-        Test samples.
+        Data.
 
     ax : matplotlib Axes, default None
         Target axes instance.
@@ -40,32 +57,32 @@ def plot_anomaly_score(
     grid : boolean, default True
         If True, turn the axes grids on.
 
+    filepath : str, default None
+        If not None, save the current figure.
+
     **kwargs : dict
-        Other keywords passed to ax.bar().
+        Other keywords passed to ax.plot().
 
     Returns
     -------
     ax : matplotlib Axes
+        Axes on which the plot was drawn.
     """
 
     import matplotlib.pyplot as plt
 
-    y_score    = detector.anomaly_score(X)
-
-    n_samples, = y_score.shape
-    xlocs      = np.arange(n_samples)
-
-    align      = 'center'
-    label      = detector.__class__.__name__
+    anomaly_score = detector.anomaly_score(X)
+    n_samples,    = anomaly_score.shape
+    xlocs         = np.arange(n_samples)
 
     if ax is None:
-        _, ax  = plt.subplots()
+        _, ax     = plt.subplots()
 
     if xlim is None:
-        xlim   = (-1, n_samples)
+        xlim      = (0., n_samples - 1.)
 
     if ylim is None:
-        ylim   = (0, 1.1 * max(max(y_score), detector.threshold_))
+        ylim      = (0., 1.1 * max(max(anomaly_score), detector.threshold_))
 
     if title is not None:
         ax.set_title(title)
@@ -79,31 +96,46 @@ def plot_anomaly_score(
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
     ax.grid(grid)
-
-    ax.bar(xlocs, y_score, align=align, label=label, **kwargs)
+    ax.plot(xlocs, anomaly_score, **kwargs)
     ax.hlines(detector.threshold_, xlim[0], xlim[1])
 
-    ax.legend()
+    if filepath is not None:
+        ax.figure.savefig(filepath)
 
     return ax
 
 
-def plot_roc_curve(detector, X, y, ax=None, title=None, grid=True, **kwargs):
+def plot_roc_curve(
+    detector,
+    X:        TwoDimArray,
+    y:        OneDimArray,
+    ax:       Axes = None,
+    label:    str  = None,
+    title:    str  = None,
+    xlabel:   str  = 'False Positive Rate',
+    ylabel:   str  = 'True Positive Rate',
+    grid:     bool = True,
+    filepath: str  = None,
+    **kwargs
+) -> Axes:
     """Plot the Receiver Operating Characteristic (ROC) curve.
 
     Parameters
     ----------
-    detector : detector
+    detector : Detector
         Detector.
 
     X : array-like of shape (n_samples, n_features)
-        Test samples.
+        Data.
 
     y : array-like of shape (n_samples,)
-        Labels for test samples.
+        Labels.
 
     ax : matplotlib Axes, default None
         Target axes instance.
+
+    label : str, default None
+        Legend label.
 
     title : string, default None
         Axes title. To disable, pass None.
@@ -111,37 +143,127 @@ def plot_roc_curve(detector, X, y, ax=None, title=None, grid=True, **kwargs):
     grid : boolean, default True
         If True, turn the axes grids on.
 
+    filepath : str, default None
+        If not None, save the current figure.
+
     **kwargs : dict
         Other keywords passed to ax.plot().
 
     Returns
     -------
     ax : matplotlib Axes
-
-    roc_auc : float
+        Axes on which the plot was drawn.
     """
 
     import matplotlib.pyplot as plt
 
-    y_score     = detector.anomaly_score(X)
-    fpr, tpr, _ = roc_curve(y, y_score)
-    roc_auc     = auc(fpr, tpr)
-
-    label       = detector.__class__.__name__
+    anomaly_score = detector.anomaly_score(X)
+    fpr, tpr, _   = roc_curve(y, anomaly_score)
+    roc_auc       = auc(fpr, tpr)
 
     if ax is None:
-        _, ax   = plt.subplots()
+        _, ax     = plt.subplots()
+
+    if label is None:
+        label     = f'ROC curve of {detector.__class__.__name__} ' \
+            + f'(area = {roc_auc:.3f})'
 
     if title is not None:
         ax.set_title(title)
 
-    ax.set_xlabel('False Positive Rate')
-    ax.set_ylabel('True Positive Rate')
-    ax.set_xlim(-0.05, 1.00)
-    ax.set_ylim(0.00, 1.05)
+    if xlabel is not None:
+        ax.set_xlabel(xlabel)
+
+    if ylabel is not None:
+        ax.set_ylabel(ylabel)
+
+    ax.set_xlim(0., 1.)
+    ax.set_ylim(0., 1.05)
     ax.grid(grid)
-
     ax.plot(fpr, tpr, label=label, **kwargs)
-    ax.legend()
+    ax.legend(loc='lower right')
 
-    return ax, roc_auc
+    if filepath is not None:
+        ax.figure.savefig(filepath)
+
+    return ax
+
+
+def plot_partial_corrcoef(
+    detector,
+    ax:       Axes     = None,
+    cmap:     Colormap = None,
+    vmin:     float    = -1.,
+    vmax:     float    = 1.,
+    cbar:     bool     = True,
+    title:    str      = 'Partial correlation',
+    filepath: str      = None,
+    **kwargs
+) -> Axes:
+    """Plot the partial correlation coefficient matrix.
+
+    Parameters
+    ----------
+    detector : detector
+        Detector.
+
+    ax : matplotlib Axes, default None
+        Target axes instance.
+
+    cmap : matplotlib Colormap, default None
+        If None, plt.cm.RdYlBu is used.
+
+    vmin : float, default -1.0
+        Used in conjunction with norm to normalize luminance data.
+
+    vmax : float, default 1.0
+        Used in conjunction with norm to normalize luminance data.
+
+    cbar : bool, default True.
+        Whether to draw a colorbar.
+
+    title : string, default 'Partial correlation'
+        Axes title. To disable, pass None.
+
+    filepath : str, default None
+        If not None, save the current figure.
+
+    **kwargs : dict
+        Other keywords passed to ax.imshow().
+
+    Returns
+    -------
+    ax : matplotlib Axes
+        Axes on which the plot was drawn.
+    """
+
+    import matplotlib.pyplot as plt
+
+    _, n_features = detector.partial_corrcoef_.shape
+
+    if ax is None:
+        _, ax     = plt.subplots()
+
+    if cmap is None:
+        cmap      = plt.cm.RdYlBu
+
+    if title is not None:
+        ax.set_title(title)
+
+    ax.set_xticks(np.arange(n_features))
+    ax.set_yticks(np.arange(n_features))
+
+    mappable      = ax.imshow(
+        np.ma.masked_equal(detector.partial_corrcoef_, 0.),
+        cmap      = cmap,
+        vmin      = vmin,
+        vmax      = vmax,
+        **kwargs)
+
+    if cbar:
+        ax.figure.colorbar(mappable, ax=ax)
+
+    if filepath is not None:
+        ax.figure.savefig(filepath)
+
+    return ax
