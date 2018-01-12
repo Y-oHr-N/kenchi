@@ -13,6 +13,13 @@ RandomState = Union[int, np.random.RandomState]
 Limits      = Tuple[float, float]
 
 
+def short_format_time(t: float) -> str:
+    if t > 60.:
+        return f'{t / 60.:5.1f} min'
+    else:
+        return f'{t:5.1f} sec'
+
+
 def timeit(func):
     """Return the wrapper function that measures the elapsed time.
 
@@ -29,12 +36,6 @@ def timeit(func):
 
     @functools.wraps(func)
     def wrapper(estimator, *args, **kwargs):
-        def short_format_time(t: float) -> str:
-            if t > 60.:
-                return f'{t / 60.:5.1f} min'
-            else:
-                return f'{t:5.1f} sec'
-
         start   = time.time()
         result  = func(estimator, *args, **kwargs)
         elapsed = time.time() - start
