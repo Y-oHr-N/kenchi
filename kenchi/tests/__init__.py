@@ -1,5 +1,3 @@
 from .all_tests import suite
 
-__all__ = [
-    'suite'
-]
+__all__ = ['suite']
