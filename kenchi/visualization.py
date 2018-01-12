@@ -21,7 +21,7 @@ def plot_anomaly_score(
     filepath: str         = None,
     **kwargs
 ) -> Axes:
-    """Plot the anomaly score for eadh sample.
+    """Plot the anomaly score for each sample.
 
     Parameters
     ----------
@@ -161,7 +161,7 @@ def plot_roc_curve(
 
     if label is None:
         label     = f'ROC curve of {detector.__class__.__name__} ' \
-            + f'(area = {roc_auc:.3f})'
+            + f'(area = {roc_auc:1.3f})'
 
     if title is not None:
         ax.set_title(title)
@@ -253,10 +253,12 @@ def plot_partial_corrcoef(
         cmap      = cmap,
         vmin      = vmin,
         vmax      = vmax,
-        **kwargs)
+        **kwargs
+    )
 
     if cbar:
         ax.figure.colorbar(mappable, ax=ax)
+
 
     if filepath is not None:
         ax.figure.savefig(filepath)
