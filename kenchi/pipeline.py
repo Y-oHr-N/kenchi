@@ -82,7 +82,8 @@ class Pipeline(SKLearnPipeline):
 
     @if_delegate_has_method(delegate='_final_estimator')
     def plot_anomaly_score(self, X: TwoDimArray = None, **kwargs) -> Axes:
-        """Apply transoforms, and plot the anomaly scores for each sample.
+        """Apply transoforms, and plot the anomaly scores for each sample with
+        the final estimator.
 
         Parameters
         ----------
@@ -174,7 +175,8 @@ class Pipeline(SKLearnPipeline):
 
     @property
     def plot_graphical_model(self):
-        """Plot the Gaussian Graphical Model (GGM).
+        """Apply transforms, and plot the Gaussian Graphical Model (GGM) with
+        the final estimator.
 
         Parameters
         ----------
@@ -203,7 +205,8 @@ class Pipeline(SKLearnPipeline):
 
     @property
     def plot_partial_corrcoef(self):
-        """Plot the partial correlation coefficient matrix.
+        """Apply transforms, and plot the partial correlation coefficient
+        matrix with the final estimator.
 
         Parameters
         ----------

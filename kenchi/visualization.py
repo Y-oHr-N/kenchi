@@ -70,6 +70,12 @@ def plot_anomaly_score(
     -------
     ax : matplotlib Axes
         Axes on which the plot was drawn.
+
+    Examples
+    --------
+    .. image:: images/plot_anomaly_score.png
+        :align: center
+        :alt: Anomaly score
     """
 
     import matplotlib.pyplot as plt
@@ -193,7 +199,7 @@ def plot_roc_curve(
 
 
 def plot_graphical_model(
-    self,
+    detector,
     ax:            Axes                    = None,
     node_color:    Union[str, OneDimArray] = None,
     title:         str                     = 'Graphical model',
@@ -204,6 +210,9 @@ def plot_graphical_model(
 
     Parameters
     ----------
+    detector : Detector
+        Detector.
+
     ax : matplotlib Axes, default None
         Target axes instance.
 
@@ -223,6 +232,12 @@ def plot_graphical_model(
     -------
     ax : matplotlib Axes
         Axes on which the plot was drawn.
+
+    Examples
+    --------
+    .. image:: images/plot_graphical_model.png
+        :align: center
+        :alt: Graphical model
     """
 
     import matplotlib.pyplot as plt
@@ -231,13 +246,13 @@ def plot_graphical_model(
         _, ax      = plt.subplots()
 
     if node_color is None:
-        node_color = self.labels_
+        node_color = detector.labels_
 
     if title is not None:
         ax.set_title(title)
 
     nx.draw_networkx(
-        nx.from_numpy_matrix(self.partial_corrcoef_),
+        nx.from_numpy_matrix(detector.partial_corrcoef_),
         ax         = ax,
         node_color = node_color,
         **kwargs
@@ -295,6 +310,12 @@ def plot_partial_corrcoef(
     -------
     ax : matplotlib Axes
         Axes on which the plot was drawn.
+
+    Examples
+    --------
+    .. image:: images/plot_partial_corrcoef.png
+        :align: center
+        :alt: Partial correlation
     """
 
     import matplotlib.pyplot as plt
