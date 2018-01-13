@@ -1,7 +1,7 @@
-kenchi\.outlier\_detection\.vmf\_distns module
+kenchi\.outlier\_detection\.statistical module
 ==============================================
 
-.. automodule:: kenchi.outlier_detection.vmf_distns
+.. automodule:: kenchi.outlier_detection.statistical
     :members:
     :undoc-members:
     :show-inheritance:

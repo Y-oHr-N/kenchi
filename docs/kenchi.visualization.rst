@@ -1,7 +1,7 @@
-kenchi\.utils\.pandas module
+kenchi\.visualization module
 ============================
 
-.. automodule:: kenchi.utils.pandas
+.. automodule:: kenchi.visualization
     :members:
     :undoc-members:
     :show-inheritance:

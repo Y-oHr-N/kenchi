@@ -1,16 +1,5 @@
-kenchi\.utils package
-=====================
-
-Submodules
-----------
-
-.. toctree::
-
-   kenchi.utils.pandas
-   kenchi.utils.pyplot
-
-Module contents
----------------
+kenchi\.utils module
+====================
 
 .. automodule:: kenchi.utils
     :members:

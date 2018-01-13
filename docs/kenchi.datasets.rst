@@ -1,15 +1,5 @@
-kenchi\.datasets package
-========================
-
-Submodules
-----------
-
-.. toctree::
-
-   kenchi.datasets.sample_generator
-
-Module contents
----------------
+kenchi\.datasets module
+=======================
 
 .. automodule:: kenchi.datasets
     :members:

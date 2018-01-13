@@ -1,7 +1,7 @@
-kenchi\.outlier\_detection\.mixture\_distns module
+kenchi\.outlier\_detection\.distance\_based module
 ==================================================
 
-.. automodule:: kenchi.outlier_detection.mixture_distns
+.. automodule:: kenchi.outlier_detection.distance_based
     :members:
     :undoc-members:
     :show-inheritance:

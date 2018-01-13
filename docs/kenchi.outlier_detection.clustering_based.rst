@@ -1,7 +1,7 @@
-kenchi\.outlier\_detection\.empirical\_distns module
+kenchi\.outlier\_detection\.clustering\_based module
 ====================================================
 
-.. automodule:: kenchi.outlier_detection.empirical_distns
+.. automodule:: kenchi.outlier_detection.clustering_based
     :members:
     :undoc-members:
     :show-inheritance:

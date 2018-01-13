@@ -6,17 +6,17 @@ Subpackages
 
 .. toctree::
 
-    kenchi.datasets
     kenchi.outlier_detection
-    kenchi.utils
 
 Submodules
 ----------
 
 .. toctree::
 
-   kenchi.base
+   kenchi.datasets
    kenchi.pipeline
+   kenchi.utils
+   kenchi.visualization
 
 Module contents
 ---------------
