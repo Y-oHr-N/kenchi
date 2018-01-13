@@ -103,6 +103,11 @@ class SparseStructureLearningTest(unittest.TestCase):
     def test_plot_anomaly_score(self):
         self.assertIsInstance(self.sut.fit(self.X).plot_anomaly_score(), Axes)
 
+    def test_plot_graphical_model(self):
+        self.assertIsInstance(
+            self.sut.fit(self.X).plot_graphical_model(), Axes
+        )
+
     def test_plot_partial_corrcoeff(self):
         self.assertIsInstance(
             self.sut.fit(self.X).plot_partial_corrcoef(), Axes

@@ -89,8 +89,32 @@ class Pipeline(SKLearnPipeline):
         X : array-like of shape (n_samples, n_features), default None
             Data.
 
+        ax : matplotlib Axes, default None
+            Target axes instance.
+
+        title : string, default None
+            Axes title. To disable, pass None.
+
+        xlim : tuple, default None
+            Tuple passed to ax.xlim().
+
+        ylim : tuple, default None
+            Tuple passed to ax.ylim().
+
+        xlabel : string, default 'Samples'
+            X axis title label. To disable, pass None.
+
+        ylabel : string, default 'Anomaly score'
+            Y axis title label. To disable, pass None.
+
+        grid : boolean, default True
+            If True, turn the axes grids on.
+
+        filepath : str, default None
+            If not None, save the current figure.
+
         **kwargs : dict
-            Other keywords.
+            Other keywords passed to ax.plot().
 
         Returns
         -------
@@ -118,8 +142,23 @@ class Pipeline(SKLearnPipeline):
         y : array-like of shape (n_samples,)
             Labels.
 
+        ax : matplotlib Axes, default None
+            Target axes instance.
+
+        label : str, default None
+            Legend label.
+
+        title : string, default None
+            Axes title. To disable, pass None.
+
+        grid : boolean, default True
+            If True, turn the axes grids on.
+
+        filepath : str, default None
+            If not None, save the current figure.
+
         **kwargs : dict
-            Other keywords.
+            Other keywords passed to ax.plot().
 
         Returns
         -------
@@ -134,5 +173,71 @@ class Pipeline(SKLearnPipeline):
         return self._final_estimator.plot_roc_curve(X, y, **kwargs)
 
     @property
+    def plot_graphical_model(self):
+        """Plot the Gaussian Graphical Model (GGM).
+
+        Parameters
+        ----------
+        ax : matplotlib Axes, default None
+            Target axes instance.
+
+        title : string, default 'Graphical model'
+            Axes title. To disable, pass None.
+
+        node_color : str or ndarray of shape (n_features,), default None
+            Node color.
+
+        filepath : str, default None
+            If not None, save the current figure.
+
+        **kwargs : dict
+            Other keywords passed to nx.draw_networkx().
+
+        Returns
+        -------
+        ax : matplotlib Axes
+            Axes on which the plot was drawn.
+        """
+
+        return self._final_estimator.plot_graphical_model
+
+    @property
     def plot_partial_corrcoef(self):
+        """Plot the partial correlation coefficient matrix.
+
+        Parameters
+        ----------
+        detector : detector
+            Detector.
+
+        ax : matplotlib Axes, default None
+            Target axes instance.
+
+        cmap : matplotlib Colormap, default None
+            If None, plt.cm.RdYlBu is used.
+
+        vmin : float, default -1.0
+            Used in conjunction with norm to normalize luminance data.
+
+        vmax : float, default 1.0
+            Used in conjunction with norm to normalize luminance data.
+
+        cbar : bool, default True.
+            Whether to draw a colorbar.
+
+        title : string, default 'Partial correlation'
+            Axes title. To disable, pass None.
+
+        filepath : str, default None
+            If not None, save the current figure.
+
+        **kwargs : dict
+            Other keywords passed to ax.imshow().
+
+        Returns
+        -------
+        ax : matplotlib Axes
+            Axes on which the plot was drawn.
+        """
+
         return self._final_estimator.plot_partial_corrcoef

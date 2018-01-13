@@ -1,3 +1,6 @@
+from typing import Union
+
+import networkx as nx
 import numpy as np
 from matplotlib.axes import Axes
 from matplotlib.colors import Colormap
@@ -5,7 +8,12 @@ from sklearn.metrics import auc, roc_curve
 
 from .utils import Limits, OneDimArray, TwoDimArray
 
-__all__     = ['plot_anomaly_score', 'plot_roc_curve', 'plot_partial_corrcoef']
+__all__ = [
+    'plot_anomaly_score',
+    'plot_roc_curve',
+    'plot_partial_corrcoef',
+    'plot_graphical_model'
+]
 
 
 def plot_anomaly_score(
@@ -184,6 +192,63 @@ def plot_roc_curve(
     return ax
 
 
+def plot_graphical_model(
+    self,
+    ax:            Axes                    = None,
+    node_color:    Union[str, OneDimArray] = None,
+    title:         str                     = 'Graphical model',
+    filepath:      str                     = None,
+    **kwargs
+) -> Axes:
+    """Plot the Gaussian Graphical Model (GGM).
+
+    Parameters
+    ----------
+    ax : matplotlib Axes, default None
+        Target axes instance.
+
+    title : string, default 'Graphical model'
+        Axes title. To disable, pass None.
+
+    node_color : str or array-like of shape (n_features,), default None
+        Node color.
+
+    filepath : str, default None
+        If not None, save the current figure.
+
+    **kwargs : dict
+        Other keywords passed to nx.draw_networkx().
+
+    Returns
+    -------
+    ax : matplotlib Axes
+        Axes on which the plot was drawn.
+    """
+
+    import matplotlib.pyplot as plt
+
+    if ax is None:
+        _, ax      = plt.subplots()
+
+    if node_color is None:
+        node_color = self.labels_
+
+    if title is not None:
+        ax.set_title(title)
+
+    nx.draw_networkx(
+        nx.from_numpy_matrix(self.partial_corrcoef_),
+        ax         = ax,
+        node_color = node_color,
+        **kwargs
+    )
+
+    if filepath is not None:
+        ax.figure.savefig(filepath)
+
+    return ax
+
+
 def plot_partial_corrcoef(
     detector,
     ax:       Axes     = None,
@@ -258,7 +323,6 @@ def plot_partial_corrcoef(
 
     if cbar:
         ax.figure.colorbar(mappable, ax=ax)
-
 
     if filepath is not None:
         ax.figure.savefig(filepath)

@@ -1,7 +1,6 @@
 import unittest
 
 import matplotlib
-import numpy as np
 from matplotlib.axes import Axes
 from sklearn.exceptions import NotFittedError
 from sklearn.preprocessing import StandardScaler
@@ -31,6 +30,11 @@ class PipelineTest(unittest.TestCase):
 
     def test_plot_anomaly_score(self):
         self.assertIsInstance(self.sut.fit(self.X).plot_anomaly_score(), Axes)
+
+    def test_plot_graphical_model(self):
+        self.assertIsInstance(
+            self.sut.fit(self.X).plot_graphical_model(), Axes
+        )
 
     def test_plot_partial_corrcoef(self):
         self.assertIsInstance(

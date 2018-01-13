@@ -9,7 +9,7 @@ from sklearn.utils.validation import check_is_fitted
 
 from .base import BaseDetector
 from ..utils import timeit, OneDimArray, TwoDimArray
-from ..visualization import plot_partial_corrcoef
+from ..visualization import plot_graphical_model, plot_partial_corrcoef
 
 __all__ = ['GMM', 'KDE', 'SparseStructureLearning']
 
@@ -350,8 +350,7 @@ class SparseStructureLearning(BaseDetector):
     In Proceedings of SDM'09, pp. 97-108, 2009.
     """
 
-    # TODO: Implement plot_graphical_model method
-
+    plot_graphical_model  = plot_graphical_model
     plot_partial_corrcoef = plot_partial_corrcoef
 
     @property
