@@ -27,12 +27,13 @@ This is a set of python modules for anomaly detection.
 Requirements
 ------------
 
--  Python (>=3.5)
--  matplotlib (>=2.0.2)
--  numpy (>=1.11.2)
--  pandas (>=0.20.3)
--  scikit-learn (>=0.18.0)
--  scipy (>=0.18.1)
+-  Python (>=3.6)
+-  matplotlib (>=2.1.1)
+-  networkx (>=2.0)
+-  numpy (>=1.14.0)
+-  pandas (>=0.22.0)
+-  scikit-learn (>=0.19.1)
+-  scipy (>=1.0.0)
 
 Installation
 ------------
@@ -55,45 +56,23 @@ Usage
 .. code:: python
 
     import matplotlib.pyplot as plt
-    import numpy as np
-    from kenchi.datasets import make_blobs_with_outliers
-    from kenchi.outlier_detection import GaussianOutlierDetector
-
-    train_size       = 1000
-    test_size        = 100
-    n_outliers       = 10
-    n_features       = 10
-    centers          = np.zeros((1, n_features))
-    random_state     = np.random.RandomState(0)
+    from kenchi.datasets import make_blobs
+    from kenchi.outlier_detection import SparseStructureLearning
 
     # Generate the training data
-    X_train, _       = make_blobs_with_outliers(
-        n_inliers    = train_size,
-        n_outliers   = 0,
-        n_features   = n_features,
-        centers      = centers,
-        random_state = random_state
-    )
-
-    # Generate the test data that contains outliers
-    X_test, _        = make_blobs_with_outliers(
-        n_inliers    = test_size - n_outliers,
-        n_outliers   = n_outliers,
-        n_features   = n_features,
-        centers      = centers,
-        shuffle      = False,
-        random_state = random_state
-    )
+    X, _ = make_blobs(centers=1, random_state=1, shuffle=False)
 
     # Fit the model according to the given training data
-    det              = GaussianOutlierDetector().fit(X_train)
+    det  = SparseStructureLearning(alpha=0.2).fit(X)
 
-    # Plot anomaly scores for test samples
-    det.plot_anomaly_score(X_test)
+    # Plot the anomaly score for each training sample
+    det.plot_anomaly_score(linestyle='', marker='.')
 
     plt.show()
 
-.. image:: docs/images/anomaly_score.png
+.. image:: docs/images/plot_anomaly_score.png
+    :align: center
+    :alt: Anomaly score
 
 License
 -------
