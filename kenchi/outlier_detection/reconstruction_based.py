@@ -21,7 +21,7 @@ class PCA(BaseDetector):
         Enable verbose output.
 
     kwargs : dict
-        All other keyword arguments are passed to sklearn.decomposition.PCA().
+        Other keywords passed to sklearn.decomposition.PCA().
 
     Attributes
     ----------
@@ -144,6 +144,22 @@ class PCA(BaseDetector):
 
         return self._pca.inverse_transform(self._pca.transform(X))
 
+    def anomaly_score(self, X: TwoDimArray = None) -> OneDimArray:
+        """Compute the anomaly score for each sample.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features), default None
+            Data.
+
+        Returns
+        -------
+        anomaly_score : array-like of shape (n_samples,)
+            Anomaly score for each sample.
+        """
+
+        return np.sqrt(np.sum(self.feature_wise_anomaly_score(X), axis=1))
+
     def feature_wise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
         """Compute the feature-wise anomaly score for each sample.
 
@@ -164,22 +180,6 @@ class PCA(BaseDetector):
             X = self.X_
 
         return (X - self.reconstruct(X)) ** 2
-
-    def anomaly_score(self, X: TwoDimArray = None) -> OneDimArray:
-        """Compute the anomaly score for each sample.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features), default None
-            Data.
-
-        Returns
-        -------
-        anomaly_score : array-like of shape (n_samples,)
-            Anomaly score for each sample.
-        """
-
-        return np.sqrt(np.sum(self.feature_wise_anomaly_score(X), axis=1))
 
     def score(self, X: TwoDimArray, y: OneDimArray = None) -> float:
         """Compute the mean log-likelihood of the given data.

@@ -20,8 +20,7 @@ class MiniBatchKMeans(BaseDetector):
         Enable verbose output.
 
     kwargs : dict
-        All other keyword arguments are passed to
-        sklearn.cluster.MiniBatchKMeans().
+        Other keywords passed to sklearn.cluster.MiniBatchKMeans().
 
     Attributes
     ----------

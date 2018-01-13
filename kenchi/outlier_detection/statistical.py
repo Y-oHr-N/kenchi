@@ -26,8 +26,7 @@ class GMM(BaseDetector):
         Enable verbose output.
 
     kwargs : dict
-        All other keyword arguments are passed to
-        sklearn.mixture.GaussianMixture().
+        Other keywords passed to sklearn.mixture.GaussianMixture().
 
     Attributes
     ----------
@@ -195,8 +194,7 @@ class KDE(BaseDetector):
         Enable verbose output.
 
     kwargs : dict
-        All other keyword arguments are passed to
-        sklearn.neighbors.KernelDensity().
+        Other keywords passed to sklearn.neighbors.KernelDensity().
 
     Attributes
     ----------
@@ -297,6 +295,8 @@ class KDE(BaseDetector):
             Mean log-likelihood of the given data.
         """
 
+        check_is_fitted(self, 'X_')
+
         return np.mean(self._kde.score_samples(X))
 
 
@@ -309,15 +309,13 @@ class SparseStructureLearning(BaseDetector):
         False positive rate. Used to compute the threshold.
 
     cluster_params : dict, default None
-        Additional keyword arguments for
-        sklearn.cluster.affinity_propagation().
+        Other keywords passed to sklearn.cluster.affinity_propagation().
 
     verbose : bool, default False
         Enable verbose output.
 
     kwargs : dict
-        All other keyword arguments are passed to
-        sklearn.covariance.GraphLasso().
+        Other keywords passed to sklearn.covariance.GraphLasso().
 
     Attributes
     ----------
@@ -507,5 +505,7 @@ class SparseStructureLearning(BaseDetector):
         score : float
             Mean log-likelihood of the given data.
         """
+
+        check_is_fitted(self, 'X_')
 
         return self._glasso.score(X)

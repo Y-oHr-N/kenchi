@@ -25,8 +25,7 @@ class KNN(BaseDetector):
         neighbors.
 
     kwargs : dict
-        All other keyword arguments are passed to
-        sklearn.neighbors.NearestNeighbors().
+        Other keywords passed to sklearn.neighbors.NearestNeighbors().
 
     Attributes
     ----------
@@ -150,7 +149,7 @@ class OneTimeSampling(BaseDetector):
         Enable verbose output.
 
     kwargs : dict
-        Additional arguments will be passed to the requested metric.
+        Other keywords passed to the requested metric.
 
     Attributes
     ----------

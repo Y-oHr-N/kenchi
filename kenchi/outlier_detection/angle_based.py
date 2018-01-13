@@ -11,7 +11,7 @@ from ..utils import timeit, OneDimArray, TwoDimArray
 __all__ = ['FastABOD']
 
 
-def _abof(
+def abof(
     X:       TwoDimArray,
     X_train: TwoDimArray,
     ind:     TwoDimArray
@@ -42,8 +42,7 @@ class FastABOD(BaseDetector):
         Enable verbose output.
 
     kwargs : dict
-        All other keyword arguments are passed to
-        sklearn.neighbors.NearestNeighbors().
+        Other keywords passed to sklearn.neighbors.NearestNeighbors().
 
     Attributes
     ----------
@@ -133,7 +132,7 @@ class FastABOD(BaseDetector):
 
         try:
             result   = Parallel(n_jobs=self.n_jobs)(
-                delayed(_abof)(
+                delayed(abof)(
                     X[s], self.X_, ind[s]
                 ) for s in gen_even_slices(n_samples, self.n_jobs)
             )

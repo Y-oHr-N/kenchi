@@ -1,16 +1,19 @@
 import unittest
 
-import matplotlib.axes
+import matplotlib
 import numpy as np
+from matplotlib.axes import Axes
 from sklearn.exceptions import NotFittedError
 
 from kenchi.datasets import make_blobs
 from kenchi.outlier_detection import PCA
 
+matplotlib.use('Agg')
+
 
 class PCATest(unittest.TestCase):
     def setUp(self):
-        self.X, _ = make_blobs(n_outliers=0)
+        self.X, _ = make_blobs(random_state=1)
         self.sut  = PCA()
 
     def test_fit(self):
@@ -36,6 +39,4 @@ class PCATest(unittest.TestCase):
             self.sut.predict(self.X)
 
     def test_plot_anomaly_score(self):
-        self.assertIsInstance(
-            self.sut.fit(self.X).plot_anomaly_score(), matplotlib.axes.Axes
-        )
+        self.assertIsInstance(self.sut.fit(self.X).plot_anomaly_score(), Axes)
