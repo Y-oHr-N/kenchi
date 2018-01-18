@@ -3,7 +3,7 @@ from sklearn.decomposition import PCA as SKLearnPCA
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
-from .base import BaseDetector
+from ..base import BaseDetector
 from ..utils import timeit, OneDimArray, TwoDimArray
 
 __all__ = ['PCA']

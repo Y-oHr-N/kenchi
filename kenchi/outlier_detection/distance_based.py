@@ -3,7 +3,7 @@ from sklearn.neighbors import DistanceMetric, NearestNeighbors
 from sklearn.utils import check_array, check_random_state
 from sklearn.utils.validation import check_is_fitted
 
-from .base import BaseDetector
+from ..base import BaseDetector
 from ..utils import timeit, OneDimArray, RandomState, TwoDimArray
 
 __all__ = ['KNN', 'OneTimeSampling']

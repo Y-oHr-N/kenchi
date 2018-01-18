@@ -5,7 +5,7 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.externals.joblib import delayed, Parallel
 from sklearn.utils import gen_even_slices
 
-from .base import BaseDetector
+from ..base import BaseDetector
 from ..utils import timeit, OneDimArray, TwoDimArray
 
 __all__ = ['FastABOD']

@@ -7,7 +7,7 @@ from sklearn.neighbors import KernelDensity
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
-from .base import BaseDetector
+from ..base import BaseDetector
 from ..utils import timeit, OneDimArray, TwoDimArray
 from ..visualization import plot_graphical_model, plot_partial_corrcoef
 
@@ -305,11 +305,11 @@ class SparseStructureLearning(BaseDetector):
 
     Parameters
     ----------
-    fpr : float, default 0.01
-        False positive rate. Used to compute the threshold.
-
     cluster_params : dict, default None
         Other keywords passed to sklearn.cluster.affinity_propagation().
+
+    fpr : float, default 0.01
+        False positive rate. Used to compute the threshold.
 
     verbose : bool, default False
         Enable verbose output.
@@ -393,15 +393,19 @@ class SparseStructureLearning(BaseDetector):
 
     def __init__(
         self,
-        fpr:            float = 0.01,
         cluster_params: dict  = None,
+        fpr:            float = 0.01,
         verbose:        bool  = False,
         **kwargs
     ) -> None:
-        self.fpr            = fpr
-        self.cluster_params = {} if cluster_params is None else cluster_params
-        self.verbose        = verbose
-        self._glasso        = GraphLasso(**kwargs)
+        if cluster_params is None:
+            self.cluster_params = {}
+        else:
+            self.cluster_params = cluster_params
+
+        self.fpr                = fpr
+        self.verbose            = verbose
+        self._glasso            = GraphLasso(**kwargs)
 
         self.check_params()
 

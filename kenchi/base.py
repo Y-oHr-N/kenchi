@@ -4,15 +4,20 @@ import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.utils.validation import check_is_fitted
 
-from ..utils import OneDimArray, TwoDimArray
-from ..visualization import plot_anomaly_score, plot_roc_curve
+from .utils import OneDimArray, TwoDimArray
+from .visualization import plot_anomaly_score, plot_roc_curve
 
-__all__ = ['BaseDetector']
+__all__ = ['is_detector', 'BaseDetector']
+
+
+def is_detector(estimator: object) -> bool:
+    return getattr(estimator, '_estimator_type', None) == 'detector'
 
 
 class BaseDetector(BaseEstimator, ABC):
     """Base class for all outlier detectors."""
 
+    _estimator_type    = 'detector'
     plot_anomaly_score = plot_anomaly_score
     plot_roc_curve     = plot_roc_curve
 

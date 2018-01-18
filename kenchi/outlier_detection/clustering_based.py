@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.cluster import MiniBatchKMeans as SKLearnMiniBatchKMeans
 from sklearn.utils import check_array
 
-from .base import BaseDetector
+from ..base import BaseDetector
 from ..utils import timeit, OneDimArray, TwoDimArray
 
 __all__ = ['MiniBatchKMeans']
