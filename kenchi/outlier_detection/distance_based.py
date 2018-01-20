@@ -118,13 +118,9 @@ class KNN(BaseDetector):
             return np.max(dist, axis=1)
 
     def feature_wise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
-        """Compute the feature-wise anomaly score for each sample."""
-
         raise NotImplementedError()
 
     def score(X: TwoDimArray, y: OneDimArray = None) -> float:
-        """Compute the mean log-likelihood of the given data."""
-
         raise NotImplementedError()
 
 
@@ -153,7 +149,7 @@ class OneTimeSampling(BaseDetector):
 
     Attributes
     ----------
-    sub_ :
+    sub_ : array-like of shape (n_subsamples,)
         Indices of subsamples.
 
     threshold_ : float
@@ -226,14 +222,17 @@ class OneTimeSampling(BaseDetector):
         self.X_         = check_array(X)
         n_samples, _    = self.X_.shape
 
-        if self.n_subsamples < n_samples:
-            self.sub_   = np.sort(
-                self.random_state.choice(
-                    n_samples, size=self.n_subsamples, replace=False
-                )
+        if n_samples <= self.n_subsamples:
+            raise ValueError(
+                f'n_samples must be larger than {self.n_subsamples} ' \
+                + f'but was {n_samples}'
             )
-        else:
-            self.sub_   = np.arange(n_samples)
+
+        self.sub_       = np.sort(
+            self.random_state.choice(
+                n_samples, size=self.n_subsamples, replace=False
+            )
+        )
 
         anomaly_score   = self.anomaly_score()
         self.threshold_ = np.percentile(anomaly_score, 100. * (1. - self.fpr))
@@ -264,11 +263,7 @@ class OneTimeSampling(BaseDetector):
         return np.min(dist, axis=1)
 
     def feature_wise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
-        """Compute the feature-wise anomaly score for each sample."""
-
         raise NotImplementedError()
 
     def score(X: TwoDimArray, y: OneDimArray = None) -> float:
-        """Compute the mean log-likelihood of the given data."""
-
         raise NotImplementedError()
