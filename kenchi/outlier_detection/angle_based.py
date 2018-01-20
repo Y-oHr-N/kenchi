@@ -60,7 +60,7 @@ class FastABOD(BaseDetector):
     """
 
     @property
-    def X_(self) -> OneDimArray:
+    def X_(self) -> TwoDimArray:
         return self._knn._fit_X
 
     def __init__(
@@ -70,20 +70,17 @@ class FastABOD(BaseDetector):
         verbose: bool  = False,
         **kwargs
     ) -> None:
-        self.fpr     = fpr
-        self.n_jobs  = n_jobs
-        self.verbose = verbose
-        self._knn    = NearestNeighbors(**kwargs)
+        super().__init__(fpr=fpr, verbose=verbose)
+
+        self.n_jobs = n_jobs
+        self._knn   = NearestNeighbors(**kwargs)
 
         self.check_params()
 
     def check_params(self) -> None:
         """Check validity of parameters and raise ValueError if not valid."""
 
-        if self.fpr < 0. or self.fpr > 1.:
-            raise ValueError(
-                f'fpr must be between 0.0 and 1.0 inclusive but was {self.fpr}'
-            )
+        super().check_params()
 
     @timeit
     def fit(self, X: TwoDimArray, y: OneDimArray = None) -> 'FastABOD':
@@ -142,11 +139,7 @@ class FastABOD(BaseDetector):
         return -np.concatenate(result)
 
     def feature_wise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
-        """Compute the feature-wise anomaly score for each sample."""
-
         raise NotImplementedError()
 
     def score(X: TwoDimArray, y: OneDimArray = None) -> float:
-        """Compute the mean log-likelihood of the given data."""
-
         raise NotImplementedError()

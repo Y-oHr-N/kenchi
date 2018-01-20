@@ -89,19 +89,16 @@ class PCA(BaseDetector):
         verbose: bool  = False,
         **kwargs
     ) -> None:
-        self.fpr     = fpr
-        self.verbose = verbose
-        self._pca    = SKLearnPCA(**kwargs)
+        super().__init__(fpr=fpr, verbose=verbose)
+
+        self._pca = SKLearnPCA(**kwargs)
 
         self.check_params()
 
     def check_params(self) -> None:
         """Check validity of parameters and raise ValueError if not valid."""
 
-        if self.fpr < 0. or self.fpr > 1.:
-            raise ValueError(
-                f'fpr must be between 0.0 and 1.0 inclusive but was {self.fpr}'
-            )
+        super().check_params()
 
     @timeit
     def fit(self, X: TwoDimArray, y: OneDimArray = None) -> 'PCA':

@@ -100,19 +100,16 @@ class GMM(BaseDetector):
         verbose: bool  = False,
         **kwargs
     ) -> None:
-        self.fpr     = fpr
-        self.verbose = verbose
-        self._gmm    = GaussianMixture(**kwargs)
+        super().__init__(fpr=fpr, verbose=verbose)
+
+        self._gmm = GaussianMixture(**kwargs)
 
         self.check_params()
 
     def check_params(self) -> None:
         """Check validity of parameters and raise ValueError if not valid."""
 
-        if self.fpr < 0. or self.fpr > 1.:
-            raise ValueError(
-                f'fpr must be between 0.0 and 1.0 inclusive but was {self.fpr}'
-            )
+        super().check_params()
 
     @timeit
     def fit(self, X: TwoDimArray, y: OneDimArray = None) -> 'GMM':
@@ -213,19 +210,16 @@ class KDE(BaseDetector):
         verbose: bool  = False,
         **kwargs
     ) -> None:
-        self.fpr     = fpr
-        self.verbose = verbose
-        self._kde    = KernelDensity(**kwargs)
+        super().__init__(fpr=fpr, verbose=verbose)
+
+        self._kde = KernelDensity(**kwargs)
 
         self.check_params()
 
     def check_params(self) -> None:
         """Check validity of parameters and raise ValueError if not valid."""
 
-        if self.fpr < 0. or self.fpr > 1.:
-            raise ValueError(
-                f'fpr must be between 0.0 and 1.0 inclusive but was {self.fpr}'
-            )
+        super().check_params()
 
     @timeit
     def fit(self, X: TwoDimArray, y: OneDimArray = None) -> 'KDE':
@@ -387,13 +381,14 @@ class SparseStructureLearning(BaseDetector):
         verbose:           bool  = False,
         **kwargs
     ) -> None:
+        super().__init__(fpr=fpr, verbose=verbose)
+
         if clustering_params is None:
             self.clustering_params = {}
         else:
             self.clustering_params = clustering_params
 
         self.fpr                   = fpr
-        self.verbose               = verbose
         self._glasso               = GraphLasso(**kwargs)
 
         self.check_params()
@@ -401,10 +396,7 @@ class SparseStructureLearning(BaseDetector):
     def check_params(self) -> None:
         """Check validity of parameters and raise ValueError if not valid."""
 
-        if self.fpr < 0. or self.fpr > 1.:
-            raise ValueError(
-                f'fpr must be between 0.0 and 1.0 inclusive but was {self.fpr}'
-            )
+        super().check_params()
 
     @timeit
     def fit(

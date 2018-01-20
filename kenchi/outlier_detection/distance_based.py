@@ -57,20 +57,17 @@ class KNN(BaseDetector):
         weight:  bool  = False,
         **kwargs
     ) -> None:
-        self.fpr     = fpr
-        self.verbose = verbose
-        self.weight  = weight
-        self._knn    = NearestNeighbors(**kwargs)
+        super().__init__(fpr=fpr, verbose=verbose)
+
+        self.weight = weight
+        self._knn   = NearestNeighbors(**kwargs)
 
         self.check_params()
 
     def check_params(self) -> None:
         """Check validity of parameters and raise ValueError if not valid."""
 
-        if self.fpr < 0. or self.fpr > 1.:
-            raise ValueError(
-                f'fpr must be between 0.0 and 1.0 inclusive but was {self.fpr}'
-            )
+        super().check_params()
 
     @timeit
     def fit(self, X: TwoDimArray, y: OneDimArray = None) -> 'KNN':
@@ -181,10 +178,10 @@ class OneTimeSampling(BaseDetector):
         verbose:      bool        = False,
         **kwargs
     ) -> None:
-        self.fpr          = fpr
+        super().__init__(fpr=fpr, verbose=verbose)
+
         self.n_subsamples = n_subsamples
         self.random_state = check_random_state(random_state)
-        self.verbose      = verbose
         self._metric      = DistanceMetric.get_metric(metric, **kwargs)
 
         self.check_params()
@@ -192,10 +189,7 @@ class OneTimeSampling(BaseDetector):
     def check_params(self) -> None:
         """Check validity of parameters and raise ValueError if not valid."""
 
-        if self.fpr < 0. or self.fpr > 1.:
-            raise ValueError(
-                f'fpr must be between 0.0 and 1.0 inclusive but was {self.fpr}'
-            )
+        super().check_params()
 
         if self.n_subsamples <= 0:
             raise ValueError(

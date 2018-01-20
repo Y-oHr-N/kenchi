@@ -20,12 +20,18 @@ class BaseDetector(BaseEstimator, ABC):
     _estimator_type = 'detector'
 
     @abstractmethod
-    def __init__(self, **params) -> None:
-        """Initialize parameters."""
+    def __init__(self, fpr: float = 0.01, verbose: bool = False) -> None:
+        self.fpr     = fpr
+        self.verbose = verbose
 
     @abstractmethod
     def check_params(self) -> None:
         """Check validity of parameters and raise ValueError if not valid."""
+
+        if self.fpr < 0. or self.fpr > 1.:
+            raise ValueError(
+                f'fpr must be between 0.0 and 1.0 inclusive but was {self.fpr}'
+            )
 
     @abstractmethod
     def fit(
