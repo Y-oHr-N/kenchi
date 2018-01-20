@@ -1,43 +1,38 @@
-from typing import Union
-
-import networkx as nx
 import numpy as np
-from matplotlib.axes import Axes
-from matplotlib.colors import Colormap
 from sklearn.metrics import auc, roc_curve
 
-from .utils import Limits, OneDimArray, TwoDimArray
+from .utils import Axes, Colormap, Limits, OneDimArray, TwoDimArray
 
 __all__ = [
     'plot_anomaly_score',
     'plot_roc_curve',
-    'plot_partial_corrcoef',
-    'plot_graphical_model'
+    'plot_graphical_model',
+    'plot_partial_corrcoef'
 ]
 
 
 def plot_anomaly_score(
-    detector,
-    X:        TwoDimArray = None,
-    ax:       Axes        = None,
-    title:    str         = None,
-    xlim:     Limits      = None,
-    ylim:     Limits      = None,
-    xlabel:   str         = 'Samples',
-    ylabel:   str         = 'Anomaly score',
-    grid:     bool        = True,
-    filepath: str         = None,
+    anomaly_score: OneDimArray,
+    threshold:     float  = None,
+    ax:            Axes   = None,
+    title:         str    = None,
+    xlim:          Limits = None,
+    ylim:          Limits = None,
+    xlabel:        str    = 'Samples',
+    ylabel:        str    = 'Anomaly score',
+    grid:          bool   = True,
+    filepath:      str    = None,
     **kwargs
 ) -> Axes:
     """Plot the anomaly score for each sample.
 
     Parameters
     ----------
-    detector : detector
-        Detector.
+    anomaly_score : array-like of shape (n_samples,)
+        Anomaly score for each sample.
 
-    X : array-like of shape (n_samples, n_features), default None
-        Data.
+    threshold : float, default None
+        Threshold.
 
     ax : matplotlib Axes, default None
         Target axes instance.
@@ -80,18 +75,17 @@ def plot_anomaly_score(
 
     import matplotlib.pyplot as plt
 
-    anomaly_score = detector.anomaly_score(X)
-    n_samples,    = anomaly_score.shape
-    xlocs         = np.arange(n_samples)
+    n_samples, = anomaly_score.shape
+    xlocs      = np.arange(n_samples)
 
     if ax is None:
-        _, ax     = plt.subplots()
+        _, ax  = plt.subplots()
 
     if xlim is None:
-        xlim      = (0., n_samples - 1.)
+        xlim   = (0., n_samples - 1.)
 
     if ylim is None:
-        ylim      = (0., 1.1 * max(max(anomaly_score), detector.threshold_))
+        ylim   = (0., 1.1 * np.max(anomaly_score))
 
     if title is not None:
         ax.set_title(title)
@@ -106,7 +100,9 @@ def plot_anomaly_score(
     ax.set_ylim(ylim)
     ax.grid(grid)
     ax.plot(xlocs, anomaly_score, **kwargs)
-    ax.hlines(detector.threshold_, xlim[0], xlim[1])
+
+    if threshold is not None:
+        ax.hlines(threshold, xlim[0], xlim[1])
 
     if filepath is not None:
         ax.figure.savefig(filepath)
@@ -115,9 +111,8 @@ def plot_anomaly_score(
 
 
 def plot_roc_curve(
-    detector,
-    X:        TwoDimArray,
-    y:        OneDimArray,
+    y_true:   OneDimArray,
+    y_score:  OneDimArray,
     ax:       Axes = None,
     label:    str  = None,
     title:    str  = None,
@@ -131,14 +126,11 @@ def plot_roc_curve(
 
     Parameters
     ----------
-    detector : Detector
-        Detector.
+    y_true : array-like of shape (n_samples,)
+        True Labels.
 
-    X : array-like of shape (n_samples, n_features)
-        Data.
-
-    y : array-like of shape (n_samples,)
-        Labels.
+    y_score : array-like of shape (n_samples,)
+        Target scores.
 
     ax : matplotlib Axes, default None
         Target axes instance.
@@ -166,16 +158,14 @@ def plot_roc_curve(
 
     import matplotlib.pyplot as plt
 
-    anomaly_score = detector.anomaly_score(X)
-    fpr, tpr, _   = roc_curve(y, anomaly_score)
-    roc_auc       = auc(fpr, tpr)
+    fpr, tpr, _ = roc_curve(y_true, y_score)
+    roc_auc     = auc(fpr, tpr)
 
     if ax is None:
-        _, ax     = plt.subplots()
+        _, ax   = plt.subplots()
 
     if label is None:
-        label     = f'ROC curve of {detector.__class__.__name__} ' \
-            + f'(area = {roc_auc:1.3f})'
+        label   = f'(area = {roc_auc:1.3f})'
 
     if title is not None:
         ax.set_title(title)
@@ -199,28 +189,24 @@ def plot_roc_curve(
 
 
 def plot_graphical_model(
-    detector,
-    ax:            Axes                    = None,
-    node_color:    Union[str, OneDimArray] = None,
-    title:         str                     = 'Graphical model',
-    filepath:      str                     = None,
+    partial_corrcoef: TwoDimArray,
+    ax:               Axes = None,
+    title:            str  = 'Graphical model',
+    filepath:         str  = None,
     **kwargs
 ) -> Axes:
     """Plot the Gaussian Graphical Model (GGM).
 
     Parameters
     ----------
-    detector : Detector
-        Detector.
+    partial_corrcoef : array-like of shape (n_features, n_features)
+        Partial correlation coefficient matrix.
 
     ax : matplotlib Axes, default None
         Target axes instance.
 
     title : string, default 'Graphical model'
         Axes title. To disable, pass None.
-
-    node_color : str or array-like of shape (n_features,), default None
-        Node color.
 
     filepath : str, default None
         If not None, save the current figure.
@@ -241,20 +227,17 @@ def plot_graphical_model(
     """
 
     import matplotlib.pyplot as plt
+    import networkx as nx
 
     if ax is None:
-        _, ax      = plt.subplots()
-
-    if node_color is None:
-        node_color = detector.labels_
+        _, ax = plt.subplots()
 
     if title is not None:
         ax.set_title(title)
 
     nx.draw_networkx(
-        nx.from_numpy_matrix(detector.partial_corrcoef_),
-        ax         = ax,
-        node_color = node_color,
+        nx.from_numpy_matrix(partial_corrcoef),
+        ax    = ax,
         **kwargs
     )
 
@@ -265,22 +248,22 @@ def plot_graphical_model(
 
 
 def plot_partial_corrcoef(
-    detector,
-    ax:       Axes     = None,
-    cmap:     Colormap = None,
-    vmin:     float    = -1.,
-    vmax:     float    = 1.,
-    cbar:     bool     = True,
-    title:    str      = 'Partial correlation',
-    filepath: str      = None,
+    partial_corrcoef: TwoDimArray,
+    ax:               Axes     = None,
+    cmap:             Colormap = None,
+    vmin:             float    = -1.,
+    vmax:             float    = 1.,
+    cbar:             bool     = True,
+    title:            str      = 'Partial correlation',
+    filepath:         str      = None,
     **kwargs
 ) -> Axes:
     """Plot the partial correlation coefficient matrix.
 
     Parameters
     ----------
-    detector : detector
-        Detector.
+    partial_corrcoef : array-like of shape (n_features, n_features)
+        Partial correlation coefficient matrix.
 
     ax : matplotlib Axes, default None
         Target axes instance.
@@ -320,7 +303,7 @@ def plot_partial_corrcoef(
 
     import matplotlib.pyplot as plt
 
-    _, n_features = detector.partial_corrcoef_.shape
+    _, n_features = partial_corrcoef.shape
 
     if ax is None:
         _, ax     = plt.subplots()
@@ -335,7 +318,7 @@ def plot_partial_corrcoef(
     ax.set_yticks(np.arange(n_features))
 
     mappable      = ax.imshow(
-        np.ma.masked_equal(detector.partial_corrcoef_, 0.),
+        np.ma.masked_equal(partial_corrcoef, 0.),
         cmap      = cmap,
         vmin      = vmin,
         vmax      = vmax,

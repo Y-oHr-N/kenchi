@@ -159,8 +159,6 @@ class GMM(BaseDetector):
         return -self._gmm.score_samples(X)
 
     def feature_wise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
-        """Compute the feature-wise anomaly score for each sample."""
-
         raise NotImplementedError()
 
     def score(self, X: TwoDimArray, y: OneDimArray = None) -> float:
@@ -275,8 +273,6 @@ class KDE(BaseDetector):
         return -self._kde.score_samples(X)
 
     def feature_wise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
-        """Compute the feature-wise anomaly score for each sample."""
-
         raise NotImplementedError()
 
     def score(self, X: TwoDimArray, y: OneDimArray = None) -> float:
@@ -305,7 +301,7 @@ class SparseStructureLearning(BaseDetector):
 
     Parameters
     ----------
-    cluster_params : dict, default None
+    clustering_params : dict, default None
         Other keywords passed to sklearn.cluster.affinity_propagation().
 
     fpr : float, default 0.01
@@ -350,20 +346,15 @@ class SparseStructureLearning(BaseDetector):
     In Proceedings of SDM'09, pp. 97-108, 2009.
     """
 
-    plot_graphical_model  = plot_graphical_model
-    plot_partial_corrcoef = plot_partial_corrcoef
-
     @property
     def covariance_(self) -> TwoDimArray:
         return self._glasso.covariance_
 
     @property
     def labels_(self) -> OneDimArray:
-        """Return the label of each feature."""
-
         # cluster using affinity propagation
         _, labels = affinity_propagation(
-            self.partial_corrcoef_, **self.cluster_params
+            self.partial_corrcoef_, **self.clustering_params
         )
 
         return labels
@@ -378,8 +369,6 @@ class SparseStructureLearning(BaseDetector):
 
     @property
     def partial_corrcoef_(self) -> TwoDimArray:
-        """Return the partial correlation coefficient matrix."""
-
         _, n_features    = self.precision_.shape
         diag             = np.diag(self.precision_)[np.newaxis]
         partial_corrcoef = - self.precision_ / np.sqrt(diag.T @ diag)
@@ -393,19 +382,19 @@ class SparseStructureLearning(BaseDetector):
 
     def __init__(
         self,
-        cluster_params: dict  = None,
-        fpr:            float = 0.01,
-        verbose:        bool  = False,
+        clustering_params: dict  = None,
+        fpr:               float = 0.01,
+        verbose:           bool  = False,
         **kwargs
     ) -> None:
-        if cluster_params is None:
-            self.cluster_params = {}
+        if clustering_params is None:
+            self.clustering_params = {}
         else:
-            self.cluster_params = cluster_params
+            self.clustering_params = clustering_params
 
-        self.fpr                = fpr
-        self.verbose            = verbose
-        self._glasso            = GraphLasso(**kwargs)
+        self.fpr                   = fpr
+        self.verbose               = verbose
+        self._glasso               = GraphLasso(**kwargs)
 
         self.check_params()
 
@@ -512,3 +501,67 @@ class SparseStructureLearning(BaseDetector):
         check_is_fitted(self, 'X_')
 
         return self._glasso.score(X)
+
+    def plot_graphical_model(self, **kwargs):
+        """Plot the Gaussian Graphical Model (GGM).
+
+        Parameters
+        ----------
+        ax : matplotlib Axes, default None
+            Target axes instance.
+
+        title : string, default 'Graphical model'
+            Axes title. To disable, pass None.
+
+        filepath : str, default None
+            If not None, save the current figure.
+
+        **kwargs : dict
+            Other keywords passed to nx.draw_networkx().
+
+        Returns
+        -------
+        ax : matplotlib Axes
+            Axes on which the plot was drawn.
+        """
+
+        kwargs['node_color'] = self.labels_
+
+        return plot_graphical_model(self.partial_corrcoef_, **kwargs)
+
+    def plot_partial_corrcoef(self, **kwargs):
+        """Plot the partial correlation coefficient matrix.
+
+        Parameters
+        ----------
+        ax : matplotlib Axes, default None
+            Target axes instance.
+
+        cmap : matplotlib Colormap, default None
+            If None, plt.cm.RdYlBu is used.
+
+        vmin : float, default -1.0
+            Used in conjunction with norm to normalize luminance data.
+
+        vmax : float, default 1.0
+            Used in conjunction with norm to normalize luminance data.
+
+        cbar : bool, default True.
+            Whether to draw a colorbar.
+
+        title : string, default 'Partial correlation'
+            Axes title. To disable, pass None.
+
+        filepath : str, default None
+            If not None, save the current figure.
+
+        **kwargs : dict
+            Other keywords passed to ax.imshow().
+
+        Returns
+        -------
+        ax : matplotlib Axes
+            Axes on which the plot was drawn.
+        """
+
+        return plot_partial_corrcoef(self.partial_corrcoef_, **kwargs)

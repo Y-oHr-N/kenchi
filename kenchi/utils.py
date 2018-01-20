@@ -3,14 +3,40 @@ import time
 from typing import Tuple, Union
 
 import numpy as np
-import pandas as pd
 
-__all__     = ['timeit', 'OneDimArray', 'TwoDimArray', 'RandomState', 'Limits']
+__all__     = [
+    'timeit',
+    'Limits',
+    'RandomState',
+    'OneDimArray',
+    'TwoDimArray',
+    'Axes',
+    'Colormap'
+]
 
-OneDimArray = Union[np.ndarray, pd.Series]
-TwoDimArray = Union[np.ndarray, pd.DataFrame]
-RandomState = Union[int, np.random.RandomState]
-Limits      = Tuple[float, float]
+Limits          = Tuple[float, float]
+RandomState     = Union[int, np.random.RandomState]
+
+try:
+    import pandas as pd
+
+    OneDimArray = Union[np.ndarray, pd.Series]
+    TwoDimArray = Union[np.ndarray, pd.DataFrame]
+
+except ImportError:
+    OneDimArray = np.ndarray
+    TwoDimArray = np.ndarray
+
+try:
+    import matplotlib.axes
+    import matplotlib.colors
+
+    Axes        = matplotlib.axes.Axes
+    Colormap    = matplotlib.colors.Colormap
+
+except ImportError:
+    Axes        = object
+    Colormap    = object
 
 
 def short_format_time(t: float) -> str:
@@ -21,7 +47,7 @@ def short_format_time(t: float) -> str:
 
 
 def timeit(func):
-    """Return the wrapper function that measures the elapsed time.
+    """Decorator that measures the elapsed time.
 
     Parameters
     ----------
@@ -40,7 +66,7 @@ def timeit(func):
         result  = func(estimator, *args, **kwargs)
         elapsed = time.time() - start
 
-        if estimator.verbose:
+        if getattr(estimator, 'verbose', False):
             print(f'elaplsed: {short_format_time(elapsed)}')
 
         return result

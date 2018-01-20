@@ -1,8 +1,7 @@
-from matplotlib.axes import Axes
 from sklearn.pipeline import Pipeline as SKLearnPipeline
 from sklearn.utils.metaestimators import if_delegate_has_method
 
-from .utils import OneDimArray, TwoDimArray
+from .utils import Axes, OneDimArray, TwoDimArray
 
 __all__ = ['Pipeline']
 
@@ -186,9 +185,6 @@ class Pipeline(SKLearnPipeline):
         title : string, default 'Graphical model'
             Axes title. To disable, pass None.
 
-        node_color : str or ndarray of shape (n_features,), default None
-            Node color.
-
         filepath : str, default None
             If not None, save the current figure.
 
@@ -210,9 +206,6 @@ class Pipeline(SKLearnPipeline):
 
         Parameters
         ----------
-        detector : detector
-            Detector.
-
         ax : matplotlib Axes, default None
             Target axes instance.
 
