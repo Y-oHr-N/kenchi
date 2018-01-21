@@ -6,6 +6,8 @@ from sklearn.utils import check_random_state
 
 from .utils import Limits, OneDimArray, RandomState, TwoDimArray
 
+__all__ = ['make_blobs']
+
 
 def make_blobs(
     n_inliers:    int                       = 490,
