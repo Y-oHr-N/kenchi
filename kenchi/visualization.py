@@ -56,7 +56,7 @@ def plot_anomaly_score(
         If True, turn the axes grids on.
 
     filepath : str, default None
-        If not None, save the current figure.
+        If provided, save the current figure.
 
     **kwargs : dict
         Other keywords passed to ax.plot().
@@ -145,7 +145,7 @@ def plot_roc_curve(
         If True, turn the axes grids on.
 
     filepath : str, default None
-        If not None, save the current figure.
+        If provided, save the current figure.
 
     **kwargs : dict
         Other keywords passed to ax.plot().
@@ -209,7 +209,7 @@ def plot_graphical_model(
         Axes title. To disable, pass None.
 
     filepath : str, default None
-        If not None, save the current figure.
+        If provided, save the current figure.
 
     **kwargs : dict
         Other keywords passed to nx.draw_networkx().
@@ -284,7 +284,7 @@ def plot_partial_corrcoef(
         Axes title. To disable, pass None.
 
     filepath : str, default None
-        If not None, save the current figure.
+        If provided, save the current figure.
 
     **kwargs : dict
         Other keywords passed to ax.imshow().

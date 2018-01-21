@@ -142,7 +142,8 @@ class GMM(BaseDetector):
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features), default None
-            Data.
+            Data. If not provided, the anomaly score for each training sample
+            is returned.
 
         Returns
         -------
@@ -251,7 +252,8 @@ class KDE(BaseDetector):
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features), default None
-            Data.
+            Data. If not provided, the anomaly score for each training sample
+            is returned.
 
         Returns
         -------
@@ -434,7 +436,8 @@ class SparseStructureLearning(BaseDetector):
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features), default None
-            Data.
+            Data. If not provided, the anomaly score for each training sample
+            is returned.
 
         Returns
         -------
@@ -450,17 +453,18 @@ class SparseStructureLearning(BaseDetector):
         return self._glasso.mahalanobis(X)
 
     def feature_wise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
-        """Compute the feature-wise anomaly score for each sample.
+        """Compute the feature-wise anomaly scores for each sample.
 
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features), default None
-            Data.
+            Data. If not provided, the feature-wise anomaly scores for each
+            training sample are returned.
 
         Returns
         -------
         anomaly_score : array-like of shape (n_samples, n_features)
-            Feature-wise anomaly score for each sample.
+            Feature-wise anomaly scores for each sample.
         """
 
         check_is_fitted(self, 'X_')

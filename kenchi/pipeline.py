@@ -41,7 +41,8 @@ class Pipeline(SKLearnPipeline):
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features), default None
-            Data.
+            Data. If not provided, the anomaly score for each training sample
+            is returned.
 
         Returns
         -------
@@ -58,18 +59,19 @@ class Pipeline(SKLearnPipeline):
 
     @if_delegate_has_method(delegate='_final_estimator')
     def feature_wise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
-        """Apply transforms, and compute the feature-wise anomaly score for
+        """Apply transforms, and compute the feature-wise anomaly scores for
         each sample with the final estimator.
 
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features), default None
-            Data.
+            Data. If not provided, the feature_wise anomaly scores for each
+            training sample are returned.
 
         Returns
         -------
         anomaly_score : array-like of shape (n_samples, n_features)
-            Feature-wise anomaly score for each sample.
+            Feature-wise anomaly scores for each sample.
         """
 
         if X is not None:
@@ -81,13 +83,14 @@ class Pipeline(SKLearnPipeline):
 
     @if_delegate_has_method(delegate='_final_estimator')
     def plot_anomaly_score(self, X: TwoDimArray = None, **kwargs) -> Axes:
-        """Apply transoforms, and plot the anomaly scores for each sample with
+        """Apply transoforms, and plot the anomaly score for each sample with
         the final estimator.
 
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features), default None
-            Data.
+            Data. If not provided, plot the anomaly score for each training
+            samples.
 
         ax : matplotlib Axes, default None
             Target axes instance.

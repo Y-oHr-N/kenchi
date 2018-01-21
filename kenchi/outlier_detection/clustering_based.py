@@ -100,7 +100,8 @@ class MiniBatchKMeans(BaseDetector):
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features), default None
-            Data.
+            Data. If not provided, the anomaly score for each training sample
+            is returned.
 
         Returns
         -------

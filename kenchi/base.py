@@ -48,7 +48,7 @@ class BaseDetector(BaseEstimator, ABC):
 
     @abstractmethod
     def feature_wise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
-        """Compute the feature-wise anomaly score for each sample."""
+        """Compute the feature-wise anomaly scores for each sample."""
 
     @abstractmethod
     def score(self, X: TwoDimArray, y: OneDimArray = None) -> float:
@@ -111,12 +111,13 @@ class BaseDetector(BaseEstimator, ABC):
         return self.fit(X, **fit_params).predict(threshold=threshold)
 
     def plot_anomaly_score(self, X: TwoDimArray = None, **kwargs) -> Axes:
-        """Plot the anomaly scores for each sample.
+        """Plot the anomaly score for each sample.
 
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features), default None
-            Data.
+            Data. If provided, plot the anomaly score for each training
+            samples.
 
         ax : matplotlib Axes, default None
             Target axes instance.
