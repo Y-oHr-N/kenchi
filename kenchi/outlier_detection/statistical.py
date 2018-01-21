@@ -8,7 +8,7 @@ from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
 from ..base import BaseDetector
-from ..utils import timeit, OneDimArray, TwoDimArray
+from ..utils import timeit, Axes, OneDimArray, TwoDimArray
 from ..visualization import plot_graphical_model, plot_partial_corrcoef
 
 __all__ = ['GMM', 'KDE', 'SparseStructureLearning']
@@ -498,7 +498,7 @@ class SparseStructureLearning(BaseDetector):
 
         return self._glasso.score(X)
 
-    def plot_graphical_model(self, **kwargs):
+    def plot_graphical_model(self, **kwargs) -> Axes:
         """Plot the Gaussian Graphical Model (GGM).
 
         Parameters
@@ -525,7 +525,7 @@ class SparseStructureLearning(BaseDetector):
 
         return plot_graphical_model(self.partial_corrcoef_, **kwargs)
 
-    def plot_partial_corrcoef(self, **kwargs):
+    def plot_partial_corrcoef(self, **kwargs) -> Axes:
         """Plot the partial correlation coefficient matrix.
 
         Parameters

@@ -1,4 +1,4 @@
-from itertools import combinations
+import itertools
 
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
@@ -11,19 +11,25 @@ from ..utils import timeit, OneDimArray, TwoDimArray
 __all__ = ['FastABOD']
 
 
-def abof(
-    X:       TwoDimArray,
-    X_train: TwoDimArray,
-    ind:     TwoDimArray
+def approximate_abof(
+    X:         TwoDimArray,
+    X_train:   TwoDimArray,
+    neigh_ind: TwoDimArray
 ) -> OneDimArray:
-    """Compute the angle-based outlier factor for each sample."""
+    """Compute the approximate Angle-Based Outlier Factor (ABOF) for each
+    sample.
+    """
 
     with np.errstate(invalid='raise'):
-        return np.var([[
-            (pa @ pb) / (pa @ pa) / (pb @ pb) for pa, pb in combinations(
-                X_train[ind_p] - p, 2
-            )
-        ] for p, ind_p in zip(X, ind)], axis=1)
+        return np.var([
+            [
+                (diff_a @ diff_b) / (diff_a @ diff_a) / (diff_b @ diff_b)
+                for diff_a, diff_b in itertools.combinations(
+                    X_neigh - query_point, 2
+                )
+            ]
+            for query_point, X_neigh in zip(X, X_train[neigh_ind])
+        ], axis=1)
 
 
 class FastABOD(BaseDetector):
@@ -121,7 +127,7 @@ class FastABOD(BaseDetector):
             Anomaly score for each sample.
         """
 
-        ind          = self._knn.kneighbors(X, return_distance=False)
+        neigh_ind    = self._knn.kneighbors(X, return_distance=False)
 
         if X is None:
             X        = self.X_
@@ -130,8 +136,8 @@ class FastABOD(BaseDetector):
 
         try:
             result   = Parallel(n_jobs=self.n_jobs)(
-                delayed(abof)(
-                    X[s], self.X_, ind[s]
+                delayed(approximate_abof)(
+                    X[s], self.X_, neigh_ind[s]
                 ) for s in gen_even_slices(n_samples, self.n_jobs)
             )
         except FloatingPointError as e:

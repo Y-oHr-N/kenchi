@@ -223,11 +223,12 @@ class OneTimeSampling(BaseDetector):
                 + f'but was {n_samples}'
             )
 
-        self.sub_       = np.sort(
-            self.random_state.choice(
-                n_samples, size=self.n_subsamples, replace=False
-            )
+        self.sub_       = self.random_state.choice(
+            n_samples, size=self.n_subsamples, replace=False
         )
+
+        # sort again as choice does not guarantee sorted order
+        self.sub_       = np.sort(self.sub_)
 
         anomaly_score   = self.anomaly_score()
         self.threshold_ = np.percentile(anomaly_score, 100. * (1. - self.fpr))
