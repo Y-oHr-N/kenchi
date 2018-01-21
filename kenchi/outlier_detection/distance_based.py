@@ -133,8 +133,8 @@ class OneTimeSampling(BaseDetector):
     metric : str, default 'euclidean'
         Distance metric to use.
 
-    n_subsamples : int, default 20
-        Number of subsamples.
+    n_samples : int, default 20
+        Number of random samples to be used.
 
     random_state : int, RandomState instance, default None
         Seed of the pseudo random number generator.
@@ -147,7 +147,7 @@ class OneTimeSampling(BaseDetector):
 
     Attributes
     ----------
-    sub_ : array-like of shape (n_subsamples,)
+    sampled_ : array-like of shape (n_samples,)
         Indices of subsamples.
 
     threshold_ : float
@@ -156,7 +156,7 @@ class OneTimeSampling(BaseDetector):
     X_ : array-like of shape (n_samples, n_features)
         Training data.
 
-    X_sub_ : array-like of shape (n_subsamples, n_features)
+    X_sampled_ : array-like of shape (n_samples, n_features)
         Subset of the given training data.
 
     References
@@ -167,21 +167,21 @@ class OneTimeSampling(BaseDetector):
     """
 
     @property
-    def X_sub_(self) -> TwoDimArray:
-        return self.X_[self.sub_]
+    def X_sampled_(self) -> TwoDimArray:
+        return self.X_[self.sampled_]
 
     def __init__(
         self,
         fpr:          float       = 0.01,
         metric:       str         = 'euclidean',
-        n_subsamples: int         = 20,
+        n_samples:    int         = 20,
         random_state: RandomState = None,
         verbose:      bool        = False,
         **kwargs
     ) -> None:
         super().__init__(fpr=fpr, verbose=verbose)
 
-        self.n_subsamples = n_subsamples
+        self.n_samples    = n_samples
         self.random_state = check_random_state(random_state)
         self._metric      = DistanceMetric.get_metric(metric, **kwargs)
 
@@ -192,9 +192,9 @@ class OneTimeSampling(BaseDetector):
 
         super().check_params()
 
-        if self.n_subsamples <= 0:
+        if self.n_samples <= 0:
             raise ValueError(
-                f'n_subsamples must be positive but was {self.n_subsamples}'
+                f'n_samples must be positive but was {self.n_samples}'
             )
 
     @timeit
@@ -217,18 +217,18 @@ class OneTimeSampling(BaseDetector):
         self.X_         = check_array(X)
         n_samples, _    = self.X_.shape
 
-        if n_samples <= self.n_subsamples:
+        if n_samples <= self.n_samples:
             raise ValueError(
-                f'n_samples must be larger than {self.n_subsamples} ' \
-                + f'but was {n_samples}'
+                f'n_samples must be smaller than {n_samples} ' \
+                + f'but was {self.n_samples}'
             )
 
-        self.sub_       = self.random_state.choice(
-            n_samples, size=self.n_subsamples, replace=False
+        self.sampled_   = self.random_state.choice(
+            n_samples, size=self.n_samples, replace=False
         )
 
         # sort again as choice does not guarantee sorted order
-        self.sub_       = np.sort(self.sub_)
+        self.sampled_   = np.sort(self.sampled_)
 
         anomaly_score   = self.anomaly_score()
         self.threshold_ = np.percentile(anomaly_score, 100. * (1. - self.fpr))
@@ -255,7 +255,7 @@ class OneTimeSampling(BaseDetector):
         if X is None:
             X = self.X_
 
-        dist  = self._metric.pairwise(X, self.X_sub_)
+        dist  = self._metric.pairwise(X, self.X_sampled_)
 
         return np.min(dist, axis=1)
 
