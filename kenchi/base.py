@@ -25,7 +25,7 @@ class BaseDetector(BaseEstimator, ABC):
         self.verbose = verbose
 
     @abstractmethod
-    def check_params(self) -> None:
+    def check_params(self, X: TwoDimArray, y: OneDimArray = None) -> None:
         """Check validity of parameters and raise ValueError if not valid."""
 
         if self.fpr < 0. or self.fpr > 1.:
@@ -116,7 +116,7 @@ class BaseDetector(BaseEstimator, ABC):
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features), default None
-            Data. If provided, plot the anomaly score for each training
+            Data. If not provided, plot the anomaly score for each training
             samples.
 
         ax : matplotlib Axes, default None

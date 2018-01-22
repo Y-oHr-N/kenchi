@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn.cluster import MiniBatchKMeans as SKLearnMiniBatchKMeans
 from sklearn.utils import check_array
+from sklearn.utils.validation import check_is_fitted
 
 from ..base import BaseDetector
 from ..utils import timeit, OneDimArray, TwoDimArray
@@ -19,7 +20,7 @@ class MiniBatchKMeans(BaseDetector):
     verbose : bool, default False
         Enable verbose output.
 
-    kwargs : dict
+    kmeans_params : dict, default None
         Other keywords passed to sklearn.cluster.MiniBatchKMeans().
 
     Attributes
@@ -54,20 +55,18 @@ class MiniBatchKMeans(BaseDetector):
 
     def __init__(
         self,
-        fpr:     float = 0.01,
-        verbose: bool  = False,
-        **kwargs
+        fpr:           float = 0.01,
+        verbose:       bool  = False,
+        kmeans_params: dict  = None
     ) -> None:
         super().__init__(fpr=fpr, verbose=verbose)
 
-        self._kmeans = SKLearnMiniBatchKMeans(**kwargs)
+        self.kmeans_params = kmeans_params
 
-        self.check_params()
-
-    def check_params(self) -> None:
+    def check_params(self, X: TwoDimArray, y: OneDimArray = None) -> None:
         """Check validity of parameters and raise ValueError if not valid."""
 
-        super().check_params()
+        super().check_params(X)
 
     @timeit
     def fit(self, X: TwoDimArray, y: OneDimArray = None) -> 'MiniBatchKMeans':
@@ -86,11 +85,21 @@ class MiniBatchKMeans(BaseDetector):
             Return self.
         """
 
-        self._kmeans.fit(X)
+        self.check_params(X)
 
-        self.X_         = check_array(X)
-        anomaly_score   = self.anomaly_score()
-        self.threshold_ = np.percentile(anomaly_score, 100. * (1. - self.fpr))
+        self.X_           = check_array(X)
+
+        if self.kmeans_params is None:
+            kmeans_params = {}
+        else:
+            kmeans_params = self.kmeans_params
+
+        self._kmeans      = SKLearnMiniBatchKMeans(**kmeans_params).fit(X)
+
+        anomaly_score     = self.anomaly_score()
+        self.threshold_   = np.percentile(
+            anomaly_score, 100. * (1. - self.fpr)
+        )
 
         return self
 
@@ -108,6 +117,8 @@ class MiniBatchKMeans(BaseDetector):
         anomaly_score : array-like of shape (n_samples,)
             Anomaly score for each sample.
         """
+
+        check_is_fitted(self, '_kmeans')
 
         if X is None:
             X = self.X_
@@ -133,5 +144,7 @@ class MiniBatchKMeans(BaseDetector):
         score : float
             Opposite value of the given data on the K-means objective.
         """
+
+        check_is_fitted(self, '_kmeans')
 
         return self._kmeans.score(X)

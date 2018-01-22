@@ -20,7 +20,7 @@ class PCA(BaseDetector):
     verbose : bool, default False
         Enable verbose output.
 
-    kwargs : dict
+    pca_params : dict, default None
         Other keywords passed to sklearn.decomposition.PCA().
 
     Attributes
@@ -85,20 +85,18 @@ class PCA(BaseDetector):
 
     def __init__(
         self,
-        fpr:     float = 0.01,
-        verbose: bool  = False,
-        **kwargs
+        fpr:        float = 0.01,
+        verbose:    bool  = False,
+        pca_params: dict  = None
     ) -> None:
         super().__init__(fpr=fpr, verbose=verbose)
 
-        self._pca = SKLearnPCA(**kwargs)
+        self.pca_params = pca_params
 
-        self.check_params()
-
-    def check_params(self) -> None:
+    def check_params(self, X: TwoDimArray, y: OneDimArray = None) -> None:
         """Check validity of parameters and raise ValueError if not valid."""
 
-        super().check_params()
+        super().check_params(X)
 
     @timeit
     def fit(self, X: TwoDimArray, y: OneDimArray = None) -> 'PCA':
@@ -117,9 +115,17 @@ class PCA(BaseDetector):
             Return self.
         """
 
-        self._pca.fit(X)
+        self.check_params(X)
 
         self.X_         = check_array(X)
+
+        if self.pca_params is None:
+            pca_params  = {}
+        else:
+            pca_params  = self.pca_params
+
+        self._pca       = SKLearnPCA(**pca_params).fit(X)
+
         anomaly_score   = self.anomaly_score()
         self.threshold_ = np.percentile(anomaly_score, 100. * (1. - self.fpr))
 
@@ -138,6 +144,8 @@ class PCA(BaseDetector):
         -------
         X_rec : array-like of shape (n_samples, n_features)
         """
+
+        check_is_fitted(self, '_pca')
 
         return self._pca.inverse_transform(self._pca.transform(X))
 
@@ -173,7 +181,7 @@ class PCA(BaseDetector):
             Feature-wise anomaly scores for each sample.
         """
 
-        check_is_fitted(self, 'X_')
+        check_is_fitted(self, '_pca')
 
         if X is None:
             X = self.X_
@@ -195,5 +203,7 @@ class PCA(BaseDetector):
         score : float
             Mean log-likelihood of the given data.
         """
+
+        check_is_fitted(self, '_pca')
 
         return self._pca.score(X)

@@ -24,7 +24,7 @@ class KNN(BaseDetector):
         If True, anomaly score is the sum of the distances from k nearest
         neighbors.
 
-    kwargs : dict
+    knn_params : dict, default None
         Other keywords passed to sklearn.neighbors.NearestNeighbors().
 
     Attributes
@@ -52,22 +52,20 @@ class KNN(BaseDetector):
 
     def __init__(
         self,
-        fpr:     float = 0.01,
-        verbose: bool  = False,
-        weight:  bool  = False,
-        **kwargs
+        fpr:        float = 0.01,
+        verbose:    bool  = False,
+        weight:     bool  = False,
+        knn_params: dict  = None
     ) -> None:
         super().__init__(fpr=fpr, verbose=verbose)
 
-        self.weight = weight
-        self._knn   = NearestNeighbors(**kwargs)
+        self.weight     = weight
+        self.knn_params = knn_params
 
-        self.check_params()
-
-    def check_params(self) -> None:
+    def check_params(self, X: TwoDimArray, y: OneDimArray = None) -> None:
         """Check validity of parameters and raise ValueError if not valid."""
 
-        super().check_params()
+        super().check_params(X)
 
     @timeit
     def fit(self, X: TwoDimArray, y: OneDimArray = None) -> 'KNN':
@@ -86,8 +84,14 @@ class KNN(BaseDetector):
             Return self.
         """
 
-        self._knn.fit(X)
+        self.check_params(X)
 
+        if self.knn_params is None:
+            knn_params  = {}
+        else:
+            knn_params  = self.knn_params
+
+        self._knn       = NearestNeighbors(**knn_params).fit(X)
         anomaly_score   = self.anomaly_score()
         self.threshold_ = np.percentile(anomaly_score, 100. * (1. - self.fpr))
 
@@ -107,6 +111,8 @@ class KNN(BaseDetector):
         anomaly_score : array-like of shape (n_samples,)
             Anomaly score for each sample.
         """
+
+        check_is_fitted(self, '_knn')
 
         dist, _ = self._knn.kneighbors(X)
 
@@ -130,9 +136,6 @@ class OneTimeSampling(BaseDetector):
     fpr : float, default 0.01
         False positive rate. Used to compute the threshold.
 
-    metric : str, default 'euclidean'
-        Distance metric to use.
-
     n_samples : int, default 20
         Number of random samples to be used.
 
@@ -142,7 +145,10 @@ class OneTimeSampling(BaseDetector):
     verbose : bool, default False
         Enable verbose output.
 
-    kwargs : dict
+    metric : str, default 'euclidean'
+        Distance metric to use.
+
+    metric_params : dict, default None
         Other keywords passed to the requested metric.
 
     Attributes
@@ -172,29 +178,36 @@ class OneTimeSampling(BaseDetector):
 
     def __init__(
         self,
-        fpr:          float       = 0.01,
-        metric:       str         = 'euclidean',
-        n_samples:    int         = 20,
-        random_state: RandomState = None,
-        verbose:      bool        = False,
-        **kwargs
+        fpr:           float       = 0.01,
+        n_samples:     int         = 20,
+        random_state:  RandomState = None,
+        verbose:       bool        = False,
+        metric:        str         = 'euclidean',
+        metric_params: dict        = None
     ) -> None:
         super().__init__(fpr=fpr, verbose=verbose)
 
-        self.n_samples    = n_samples
-        self.random_state = check_random_state(random_state)
-        self._metric      = DistanceMetric.get_metric(metric, **kwargs)
+        self.n_samples     = n_samples
+        self.random_state  = random_state
+        self.metric        = metric
+        self.metric_params = metric_params
 
-        self.check_params()
-
-    def check_params(self) -> None:
+    def check_params(self, X: TwoDimArray, y: OneDimArray = None) -> None:
         """Check validity of parameters and raise ValueError if not valid."""
 
-        super().check_params()
+        super().check_params(X)
+
+        n_samples, _ = X.shape
 
         if self.n_samples <= 0:
             raise ValueError(
                 f'n_samples must be positive but was {self.n_samples}'
+            )
+
+        if self.n_samples >= n_samples:
+            raise ValueError(
+                f'n_samples must be smaller than {n_samples} ' \
+                + f'but was {self.n_samples}'
             )
 
     @timeit
@@ -214,24 +227,32 @@ class OneTimeSampling(BaseDetector):
             Return self.
         """
 
-        self.X_         = check_array(X)
-        n_samples, _    = self.X_.shape
+        self.check_params(X)
 
-        if n_samples <= self.n_samples:
-            raise ValueError(
-                f'n_samples must be smaller than {n_samples} ' \
-                + f'but was {self.n_samples}'
-            )
+        self.X_           = check_array(X)
+        n_samples, _      = self.X_.shape
 
-        self.sampled_   = self.random_state.choice(
+        rnd               = check_random_state(self.random_state)
+        self.sampled_     = rnd.choice(
             n_samples, size=self.n_samples, replace=False
         )
 
         # sort again as choice does not guarantee sorted order
-        self.sampled_   = np.sort(self.sampled_)
+        self.sampled_     = np.sort(self.sampled_)
 
-        anomaly_score   = self.anomaly_score()
-        self.threshold_ = np.percentile(anomaly_score, 100. * (1. - self.fpr))
+        if self.metric_params is None:
+            metric_params = {}
+        else:
+            metric_params = self.metric_params
+
+        self._metric      = DistanceMetric.get_metric(
+            self.metric, **metric_params
+        )
+
+        anomaly_score     = self.anomaly_score()
+        self.threshold_   = np.percentile(
+            anomaly_score, 100. * (1. - self.fpr)
+        )
 
         return self
 
@@ -250,7 +271,7 @@ class OneTimeSampling(BaseDetector):
             Anomaly score for each sample.
         """
 
-        check_is_fitted(self, 'X_')
+        check_is_fitted(self, '_metric')
 
         if X is None:
             X = self.X_

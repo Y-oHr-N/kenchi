@@ -25,7 +25,7 @@ class GMM(BaseDetector):
     verbose : bool, default False
         Enable verbose output.
 
-    kwargs : dict
+    gmm_params : dict, default None
         Other keywords passed to sklearn.mixture.GaussianMixture().
 
     Attributes
@@ -96,20 +96,18 @@ class GMM(BaseDetector):
 
     def __init__(
         self,
-        fpr:     float = 0.01,
-        verbose: bool  = False,
-        **kwargs
+        fpr:        float = 0.01,
+        verbose:    bool  = False,
+        gmm_params: dict  = None
     ) -> None:
         super().__init__(fpr=fpr, verbose=verbose)
 
-        self._gmm = GaussianMixture(**kwargs)
+        self.gmm_params = gmm_params
 
-        self.check_params()
-
-    def check_params(self) -> None:
+    def check_params(self, X: TwoDimArray, y: OneDimArray = None) -> None:
         """Check validity of parameters and raise ValueError if not valid."""
 
-        super().check_params()
+        super().check_params(X)
 
     @timeit
     def fit(self, X: TwoDimArray, y: OneDimArray = None) -> 'GMM':
@@ -128,9 +126,17 @@ class GMM(BaseDetector):
             Return self.
         """
 
-        self._gmm.fit(X)
+        self.check_params(X)
 
         self.X_         = check_array(X)
+
+        if self.gmm_params is None:
+            gmm_params  = {}
+        else:
+            gmm_params  = self.gmm_params
+
+        self._gmm       = GaussianMixture(**gmm_params).fit(X)
+
         anomaly_score   = self.anomaly_score()
         self.threshold_ = np.percentile(anomaly_score, 100. * (1. - self.fpr))
 
@@ -150,6 +156,8 @@ class GMM(BaseDetector):
         anomaly_score : array-like of shape (n_samples,)
             Anomaly score for each sample.
         """
+
+        check_is_fitted(self, '_gmm')
 
         if X is None:
             X = self.X_
@@ -175,6 +183,8 @@ class GMM(BaseDetector):
             Mean log-likelihood of the given data.
         """
 
+        check_is_fitted(self, '_gmm')
+
         return self._gmm.score(X)
 
 
@@ -189,7 +199,7 @@ class KDE(BaseDetector):
     verbose : bool, default False
         Enable verbose output.
 
-    kwargs : dict
+    kde_params : dict, default None
         Other keywords passed to sklearn.neighbors.KernelDensity().
 
     Attributes
@@ -207,20 +217,18 @@ class KDE(BaseDetector):
 
     def __init__(
         self,
-        fpr:     float = 0.01,
-        verbose: bool  = False,
-        **kwargs
+        fpr:        float = 0.01,
+        verbose:    bool  = False,
+        kde_params: dict  = None
     ) -> None:
         super().__init__(fpr=fpr, verbose=verbose)
 
-        self._kde = KernelDensity(**kwargs)
+        self.kde_params = kde_params
 
-        self.check_params()
-
-    def check_params(self) -> None:
+    def check_params(self, X: TwoDimArray, y: OneDimArray = None) -> None:
         """Check validity of parameters and raise ValueError if not valid."""
 
-        super().check_params()
+        super().check_params(X)
 
     @timeit
     def fit(self, X: TwoDimArray, y: OneDimArray = None) -> 'KDE':
@@ -239,7 +247,14 @@ class KDE(BaseDetector):
             Return self.
         """
 
-        self._kde.fit(X)
+        self.check_params(X)
+
+        if self.kde_params is None:
+            kde_params  = {}
+        else:
+            kde_params  = self.kde_params
+
+        self._kde       = KernelDensity(**kde_params).fit(X)
 
         anomaly_score   = self.anomaly_score()
         self.threshold_ = np.percentile(anomaly_score, 100. * (1. - self.fpr))
@@ -261,7 +276,7 @@ class KDE(BaseDetector):
             Anomaly score for each sample.
         """
 
-        check_is_fitted(self, 'X_')
+        check_is_fitted(self, '_kde')
 
         if X is None:
             X = self.X_
@@ -287,7 +302,7 @@ class KDE(BaseDetector):
             Mean log-likelihood of the given data.
         """
 
-        check_is_fitted(self, 'X_')
+        check_is_fitted(self, '_kde')
 
         return np.mean(self._kde.score_samples(X))
 
@@ -297,16 +312,16 @@ class SparseStructureLearning(BaseDetector):
 
     Parameters
     ----------
-    clustering_params : dict, default None
-        Other keywords passed to sklearn.cluster.affinity_propagation().
-
     fpr : float, default 0.01
         False positive rate. Used to compute the threshold.
 
     verbose : bool, default False
         Enable verbose output.
 
-    kwargs : dict
+    apcluster_params : dict, default None
+        Other keywords passed to sklearn.cluster.affinity_propagation().
+
+    glasso_params : dict, default None
         Other keywords passed to sklearn.covariance.GraphLasso().
 
     Attributes
@@ -348,9 +363,14 @@ class SparseStructureLearning(BaseDetector):
 
     @property
     def labels_(self) -> OneDimArray:
+        if self.apcluster_params is None:
+            apcluster_params = {}
+        else:
+            apcluster_params = self.apcluster_params
+
         # cluster using affinity propagation
         _, labels = affinity_propagation(
-            self.partial_corrcoef_, **self.clustering_params
+            self.partial_corrcoef_, **apcluster_params
         )
 
         return labels
@@ -365,7 +385,7 @@ class SparseStructureLearning(BaseDetector):
 
     @property
     def partial_corrcoef_(self) -> TwoDimArray:
-        _, n_features    = self.precision_.shape
+        n_features, _    = self.precision_.shape
         diag             = np.diag(self.precision_)[np.newaxis]
         partial_corrcoef = - self.precision_ / np.sqrt(diag.T @ diag)
         partial_corrcoef.flat[::n_features + 1] = 1.
@@ -378,27 +398,20 @@ class SparseStructureLearning(BaseDetector):
 
     def __init__(
         self,
-        clustering_params: dict  = None,
-        fpr:               float = 0.01,
-        verbose:           bool  = False,
-        **kwargs
+        fpr:              float = 0.01,
+        verbose:          bool  = False,
+        apcluster_params: dict  = None,
+        glasso_params:    dict  = None
     ) -> None:
         super().__init__(fpr=fpr, verbose=verbose)
 
-        if clustering_params is None:
-            self.clustering_params = {}
-        else:
-            self.clustering_params = clustering_params
+        self.apcluster_params = apcluster_params
+        self.glasso_params    = glasso_params
 
-        self.fpr                   = fpr
-        self._glasso               = GraphLasso(**kwargs)
-
-        self.check_params()
-
-    def check_params(self) -> None:
+    def check_params(self, X: TwoDimArray, y: OneDimArray = None) -> None:
         """Check validity of parameters and raise ValueError if not valid."""
 
-        super().check_params()
+        super().check_params(X)
 
     @timeit
     def fit(
@@ -421,12 +434,20 @@ class SparseStructureLearning(BaseDetector):
             Return self.
         """
 
-        self._glasso.fit(X)
+        self.check_params(X)
 
-        self.X_         = check_array(X)
-        anomaly_score   = self.anomaly_score()
-        df, loc, scale  = sp.stats.chi2.fit(anomaly_score)
-        self.threshold_ = sp.stats.chi2.ppf(1.0 - self.fpr, df, loc, scale)
+        self.X_           = check_array(X)
+
+        if self.glasso_params is None:
+            glasso_params = {}
+        else:
+            glasso_params = self.glasso_params
+
+        self._glasso      = GraphLasso(**glasso_params).fit(X)
+
+        anomaly_score     = self.anomaly_score()
+        df, loc, scale    = sp.stats.chi2.fit(anomaly_score)
+        self.threshold_   = sp.stats.chi2.ppf(1.0 - self.fpr, df, loc, scale)
 
         return self
 
@@ -445,7 +466,7 @@ class SparseStructureLearning(BaseDetector):
             Anomaly score for each sample.
         """
 
-        check_is_fitted(self, 'X_')
+        check_is_fitted(self, '_glasso')
 
         if X is None:
             X = self.X_
@@ -467,7 +488,7 @@ class SparseStructureLearning(BaseDetector):
             Feature-wise anomaly scores for each sample.
         """
 
-        check_is_fitted(self, 'X_')
+        check_is_fitted(self, '_glasso')
 
         if X is None:
             X = self.X_
@@ -494,7 +515,7 @@ class SparseStructureLearning(BaseDetector):
             Mean log-likelihood of the given data.
         """
 
-        check_is_fitted(self, 'X_')
+        check_is_fitted(self, '_glasso')
 
         return self._glasso.score(X)
 

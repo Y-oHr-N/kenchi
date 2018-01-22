@@ -4,6 +4,7 @@ import numpy as np
 from sklearn.neighbors import NearestNeighbors
 from sklearn.externals.joblib import delayed, Parallel
 from sklearn.utils import gen_even_slices
+from sklearn.utils.validation import check_is_fitted
 
 from ..base import BaseDetector
 from ..utils import timeit, OneDimArray, TwoDimArray
@@ -27,8 +28,7 @@ def approximate_abof(
                 for diff_a, diff_b in itertools.combinations(
                     X_neigh - query_point, 2
                 )
-            ]
-            for query_point, X_neigh in zip(X, X_train[neigh_ind])
+            ] for query_point, X_neigh in zip(X, X_train[neigh_ind])
         ], axis=1)
 
 
@@ -47,7 +47,7 @@ class FastABOD(BaseDetector):
     verbose : bool, default False
         Enable verbose output.
 
-    kwargs : dict
+    knn_params : dict, default None
         Other keywords passed to sklearn.neighbors.NearestNeighbors().
 
     Attributes
@@ -71,22 +71,20 @@ class FastABOD(BaseDetector):
 
     def __init__(
         self,
-        fpr:     float = 0.01,
-        n_jobs:  int   = 1,
-        verbose: bool  = False,
-        **kwargs
+        fpr:        float = 0.01,
+        n_jobs:     int   = 1,
+        verbose:    bool  = False,
+        knn_params: dict  = None
     ) -> None:
         super().__init__(fpr=fpr, verbose=verbose)
 
-        self.n_jobs = n_jobs
-        self._knn   = NearestNeighbors(**kwargs)
+        self.n_jobs     = n_jobs
+        self.knn_params = knn_params
 
-        self.check_params()
-
-    def check_params(self) -> None:
+    def check_params(self, X: TwoDimArray, y: OneDimArray = None) -> None:
         """Check validity of parameters and raise ValueError if not valid."""
 
-        super().check_params()
+        super().check_params(X)
 
     @timeit
     def fit(self, X: TwoDimArray, y: OneDimArray = None) -> 'FastABOD':
@@ -105,7 +103,14 @@ class FastABOD(BaseDetector):
             Return self.
         """
 
-        self._knn.fit(X)
+        self.check_params(X)
+
+        if self.knn_params is None:
+            knn_params  = {}
+        else:
+            knn_params  = self.knn_params
+
+        self._knn       = NearestNeighbors(**knn_params).fit(X)
 
         anomaly_score   = self.anomaly_score()
         self.threshold_ = np.percentile(anomaly_score, 100. * (1. - self.fpr))
@@ -126,6 +131,8 @@ class FastABOD(BaseDetector):
         anomaly_score : array-like of shape (n_samples,)
             Anomaly score for each sample.
         """
+
+        check_is_fitted(self, '_knn')
 
         neigh_ind    = self._knn.kneighbors(X, return_distance=False)
 
