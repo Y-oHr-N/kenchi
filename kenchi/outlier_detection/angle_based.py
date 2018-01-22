@@ -52,6 +52,9 @@ class FastABOD(BaseDetector):
 
     Attributes
     ----------
+    abof_max_ : float
+        Maximum possible abof.
+
     threshold_ : float
         Threshold.
 
@@ -63,6 +66,10 @@ class FastABOD(BaseDetector):
     H.-P. Kriegel, M. Schubert and A. Zimek,
     "Angle-based outlier detection in high-dimensional data,"
     In Proceedings of SIGKDD'08, pp. 444-452, 2008.
+
+    H.-P. Kriegel, P. Kroger, E. Schubert and A. Zimek,
+    "Interpreting and unifying outlier scores,"
+    In Proceedings of SDM'11, pp. 13-24, 2011.
     """
 
     @property
@@ -134,15 +141,18 @@ class FastABOD(BaseDetector):
 
         check_is_fitted(self, '_knn')
 
-        neigh_ind    = self._knn.kneighbors(X, return_distance=False)
+        neigh_ind          = self._knn.kneighbors(X, return_distance=False)
 
         if X is None:
-            X        = self.X_
+            query_is_train = True
+            X              = self.X_
+        else:
+            query_is_train = False
 
-        n_samples, _ = X.shape
+        n_samples, _       = X.shape
 
         try:
-            result   = Parallel(n_jobs=self.n_jobs)(
+            result         = Parallel(n_jobs=self.n_jobs)(
                 delayed(approximate_abof)(
                     X[s], self.X_, neigh_ind[s]
                 ) for s in gen_even_slices(n_samples, self.n_jobs)
@@ -150,7 +160,12 @@ class FastABOD(BaseDetector):
         except FloatingPointError as e:
             raise ValueError('X must not contain training samples') from e
 
-        return -np.concatenate(result)
+        abof               = np.concatenate(result)
+
+        if query_is_train:
+            self.abof_max_ = np.max(abof)
+
+        return -np.log(abof / self.abof_max_)
 
     def feature_wise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
         raise NotImplementedError()
