@@ -53,7 +53,7 @@ class FastABOD(BaseDetector):
     Attributes
     ----------
     abof_max_ : float
-        Maximum possible abof.
+        Maximum possible ABOF.
 
     threshold_ : float
         Threshold.
@@ -141,31 +141,29 @@ class FastABOD(BaseDetector):
 
         check_is_fitted(self, '_knn')
 
-        neigh_ind          = self._knn.kneighbors(X, return_distance=False)
-
         if X is None:
             query_is_train = True
             X              = self.X_
+            neigh_ind      = self._knn.kneighbors(None, return_distance=False)
         else:
             query_is_train = False
+            neigh_ind      = self._knn.kneighbors(X, return_distance=False)
 
         n_samples, _       = X.shape
 
-        try:
-            result         = Parallel(n_jobs=self.n_jobs)(
-                delayed(approximate_abof)(
-                    X[s], self.X_, neigh_ind[s]
-                ) for s in gen_even_slices(n_samples, self.n_jobs)
-            )
-        except FloatingPointError as e:
-            raise ValueError('X must not contain training samples') from e
+        result             = Parallel(n_jobs=self.n_jobs)(
+            delayed(approximate_abof)(
+                X[s], self.X_, neigh_ind[s]
+            ) for s in gen_even_slices(n_samples, self.n_jobs)
+        )
 
         abof               = np.concatenate(result)
 
         if query_is_train:
             self.abof_max_ = np.max(abof)
 
-        return -np.log(abof / self.abof_max_)
+        # transform raw scores into regular scores
+        return np.maximum(0., -np.log(abof / self.abof_max_))
 
     def feature_wise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
         raise NotImplementedError()
