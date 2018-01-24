@@ -14,8 +14,9 @@ class PCA(BaseDetector):
 
     Parameters
     ----------
-    fpr : float, default 0.01
-        False positive rate. Used to compute the threshold.
+    contamination : float, default 0.01
+        Amount of contamination of the data set, i.e. the proportion of
+        outliers in the data set. Used to define the threshold.
 
     verbose : bool, default False
         Enable verbose output.
@@ -85,11 +86,11 @@ class PCA(BaseDetector):
 
     def __init__(
         self,
-        fpr:        float = 0.01,
-        verbose:    bool  = False,
-        pca_params: dict  = None
+        contamination: float = 0.01,
+        verbose:       bool  = False,
+        pca_params:    dict  = None
     ) -> None:
-        super().__init__(fpr=fpr, verbose=verbose)
+        super().__init__(contamination=contamination, verbose=verbose)
 
         self.pca_params = pca_params
 
@@ -126,8 +127,9 @@ class PCA(BaseDetector):
 
         self._pca       = SKLearnPCA(**pca_params).fit(X)
 
-        anomaly_score   = self.anomaly_score()
-        self.threshold_ = np.percentile(anomaly_score, 100. * (1. - self.fpr))
+        self.threshold_ = np.percentile(
+            self.anomaly_score(), 100. * (1. - self.contamination)
+        )
 
         return self
 

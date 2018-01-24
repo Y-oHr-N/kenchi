@@ -14,8 +14,9 @@ class KNN(BaseDetector):
 
     Parameters
     ----------
-    fpr : float, default 0.01
-        False positive rate. Used to compute the threshold.
+    contamination : float, default 0.01
+        Amount of contamination of the data set, i.e. the proportion of
+        outliers in the data set. Used to define the threshold.
 
     verbose : bool, default False
         Enable verbose output.
@@ -52,12 +53,12 @@ class KNN(BaseDetector):
 
     def __init__(
         self,
-        fpr:        float = 0.01,
-        verbose:    bool  = False,
-        weight:     bool  = False,
-        knn_params: dict  = None
+        contamination: float = 0.01,
+        verbose:       bool  = False,
+        weight:        bool  = False,
+        knn_params:    dict  = None
     ) -> None:
-        super().__init__(fpr=fpr, verbose=verbose)
+        super().__init__(contamination=contamination, verbose=verbose)
 
         self.weight     = weight
         self.knn_params = knn_params
@@ -92,8 +93,10 @@ class KNN(BaseDetector):
             knn_params  = self.knn_params
 
         self._knn       = NearestNeighbors(**knn_params).fit(X)
-        anomaly_score   = self.anomaly_score()
-        self.threshold_ = np.percentile(anomaly_score, 100. * (1. - self.fpr))
+
+        self.threshold_ = np.percentile(
+            self.anomaly_score(), 100. * (1. - self.contamination)
+        )
 
         return self
 
@@ -133,8 +136,9 @@ class OneTimeSampling(BaseDetector):
 
     Parameters
     ----------
-    fpr : float, default 0.01
-        False positive rate. Used to compute the threshold.
+    contamination : float, default 0.01
+        Amount of contamination of the data set, i.e. the proportion of
+        outliers in the data set. Used to define the threshold.
 
     n_samples : int, default 20
         Number of random samples to be used.
@@ -178,14 +182,14 @@ class OneTimeSampling(BaseDetector):
 
     def __init__(
         self,
-        fpr:           float       = 0.01,
+        contamination: float       = 0.01,
         n_samples:     int         = 20,
         random_state:  RandomState = None,
         verbose:       bool        = False,
         metric:        str         = 'euclidean',
         metric_params: dict        = None
     ) -> None:
-        super().__init__(fpr=fpr, verbose=verbose)
+        super().__init__(contamination=contamination, verbose=verbose)
 
         self.n_samples     = n_samples
         self.random_state  = random_state
@@ -249,9 +253,8 @@ class OneTimeSampling(BaseDetector):
             self.metric, **metric_params
         )
 
-        anomaly_score     = self.anomaly_score()
         self.threshold_   = np.percentile(
-            anomaly_score, 100. * (1. - self.fpr)
+            self.anomaly_score(), 100. * (1. - self.contamination)
         )
 
         return self

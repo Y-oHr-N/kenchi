@@ -37,8 +37,9 @@ class FastABOD(BaseDetector):
 
     Parameters
     ----------
-    fpr : float, default 0.01
-        False positive rate. Used to compute the threshold.
+    contamination : float, default 0.01
+        Amount of contamination of the data set, i.e. the proportion of
+        outliers in the data set. Used to define the threshold.
 
     n_jobs : int, default 1
         Number of jobs to run in parallel. If -1, then the number of jobs is
@@ -78,12 +79,12 @@ class FastABOD(BaseDetector):
 
     def __init__(
         self,
-        fpr:        float = 0.01,
-        n_jobs:     int   = 1,
-        verbose:    bool  = False,
-        knn_params: dict  = None
+        contamination: float = 0.01,
+        n_jobs:        int   = 1,
+        verbose:       bool  = False,
+        knn_params:    dict  = None
     ) -> None:
-        super().__init__(fpr=fpr, verbose=verbose)
+        super().__init__(contamination=contamination, verbose=verbose)
 
         self.n_jobs     = n_jobs
         self.knn_params = knn_params
@@ -119,8 +120,9 @@ class FastABOD(BaseDetector):
 
         self._knn       = NearestNeighbors(**knn_params).fit(X)
 
-        anomaly_score   = self.anomaly_score()
-        self.threshold_ = np.percentile(anomaly_score, 100. * (1. - self.fpr))
+        self.threshold_ = np.percentile(
+            self.anomaly_score(), 100. * (1. - self.contamination)
+        )
 
         return self
 
