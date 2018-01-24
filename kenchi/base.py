@@ -51,14 +51,6 @@ class BaseDetector(BaseEstimator, ABC):
     def anomaly_score(self, X: TwoDimArray = None) -> OneDimArray:
         """Compute the anomaly score for each sample."""
 
-    @abstractmethod
-    def featurewise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
-        """Compute the feature-wise anomaly scores for each sample."""
-
-    @abstractmethod
-    def score(self, X: TwoDimArray, y: OneDimArray = None) -> float:
-        """Compute the mean log-likelihood of the given data."""
-
     def predict(
         self,
         X:         TwoDimArray = None,

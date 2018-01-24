@@ -3,7 +3,7 @@ import itertools
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
 from sklearn.externals.joblib import delayed, Parallel
-from sklearn.utils import gen_even_slices
+from sklearn.utils import check_array, gen_even_slices
 from sklearn.utils.validation import check_is_fitted
 
 from ..base import BaseDetector
@@ -149,6 +149,7 @@ class FastABOD(BaseDetector):
             neigh_ind      = self._knn.kneighbors(None, return_distance=False)
         else:
             query_is_train = False
+            X              = check_array(X)
             neigh_ind      = self._knn.kneighbors(X, return_distance=False)
 
         n_samples, _       = X.shape
@@ -166,9 +167,3 @@ class FastABOD(BaseDetector):
 
         # transform raw scores into regular scores
         return np.maximum(0., -np.log(abof / self.abof_max_))
-
-    def featurewise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
-        raise NotImplementedError()
-
-    def score(X: TwoDimArray, y: OneDimArray = None) -> float:
-        raise NotImplementedError()

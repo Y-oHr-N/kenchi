@@ -4,6 +4,7 @@ import matplotlib
 import matplotlib.axes
 import numpy as np
 from sklearn.exceptions import NotFittedError
+from sklearn.utils.estimator_checks import check_estimator
 
 from kenchi.datasets import make_blobs
 from kenchi.outlier_detection import GMM, KDE, SparseStructureLearning
@@ -23,6 +24,9 @@ class GMMTest(unittest.TestCase):
     def tearDown(self):
         plt.close()
 
+    def test_check_estimator(self):
+        self.assertIsNone(check_estimator(self.sut))
+
     def test_fit(self):
         self.assertIsInstance(self.sut.fit(self.X_train), GMM)
 
@@ -32,10 +36,6 @@ class GMMTest(unittest.TestCase):
     def test_anomaly_score_notfitted(self):
         with self.assertRaises(NotFittedError):
             self.sut.anomaly_score(self.X_train)
-
-    def test_featurewise_anomaly_score_notimplemented(self):
-        with self.assertRaises(NotImplementedError):
-            self.sut.featurewise_anomaly_score(self.X_train)
 
     def test_predict_notfitted(self):
         with self.assertRaises(NotFittedError):
@@ -75,6 +75,9 @@ class KDETest(unittest.TestCase):
     def tearDown(self):
         plt.close()
 
+    def test_check_estimator(self):
+        self.assertIsNone(check_estimator(self.sut))
+
     def test_fit(self):
         self.assertIsInstance(self.sut.fit(self.X_train), KDE)
 
@@ -84,10 +87,6 @@ class KDETest(unittest.TestCase):
     def test_anomaly_score_notfitted(self):
         with self.assertRaises(NotFittedError):
             self.sut.anomaly_score(self.X_train)
-
-    def test_featurewise_anomaly_score_notimplemented(self):
-        with self.assertRaises(NotImplementedError):
-            self.sut.featurewise_anomaly_score(self.X_train)
 
     def test_predict_notfitted(self):
         with self.assertRaises(NotFittedError):
@@ -121,11 +120,16 @@ class SparseStructureLearningTest(unittest.TestCase):
     def setUp(self):
         self.X_train, _          = make_blobs(centers=1, random_state=1)
         self.X_test, self.y_test = make_blobs(random_state=2)
-        self.sut                 = SparseStructureLearning()
+        self.sut                 = SparseStructureLearning(
+            glasso_params        = {'tol': 0.02}
+        )
         _, self.ax               = plt.subplots()
 
     def tearDown(self):
         plt.close()
+
+    def test_check_estimator(self):
+        self.assertIsNone(check_estimator(self.sut))
 
     def test_fit(self):
         self.assertIsInstance(

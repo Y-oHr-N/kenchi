@@ -4,6 +4,7 @@ import matplotlib
 import matplotlib.axes
 import numpy as np
 from sklearn.exceptions import NotFittedError
+from sklearn.utils.estimator_checks import check_estimator
 
 from kenchi.datasets import make_blobs
 from kenchi.outlier_detection import MiniBatchKMeans
@@ -23,6 +24,9 @@ class MiniBatchKMeansTest(unittest.TestCase):
     def tearDown(self):
         plt.close()
 
+    def test_check_estimator(self):
+        self.assertIsNone(check_estimator(self.sut))
+
     def test_fit(self):
         self.assertIsInstance(self.sut.fit(self.X_train), MiniBatchKMeans)
 
@@ -32,10 +36,6 @@ class MiniBatchKMeansTest(unittest.TestCase):
     def test_anomaly_score_notfitted(self):
         with self.assertRaises(NotFittedError):
             self.sut.anomaly_score(self.X_train)
-
-    def test_featurewise_anomaly_score_notimplemented(self):
-        with self.assertRaises(NotImplementedError):
-            self.sut.featurewise_anomaly_score(self.X_train)
 
     def test_predict_notfitted(self):
         with self.assertRaises(NotFittedError):

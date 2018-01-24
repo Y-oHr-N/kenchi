@@ -187,6 +187,8 @@ class PCA(BaseDetector):
 
         if X is None:
             X = self.X_
+        else:
+            X = check_array(X)
 
         return (X - self.reconstruct(X)) ** 2
 

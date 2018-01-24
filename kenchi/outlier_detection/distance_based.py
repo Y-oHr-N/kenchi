@@ -124,12 +124,6 @@ class KNN(BaseDetector):
         else:
             return np.max(dist, axis=1)
 
-    def featurewise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
-        raise NotImplementedError()
-
-    def score(X: TwoDimArray, y: OneDimArray = None) -> float:
-        raise NotImplementedError()
-
 
 class OneTimeSampling(BaseDetector):
     """One-time sampling.
@@ -278,13 +272,9 @@ class OneTimeSampling(BaseDetector):
 
         if X is None:
             X = self.X_
+        else:
+            X = check_array(X)
 
         dist  = self._metric.pairwise(X, self.X_sampled_)
 
         return np.min(dist, axis=1)
-
-    def featurewise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
-        raise NotImplementedError()
-
-    def score(X: TwoDimArray, y: OneDimArray = None) -> float:
-        raise NotImplementedError()

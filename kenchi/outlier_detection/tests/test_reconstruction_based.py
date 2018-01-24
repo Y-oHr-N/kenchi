@@ -4,6 +4,7 @@ import matplotlib
 import matplotlib.axes
 import numpy as np
 from sklearn.exceptions import NotFittedError
+from sklearn.utils.estimator_checks import check_estimator
 
 from kenchi.datasets import make_blobs
 from kenchi.outlier_detection import PCA
@@ -22,6 +23,9 @@ class PCATest(unittest.TestCase):
 
     def tearDown(self):
         plt.close()
+
+    def test_check_estimator(self):
+        self.assertIsNone(check_estimator(self.sut))
 
     def test_fit(self):
         self.assertIsInstance(self.sut.fit(self.X_train), PCA)

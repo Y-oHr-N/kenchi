@@ -4,6 +4,7 @@ import matplotlib
 import matplotlib.axes
 import numpy as np
 from sklearn.exceptions import NotFittedError
+from sklearn.utils.estimator_checks import check_estimator
 
 from kenchi.datasets import make_blobs
 from kenchi.outlier_detection import FastABOD
@@ -23,6 +24,10 @@ class FastABODTest(unittest.TestCase):
     def tearDown(self):
         plt.close()
 
+    def test_check_estimator(self):
+        with self.assertRaises(FloatingPointError):
+            check_estimator(self.sut)
+
     def test_fit(self):
         self.assertIsInstance(self.sut.fit(self.X_train), FastABOD)
 
@@ -33,17 +38,9 @@ class FastABODTest(unittest.TestCase):
         with self.assertRaises(NotFittedError):
             self.sut.anomaly_score(self.X_train)
 
-    def test_featurewise_anomaly_score_notimplemented(self):
-        with self.assertRaises(NotImplementedError):
-            self.sut.featurewise_anomaly_score(self.X_train)
-
     def test_predict_notfitted(self):
         with self.assertRaises(NotFittedError):
             self.sut.predict(self.X_train)
-
-    def test_score_notimplemented(self):
-        with self.assertRaises(NotImplementedError):
-            self.sut.score(self.X_train)
 
     def test_plot_anomaly_score(self):
         self.assertIsInstance(

@@ -4,6 +4,7 @@ import matplotlib
 import matplotlib.axes
 import numpy as np
 from sklearn.exceptions import NotFittedError
+from sklearn.utils.estimator_checks import check_estimator
 
 from kenchi.datasets import make_blobs
 from kenchi.outlier_detection import KNN, OneTimeSampling
@@ -23,6 +24,9 @@ class KNNTest(unittest.TestCase):
     def tearDown(self):
         plt.close()
 
+    def test_check_estimator(self):
+        self.assertIsNone(check_estimator(self.sut))
+
     def test_fit(self):
         self.assertIsInstance(self.sut.fit(self.X_train), KNN)
 
@@ -33,17 +37,9 @@ class KNNTest(unittest.TestCase):
         with self.assertRaises(NotFittedError):
             self.sut.anomaly_score(self.X_train)
 
-    def test_featurewise_anomaly_score_notimplemented(self):
-        with self.assertRaises(NotImplementedError):
-            self.sut.featurewise_anomaly_score(self.X_train)
-
     def test_predict_notfitted(self):
         with self.assertRaises(NotFittedError):
             self.sut.predict(self.X_train)
-
-    def test_score_notimplemented(self):
-        with self.assertRaises(NotImplementedError):
-            self.sut.score(self.X_train)
 
     def test_plot_anomaly_score(self):
         self.assertIsInstance(
@@ -64,11 +60,17 @@ class OneTimeSamplingTest(unittest.TestCase):
     def setUp(self):
         self.X_train, _          = make_blobs(random_state=1)
         self.X_test, self.y_test = make_blobs(random_state=2)
-        self.sut                 = OneTimeSampling(random_state=1)
+        self.sut                 = OneTimeSampling(
+            n_samples            = 2,
+            random_state         = 1
+        )
         _, self.ax               = plt.subplots()
 
     def tearDown(self):
         plt.close()
+
+    def test_check_estimator(self):
+        self.assertIsNone(check_estimator(self.sut))
 
     def test_fit(self):
         self.assertIsInstance(self.sut.fit(self.X_train), OneTimeSampling)
@@ -80,17 +82,9 @@ class OneTimeSamplingTest(unittest.TestCase):
         with self.assertRaises(NotFittedError):
             self.sut.anomaly_score(self.X_train)
 
-    def test_featurewise_anomaly_score_notimplemented(self):
-        with self.assertRaises(NotImplementedError):
-            self.sut.featurewise_anomaly_score(self.X_train)
-
     def test_predict_notfitted(self):
         with self.assertRaises(NotFittedError):
             self.sut.predict(self.X_train)
-
-    def test_score_notimplemented(self):
-        with self.assertRaises(NotImplementedError):
-            self.sut.score(self.X_train)
 
     def test_plot_anomaly_score(self):
         self.assertIsInstance(

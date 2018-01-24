@@ -166,9 +166,6 @@ class GMM(BaseDetector):
 
         return -self._gmm.score_samples(X)
 
-    def featurewise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
-        raise NotImplementedError()
-
     def score(self, X: TwoDimArray, y: OneDimArray = None) -> float:
         """Compute the mean log-likelihood of the given data.
 
@@ -286,9 +283,6 @@ class KDE(BaseDetector):
             X = self.X_
 
         return -self._kde.score_samples(X)
-
-    def featurewise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
-        raise NotImplementedError()
 
     def score(self, X: TwoDimArray, y: OneDimArray = None) -> float:
         """Compute the mean log-likelihood of the given data.
@@ -476,6 +470,8 @@ class SparseStructureLearning(BaseDetector):
 
         if X is None:
             X = self.X_
+        else:
+            X = check_array(X)
 
         return self._glasso.mahalanobis(X)
 
