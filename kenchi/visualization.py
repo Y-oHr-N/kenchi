@@ -303,7 +303,7 @@ def plot_partial_corrcoef(
 
     import matplotlib.pyplot as plt
 
-    _, n_features = partial_corrcoef.shape
+    n_features, _ = partial_corrcoef.shape
 
     if ax is None:
         _, ax     = plt.subplots()
