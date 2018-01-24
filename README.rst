@@ -63,14 +63,14 @@ Usage
     X, _ = make_blobs(centers=1, random_state=1, shuffle=False)
 
     # Fit the model according to the given training data
-    det  = SparseStructureLearning(alpha=0.2).fit(X)
+    det  = SparseStructureLearning(glasso_params={'alpha': 0.2}).fit(X)
 
     # Plot the anomaly score for each training sample
     det.plot_anomaly_score(linestyle='', marker='.')
 
     plt.show()
 
-.. image:: docs/images/plot_anomaly_score.png
+.. image:: https://raw.githubusercontent.com/Y-oHr-N/kenchi/master/docs/images/plot_anomaly_score.png
     :align: center
     :alt: Anomaly score
 
