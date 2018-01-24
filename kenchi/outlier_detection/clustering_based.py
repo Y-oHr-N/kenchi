@@ -125,7 +125,7 @@ class MiniBatchKMeans(BaseDetector):
 
         return np.min(self._kmeans.transform(X), axis=1)
 
-    def feature_wise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
+    def featurewise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
         raise NotImplementedError()
 
     def score(self, X: TwoDimArray, y: OneDimArray = None) -> float:

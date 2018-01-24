@@ -164,7 +164,7 @@ class GMM(BaseDetector):
 
         return -self._gmm.score_samples(X)
 
-    def feature_wise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
+    def featurewise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
         raise NotImplementedError()
 
     def score(self, X: TwoDimArray, y: OneDimArray = None) -> float:
@@ -283,7 +283,7 @@ class KDE(BaseDetector):
 
         return -self._kde.score_samples(X)
 
-    def feature_wise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
+    def featurewise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
         raise NotImplementedError()
 
     def score(self, X: TwoDimArray, y: OneDimArray = None) -> float:
@@ -473,7 +473,7 @@ class SparseStructureLearning(BaseDetector):
 
         return self._glasso.mahalanobis(X)
 
-    def feature_wise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
+    def featurewise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
         """Compute the feature-wise anomaly scores for each sample.
 
         Parameters

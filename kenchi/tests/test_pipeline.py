@@ -33,9 +33,9 @@ class PipelineTest(unittest.TestCase):
         with self.assertRaises(NotFittedError):
             self.sut.anomaly_score(self.X_train)
 
-    def test_feature_wise_anomaly_score_notfitted(self):
+    def test_featurewise_anomaly_score_notfitted(self):
         with self.assertRaises(NotFittedError):
-            self.sut.feature_wise_anomaly_score(self.X_train)
+            self.sut.featurewise_anomaly_score(self.X_train)
 
     def test_plot_anomaly_score(self):
         self.assertIsInstance(

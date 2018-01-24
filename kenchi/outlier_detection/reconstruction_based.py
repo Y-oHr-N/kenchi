@@ -164,9 +164,9 @@ class PCA(BaseDetector):
             Anomaly score for each sample.
         """
 
-        return np.sqrt(np.sum(self.feature_wise_anomaly_score(X), axis=1))
+        return np.sqrt(np.sum(self.featurewise_anomaly_score(X), axis=1))
 
-    def feature_wise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
+    def featurewise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
         """Compute the feature-wise anomaly scores for each sample.
 
         Parameters

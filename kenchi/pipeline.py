@@ -58,7 +58,7 @@ class Pipeline(SKLearnPipeline):
         return self._final_estimator.anomaly_score(X)
 
     @if_delegate_has_method(delegate='_final_estimator')
-    def feature_wise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
+    def featurewise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
         """Apply transforms, and compute the feature-wise anomaly scores for
         each sample with the final estimator.
 
@@ -79,7 +79,7 @@ class Pipeline(SKLearnPipeline):
                 if transform is not None:
                     X = transform.transform(X)
 
-        return self._final_estimator.feature_wise_anomaly_score(X)
+        return self._final_estimator.featurewise_anomaly_score(X)
 
     @if_delegate_has_method(delegate='_final_estimator')
     def plot_anomaly_score(self, X: TwoDimArray = None, **kwargs) -> Axes:

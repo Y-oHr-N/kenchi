@@ -165,7 +165,7 @@ class FastABOD(BaseDetector):
         # transform raw scores into regular scores
         return np.maximum(0., -np.log(abof / self.abof_max_))
 
-    def feature_wise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
+    def featurewise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
         raise NotImplementedError()
 
     def score(X: TwoDimArray, y: OneDimArray = None) -> float:

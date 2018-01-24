@@ -47,7 +47,7 @@ class BaseDetector(BaseEstimator, ABC):
         """Compute the anomaly score for each sample."""
 
     @abstractmethod
-    def feature_wise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
+    def featurewise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
         """Compute the feature-wise anomaly scores for each sample."""
 
     @abstractmethod

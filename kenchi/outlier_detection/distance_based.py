@@ -121,7 +121,7 @@ class KNN(BaseDetector):
         else:
             return np.max(dist, axis=1)
 
-    def feature_wise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
+    def featurewise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
         raise NotImplementedError()
 
     def score(X: TwoDimArray, y: OneDimArray = None) -> float:
@@ -280,7 +280,7 @@ class OneTimeSampling(BaseDetector):
 
         return np.min(dist, axis=1)
 
-    def feature_wise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
+    def featurewise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
         raise NotImplementedError()
 
     def score(X: TwoDimArray, y: OneDimArray = None) -> float:
