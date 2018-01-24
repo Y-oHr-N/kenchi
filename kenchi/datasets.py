@@ -67,7 +67,7 @@ def make_blobs(
     Advances in NIPS'13, pp. 467-475, 2013.
     """
 
-    generator        = check_random_state(random_state)
+    rnd              = check_random_state(random_state)
 
     X_inliers, _     = sklearn_make_blobs(
         n_samples    = n_inliers,
@@ -75,10 +75,10 @@ def make_blobs(
         centers      = centers,
         cluster_std  = cluster_std,
         shuffle      = False,
-        random_state = generator
+        random_state = rnd
     )
 
-    X_outliers       = generator.uniform(
+    X_outliers       = rnd.uniform(
         low          = np.min(X_inliers),
         high         = np.max(X_inliers),
         size         = (n_outliers, n_features)
@@ -92,7 +92,7 @@ def make_blobs(
     if shuffle:
         indices      = np.arange(n_inliers + n_outliers)
 
-        generator.shuffle(indices)
+        rnd.shuffle(indices)
 
         X            = X[indices]
         y            = y[indices]
