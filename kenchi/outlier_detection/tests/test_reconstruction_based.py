@@ -45,6 +45,11 @@ class PCATest(unittest.TestCase):
         with self.assertRaises(NotFittedError):
             self.sut.predict(self.X_train)
 
+    def test_score(self):
+        self.assertIsInstance(
+            self.sut.fit(self.X_train).score(self.X_test), float
+        )
+
     def test_score_notfitted(self):
         with self.assertRaises(NotFittedError):
             self.sut.score(self.X_train)
