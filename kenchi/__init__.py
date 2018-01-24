@@ -3,7 +3,9 @@ from . import outlier_detection
 from . import pipeline
 from . import visualization
 
-__version__ = '0.6.0'
+# TODO: Implement ensemble module
+
+__version__ = '0.7.0'
 
 __all__     = [
     'datasets',

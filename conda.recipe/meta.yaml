@@ -1,26 +1,30 @@
 package:
   name: kenchi
-  version: "0.6.0"
+  version: "0.7.0"
 
 source:
-  git_rev: 0.6.0
+  git_rev: 0.7.0
   git_url: https://github.com/Y-oHr-N/kenchi.git
 
 requirements:
   build:
     - python
     - matplotlib
+    - networkx
     - numpy
     - pandas
     - scikit-learn
     - scipy
+    - nose
   run:
     - python
     - matplotlib
+    - networkx
     - numpy
     - pandas
     - scikit-learn
     - scipy
+    - nose
 
 test:
   imports:
