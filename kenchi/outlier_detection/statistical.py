@@ -529,7 +529,7 @@ class SparseStructureLearning(BaseDetector):
         ax : matplotlib Axes, default None
             Target axes instance.
 
-        title : string, default 'Graphical model'
+        title : string, default 'Graphical model (n_clusters = %d)'
             Axes title. To disable, pass None.
 
         filepath : str, default None
@@ -544,7 +544,13 @@ class SparseStructureLearning(BaseDetector):
             Axes on which the plot was drawn.
         """
 
-        kwargs['node_color'] = self.labels_
+        if 'node_color' not in kwargs:
+            kwargs['node_color'] = self.labels_
+
+        if 'title' not in kwargs:
+            n_clusters,          = np.unique(self.labels_).shape
+            kwargs['title']      = f'Graphical model ' \
+                + f'(n_clusters = {n_clusters})'
 
         return plot_graphical_model(self.partial_corrcoef_, **kwargs)
 
