@@ -39,7 +39,7 @@ class PipelineTest(unittest.TestCase):
 
     def test_plot_anomaly_score(self):
         self.assertIsInstance(
-            self.sut.fit(self.X_train).plot_anomaly_score(),
+            self.sut.fit(self.X_train).plot_anomaly_score(ax=self.ax),
             matplotlib.axes.Axes
         )
 
@@ -47,18 +47,18 @@ class PipelineTest(unittest.TestCase):
         self.assertIsInstance(
             self.sut.fit(
                 self.X_train
-            ).plot_roc_curve(self.X_test, self.y_test),
+            ).plot_roc_curve(self.X_test, self.y_test, ax=self.ax),
             matplotlib.axes.Axes
         )
 
     def test_plot_graphical_model(self):
         self.assertIsInstance(
-            self.sut.fit(self.X_train).plot_graphical_model(),
+            self.sut.fit(self.X_train).plot_graphical_model(ax=self.ax),
             matplotlib.axes.Axes
         )
 
     def test_plot_partial_corrcoef(self):
         self.assertIsInstance(
-            self.sut.fit(self.X_train).plot_partial_corrcoef(),
+            self.sut.fit(self.X_train).plot_partial_corrcoef(ax=self.ax),
             matplotlib.axes.Axes
         )
