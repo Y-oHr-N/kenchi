@@ -15,6 +15,7 @@ def plot_anomaly_score(
     anomaly_score: OneDimArray,
     threshold:     float  = None,
     ax:            Axes   = None,
+    figsize:       Limits = None,
     title:         str    = None,
     xlim:          Limits = None,
     ylim:          Limits = None,
@@ -36,6 +37,9 @@ def plot_anomaly_score(
 
     ax : matplotlib Axes, default None
         Target axes instance.
+
+    figsize: tuple, default None
+        Tuple denoting figure size of the plot.
 
     title : string, default None
         Axes title. To disable, pass None.
@@ -79,7 +83,7 @@ def plot_anomaly_score(
     xlocs      = np.arange(n_samples)
 
     if ax is None:
-        _, ax  = plt.subplots()
+        _, ax  = plt.subplots(figsize=figsize)
 
     if xlim is None:
         xlim   = (0., n_samples - 1.)
@@ -113,13 +117,14 @@ def plot_anomaly_score(
 def plot_roc_curve(
     y_true:   OneDimArray,
     y_score:  OneDimArray,
-    ax:       Axes = None,
-    label:    str  = None,
-    title:    str  = None,
-    xlabel:   str  = 'False Positive Rate',
-    ylabel:   str  = 'True Positive Rate',
-    grid:     bool = True,
-    filepath: str  = None,
+    ax:       Axes   = None,
+    figsize:  Limits = None,
+    label:    str    = None,
+    title:    str    = None,
+    xlabel:   str    = 'False Positive Rate',
+    ylabel:   str    = 'True Positive Rate',
+    grid:     bool   = True,
+    filepath: str    = None,
     **kwargs
 ) -> Axes:
     """Plot the Receiver Operating Characteristic (ROC) curve.
@@ -134,6 +139,9 @@ def plot_roc_curve(
 
     ax : matplotlib Axes, default None
         Target axes instance.
+
+    figsize: tuple, default None
+        Tuple denoting figure size of the plot.
 
     label : str, default None
         Legend label.
@@ -162,7 +170,7 @@ def plot_roc_curve(
     roc_auc     = auc(fpr, tpr)
 
     if ax is None:
-        _, ax   = plt.subplots()
+        _, ax   = plt.subplots(figsize=figsize)
 
     if label is None:
         label   = f'(area = {roc_auc:1.3f})'
@@ -190,9 +198,10 @@ def plot_roc_curve(
 
 def plot_graphical_model(
     partial_corrcoef: TwoDimArray,
-    ax:               Axes = None,
-    title:            str  = 'Graphical model',
-    filepath:         str  = None,
+    ax:               Axes   = None,
+    figsize:          Limits = None,
+    title:            str    = 'Graphical model',
+    filepath:         str    = None,
     **kwargs
 ) -> Axes:
     """Plot the Gaussian Graphical Model (GGM).
@@ -204,6 +213,9 @@ def plot_graphical_model(
 
     ax : matplotlib Axes, default None
         Target axes instance.
+
+    figsize: tuple, default None
+        Tuple denoting figure size of the plot.
 
     title : string, default 'Graphical model'
         Axes title. To disable, pass None.
@@ -230,7 +242,7 @@ def plot_graphical_model(
     import networkx as nx
 
     if ax is None:
-        _, ax = plt.subplots()
+        _, ax = plt.subplots(figsize=figsize)
 
     if title is not None:
         ax.set_title(title)
@@ -250,6 +262,7 @@ def plot_graphical_model(
 def plot_partial_corrcoef(
     partial_corrcoef: TwoDimArray,
     ax:               Axes     = None,
+    figsize:          Limits   = None,
     cmap:             Colormap = None,
     vmin:             float    = -1.,
     vmax:             float    = 1.,
@@ -267,6 +280,9 @@ def plot_partial_corrcoef(
 
     ax : matplotlib Axes, default None
         Target axes instance.
+
+    figsize: tuple, default None
+        Tuple denoting figure size of the plot.
 
     cmap : matplotlib Colormap, default None
         If None, plt.cm.RdYlBu is used.
@@ -306,7 +322,7 @@ def plot_partial_corrcoef(
     n_features, _ = partial_corrcoef.shape
 
     if ax is None:
-        _, ax     = plt.subplots()
+        _, ax     = plt.subplots(figsize=figsize)
 
     if cmap is None:
         cmap      = plt.cm.RdYlBu
