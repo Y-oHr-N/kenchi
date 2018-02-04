@@ -120,9 +120,7 @@ class SparseStructureLearningTest(unittest.TestCase):
     def setUp(self):
         self.X_train, _          = make_blobs(centers=1, random_state=1)
         self.X_test, self.y_test = make_blobs(random_state=2)
-        self.sut                 = SparseStructureLearning(
-            glasso_params        = {'tol': 0.02}
-        )
+        self.sut                 = SparseStructureLearning(tol=0.02)
         _, self.ax               = plt.subplots()
 
     def tearDown(self):

@@ -20,9 +20,7 @@ class PipelineTest(unittest.TestCase):
         self.X_test, self.y_test = make_blobs(random_state=2)
         self.sut                 = Pipeline([
             ('standardize', StandardScaler()),
-            ('detect',      SparseStructureLearning(
-                glasso_params    = {'assume_centered': True}
-            ))
+            ('detect',      SparseStructureLearning(assume_centered=True))
         ])
         _, self.ax               = plt.subplots()
 
