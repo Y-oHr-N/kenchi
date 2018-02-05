@@ -4,7 +4,7 @@ from sklearn.utils import check_array, check_random_state
 from sklearn.utils.validation import check_is_fitted
 
 from ..base import BaseDetector
-from ..utils import timeit, OneDimArray, RandomState, TwoDimArray
+from ..utils import timeit
 
 __all__ = ['KNN', 'OneTimeSampling']
 
@@ -14,9 +14,28 @@ class KNN(BaseDetector):
 
     Parameters
     ----------
+    algorithm : str, default 'auto'
+        Tree algorithm to use. Valid algorithms are
+        ['kd_tree'|'ball_tree'|'auto'].
+
     contamination : float, default 0.01
-        Amount of contamination of the data set, i.e. the proportion of
-        outliers in the data set. Used to define the threshold.
+        Proportion of outliers in the data set. Used to define the threshold.
+
+    leaf_size : int, default 30
+        Leaf size of the underlying tree.
+
+    metric : str or callable, default 'minkowski'
+        Distance metric to use.
+
+    n_jobs : int, default 1
+        Number of jobs to run in parallel. If -1, then the number of jobs is
+        set to the number of CPU cores.
+
+    n_neighbors : int, default 5
+        Number of neighbors.
+
+    p : int, default 2
+        Power parameter for the Minkowski metric.
 
     verbose : bool, default False
         Enable verbose output.
@@ -25,8 +44,8 @@ class KNN(BaseDetector):
         If True, anomaly score is the sum of the distances from k nearest
         neighbors.
 
-    knn_params : dict, default None
-        Other keywords passed to sklearn.neighbors.NearestNeighbors().
+    metric_params : dict, default None
+        Additioal parameters passed to the requested metric.
 
     Attributes
     ----------
@@ -48,28 +67,35 @@ class KNN(BaseDetector):
     """
 
     @property
-    def X_(self) -> TwoDimArray:
+    def X_(self):
         return self._knn._fit_X
 
     def __init__(
-        self,
-        contamination: float = 0.01,
-        verbose:       bool  = False,
-        weight:        bool  = False,
-        knn_params:    dict  = None
-    ) -> None:
+        self,               algorithm='auto',
+        contamination=0.01, leaf_size=30,
+        metric='minkowski', n_jobs=1,
+        n_neighbors=5,      p=2,
+        verbose=False,      weight=False,
+        metric_params=None
+    ):
         super().__init__(contamination=contamination, verbose=verbose)
 
-        self.weight     = weight
-        self.knn_params = knn_params
+        self.algorithm     = algorithm
+        self.leaf_size     = leaf_size
+        self.metric        = metric
+        self.n_jobs        = n_jobs
+        self.n_neighbors   = n_neighbors
+        self.p             = p
+        self.weight        = weight
+        self.metric_params = metric_params
 
-    def check_params(self, X: TwoDimArray, y: OneDimArray = None) -> None:
+    def check_params(self, X, y=None):
         """Check validity of parameters and raise ValueError if not valid."""
 
         super().check_params(X)
 
     @timeit
-    def fit(self, X: TwoDimArray, y: OneDimArray = None) -> 'KNN':
+    def fit(self, X, y=None):
         """Fit the model according to the given training data.
 
         Parameters
@@ -87,20 +113,22 @@ class KNN(BaseDetector):
 
         self.check_params(X)
 
-        if self.knn_params is None:
-            knn_params  = {}
-        else:
-            knn_params  = self.knn_params
-
-        self._knn       = NearestNeighbors(**knn_params).fit(X)
-
-        self.threshold_ = np.percentile(
+        self._knn         = NearestNeighbors(
+            algorithm     = self.algorithm,
+            leaf_size     = self.leaf_size,
+            metric        = self.metric,
+            n_jobs        = self.n_jobs,
+            n_neighbors   = self.n_neighbors,
+            p             = self.p,
+            metric_params = self.metric_params
+        ).fit(X)
+        self.threshold_   = np.percentile(
             self.anomaly_score(), 100. * (1. - self.contamination)
         )
 
         return self
 
-    def anomaly_score(self, X: TwoDimArray = None) -> OneDimArray:
+    def anomaly_score(self, X=None):
         """Compute the anomaly score for each sample.
 
         Parameters
@@ -131,8 +159,10 @@ class OneTimeSampling(BaseDetector):
     Parameters
     ----------
     contamination : float, default 0.01
-        Amount of contamination of the data set, i.e. the proportion of
-        outliers in the data set. Used to define the threshold.
+        Proportion of outliers in the data set. Used to define the threshold.
+
+    metric : str, default 'euclidean'
+        Distance metric to use.
 
     n_samples : int, default 20
         Number of random samples to be used.
@@ -143,11 +173,8 @@ class OneTimeSampling(BaseDetector):
     verbose : bool, default False
         Enable verbose output.
 
-    metric : str, default 'euclidean'
-        Distance metric to use.
-
     metric_params : dict, default None
-        Other keywords passed to the requested metric.
+        Additional parameters passed to the requested metric.
 
     Attributes
     ----------
@@ -171,26 +198,23 @@ class OneTimeSampling(BaseDetector):
     """
 
     @property
-    def X_sampled_(self) -> TwoDimArray:
+    def X_sampled_(self):
         return self.X_[self.sampled_]
 
     def __init__(
-        self,
-        contamination: float       = 0.01,
-        n_samples:     int         = 20,
-        random_state:  RandomState = None,
-        verbose:       bool        = False,
-        metric:        str         = 'euclidean',
-        metric_params: dict        = None
-    ) -> None:
+        self,               contamination=0.01,
+        metric='euclidean', n_samples=20,
+        random_state=None,  verbose=False,
+        metric_params=None
+    ):
         super().__init__(contamination=contamination, verbose=verbose)
 
         self.n_samples     = n_samples
-        self.random_state  = random_state
         self.metric        = metric
+        self.random_state  = random_state
         self.metric_params = metric_params
 
-    def check_params(self, X: TwoDimArray, y: OneDimArray = None) -> None:
+    def check_params(self, X, y=None):
         """Check validity of parameters and raise ValueError if not valid."""
 
         super().check_params(X)
@@ -204,12 +228,12 @@ class OneTimeSampling(BaseDetector):
 
         if self.n_samples >= n_samples:
             raise ValueError(
-                f'n_samples must be smaller than {n_samples} ' \
-                + f'but was {self.n_samples}'
+                f'n_samples must be smaller than {n_samples} '
+                f'but was {self.n_samples}'
             )
 
     @timeit
-    def fit(self, X: TwoDimArray, y: OneDimArray = None) -> 'OneTimeSampling':
+    def fit(self, X, y=None):
         """Fit the model according to the given training data.
 
         Parameters
@@ -227,7 +251,7 @@ class OneTimeSampling(BaseDetector):
 
         self.check_params(X)
 
-        self.X_           = check_array(X)
+        self.X_           = check_array(X, estimator=self)
         n_samples, _      = self.X_.shape
 
         rnd               = check_random_state(self.random_state)
@@ -253,7 +277,7 @@ class OneTimeSampling(BaseDetector):
 
         return self
 
-    def anomaly_score(self, X: TwoDimArray = None) -> OneDimArray:
+    def anomaly_score(self, X=None):
         """Compute the anomaly score for each sample.
 
         Parameters
@@ -273,7 +297,7 @@ class OneTimeSampling(BaseDetector):
         if X is None:
             X = self.X_
         else:
-            X = check_array(X)
+            X = check_array(X, estimator=self)
 
         dist  = self._metric.pairwise(X, self.X_sampled_)
 

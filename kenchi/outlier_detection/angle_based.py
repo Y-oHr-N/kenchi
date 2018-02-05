@@ -7,16 +7,12 @@ from sklearn.utils import check_array, gen_even_slices
 from sklearn.utils.validation import check_is_fitted
 
 from ..base import BaseDetector
-from ..utils import timeit, OneDimArray, TwoDimArray
+from ..utils import timeit
 
 __all__ = ['FastABOD']
 
 
-def _approximate_abof(
-    X:         TwoDimArray,
-    X_train:   TwoDimArray,
-    neigh_ind: TwoDimArray
-) -> OneDimArray:
+def _approximate_abof(X, X_train, neigh_ind):
     """Compute the approximate Angle-Based Outlier Factor (ABOF) for each
     sample.
     """
