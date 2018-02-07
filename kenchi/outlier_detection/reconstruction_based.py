@@ -17,9 +17,6 @@ class PCA(BaseDetector):
     contamination : float, default 0.01
         Proportion of outliers in the data set. Used to define the threshold.
 
-    copy : bool, default False
-        If False, data passed to `fit` are overwritten.
-
     iterated_power : int, default 'auto'
         Number of iterations for the power method computed by svd_solver ==
         'randomized'.
@@ -31,21 +28,8 @@ class PCA(BaseDetector):
         Seed of the pseudo random number generator.
 
     svd_solver : string, default 'auto'
-        auto :
-            the solver is selected by a default policy based on `X.shape` and
-            `n_components`: if the input data is larger than 500x500 and the
-            number of components to extract is lower than 80% of the smallest
-            dimension of the data, then the more efficient 'randomized' method
-            is enabled. Otherwise the exact full SVD is computed and optionally
-            truncated afterwards.
-        full :
-            run exact full SVD calling the standard LAPACK solver via
-            `scipy.linalg.svd` and select the components by postprocessing
-        arpack :
-            run SVD truncated to n_components calling ARPACK solver via
-            `scipy.sparse.linalg.svds`.
-        randomized :
-            run randomized SVD by the method of Halko et al.
+        SVD solver to use. Valid solvers are
+        ['auto'|'full'|'arpack'|'randomized'].
 
     tol : float, default 0.0
         Tolerance to declare convergence for singular values computed by
@@ -120,15 +104,14 @@ class PCA(BaseDetector):
         return self._pca.singular_values_
 
     def __init__(
-        self,              contamination=0.01,
-        copy=True,         iterated_power='auto',
-        n_components=None, random_state=None,
-        svd_solver='auto', tol=0.,
-        verbose=False,     whiten=False
+        self,                  contamination=0.01,
+        iterated_power='auto', n_components=None,
+        random_state=None,     svd_solver='auto',
+        tol=0.,                verbose=False,
+        whiten=False
     ):
         super().__init__(contamination=contamination, verbose=verbose)
 
-        self.copy           = copy
         self.iterated_power = iterated_power
         self.n_components   = n_components
         self.random_state   = random_state
@@ -162,7 +145,6 @@ class PCA(BaseDetector):
 
         self.X_            = check_array(X, estimator=self)
         self._pca          = SKLearnPCA(
-            copy           = self.copy,
             iterated_power = self.iterated_power,
             n_components   = self.n_components,
             random_state   = self.random_state,
