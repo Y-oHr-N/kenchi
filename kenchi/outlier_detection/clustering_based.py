@@ -21,7 +21,7 @@ class MiniBatchKMeans(BaseDetector):
         Proportion of outliers in the data set. Used to define the threshold.
 
     init : str or array-like, default 'k-means++'
-        Method for initialization.
+        Method for initialization. Valid options are ['k-means++'|'random'].
 
     init_size : int, default: 3 * batch_size
         Number of samples to randomly sample for speeding up the

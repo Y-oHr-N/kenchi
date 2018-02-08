@@ -209,8 +209,8 @@ class OneTimeSampling(BaseDetector):
     ):
         super().__init__(contamination=contamination, verbose=verbose)
 
-        self.n_samples     = n_samples
         self.metric        = metric
+        self.n_samples     = n_samples
         self.random_state  = random_state
         self.metric_params = metric_params
 
@@ -299,6 +299,4 @@ class OneTimeSampling(BaseDetector):
         else:
             X = check_array(X, estimator=self)
 
-        dist  = self._metric.pairwise(X, self.X_sampled_)
-
-        return np.min(dist, axis=1)
+        return np.min(self._metric.pairwise(X, self.X_sampled_), axis=1)

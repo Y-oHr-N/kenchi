@@ -82,7 +82,7 @@ class GMM(BaseDetector):
         Number of step used by the best fit of EM to reach the convergence.
 
     precisions_ : array-like
-        Precision matrices for each component in the mixture.
+        Precision matrix for each component in the mixture.
 
     precisions_cholesky_ : array-like
         Cholesky decomposition of the precision matrices of each mixture
@@ -92,7 +92,7 @@ class GMM(BaseDetector):
         Threshold.
 
     weights_ : array-like of shape (n_components,)
-        Weights of each mixture components.
+        Weight of each mixture components.
 
     X_ : array-like of shape (n_samples, n_features)
         Training data.
@@ -666,7 +666,7 @@ class SparseStructureLearning(BaseDetector):
             kwargs['node_color'] = self.labels_
 
         if 'title' not in kwargs:
-            n_clusters,          = np.unique(self.labels_).shape
+            n_clusters           = np.max(self.labels_) + 1
             kwargs['title']      = (
                 f'Graphical model (n_clusters = {n_clusters})'
             )
