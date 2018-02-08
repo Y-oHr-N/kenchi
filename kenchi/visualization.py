@@ -182,9 +182,10 @@ def plot_roc_curve(
 
 
 def plot_graphical_model(
-    partial_corrcoef, ax=None,
-    figsize=None,     title='Graphical model',
-    filepath=None,    **kwargs
+    partial_corrcoef,        ax=None,
+    width=None,              figsize=None,
+    title='Graphical model', filepath=None,
+    **kwargs
 ):
     """Plot the Gaussian Graphical Model (GGM).
 
@@ -198,6 +199,9 @@ def plot_graphical_model(
 
     figsize: tuple, default None
         Tuple denoting figure size of the plot.
+
+    width: float or array-like, default None
+        Line width of edges.
 
     title : string, default 'Graphical model'
         Axes title. To disable, pass None.
@@ -221,13 +225,18 @@ def plot_graphical_model(
     import matplotlib.pyplot as plt
     import networkx as nx
 
+    tril      = np.tril(partial_corrcoef)
+
     if ax is None:
         _, ax = plt.subplots(figsize=figsize)
+
+    if width is None:
+        width = np.abs(tril.flat[tril.flat[:] != 0.])
 
     if title is not None:
         ax.set_title(title)
 
-    nx.draw_networkx(nx.from_numpy_matrix(partial_corrcoef), ax=ax, **kwargs)
+    nx.draw_networkx(nx.from_numpy_matrix(tril), ax=ax, width=width, **kwargs)
 
     if filepath is not None:
         ax.figure.savefig(filepath)
