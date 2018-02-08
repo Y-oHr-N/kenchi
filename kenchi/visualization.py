@@ -1,8 +1,6 @@
 import numpy as np
 from sklearn.metrics import auc, roc_curve
 
-from .utils import Axes, Colormap, Limits, OneDimArray, TwoDimArray
-
 __all__ = [
     'plot_anomaly_score',
     'plot_roc_curve',
@@ -12,19 +10,13 @@ __all__ = [
 
 
 def plot_anomaly_score(
-    anomaly_score: OneDimArray,
-    threshold:     float  = None,
-    ax:            Axes   = None,
-    figsize:       Limits = None,
-    title:         str    = None,
-    xlim:          Limits = None,
-    ylim:          Limits = None,
-    xlabel:        str    = 'Samples',
-    ylabel:        str    = 'Anomaly score',
-    grid:          bool   = True,
-    filepath:      str    = None,
-    **kwargs
-) -> Axes:
+    anomaly_score,          threshold=None,
+    ax=None,                figsize=None,
+    title=None,             xlim=None,
+    ylim=None,              xlabel='Samples',
+    ylabel='Anomaly score', grid=True,
+    filepath=None,          **kwargs
+):
     """Plot the anomaly score for each sample.
 
     Parameters
@@ -45,10 +37,10 @@ def plot_anomaly_score(
         Axes title. To disable, pass None.
 
     xlim : tuple, default None
-        Tuple passed to ax.xlim().
+        Tuple passed to `ax.xlim`.
 
     ylim : tuple, default None
-        Tuple passed to ax.ylim().
+        Tuple passed to `ax.ylim`.
 
     xlabel : string, default 'Samples'
         X axis title label. To disable, pass None.
@@ -63,7 +55,7 @@ def plot_anomaly_score(
         If provided, save the current figure.
 
     **kwargs : dict
-        Other keywords passed to ax.plot().
+        Other keywords passed to `ax.plot`.
 
     Returns
     -------
@@ -73,8 +65,6 @@ def plot_anomaly_score(
     Examples
     --------
     .. image:: images/plot_anomaly_score.png
-        :align: center
-        :alt: Anomaly score
     """
 
     import matplotlib.pyplot as plt
@@ -115,18 +105,13 @@ def plot_anomaly_score(
 
 
 def plot_roc_curve(
-    y_true:   OneDimArray,
-    y_score:  OneDimArray,
-    ax:       Axes   = None,
-    figsize:  Limits = None,
-    label:    str    = None,
-    title:    str    = None,
-    xlabel:   str    = 'False Positive Rate',
-    ylabel:   str    = 'True Positive Rate',
-    grid:     bool   = True,
-    filepath: str    = None,
+    y_true,                       y_score,
+    ax=None,                      figsize=None,
+    label=None,                   title=None,
+    xlabel='False Positive Rate', ylabel='True Positive Rate',
+    grid=True,                    filepath=None,
     **kwargs
-) -> Axes:
+):
     """Plot the Receiver Operating Characteristic (ROC) curve.
 
     Parameters
@@ -156,7 +141,7 @@ def plot_roc_curve(
         If provided, save the current figure.
 
     **kwargs : dict
-        Other keywords passed to ax.plot().
+        Other keywords passed to `ax.plot`.
 
     Returns
     -------
@@ -197,13 +182,10 @@ def plot_roc_curve(
 
 
 def plot_graphical_model(
-    partial_corrcoef: TwoDimArray,
-    ax:               Axes   = None,
-    figsize:          Limits = None,
-    title:            str    = 'Graphical model',
-    filepath:         str    = None,
-    **kwargs
-) -> Axes:
+    partial_corrcoef, ax=None,
+    figsize=None,     title='Graphical model',
+    filepath=None,    **kwargs
+):
     """Plot the Gaussian Graphical Model (GGM).
 
     Parameters
@@ -224,7 +206,7 @@ def plot_graphical_model(
         If provided, save the current figure.
 
     **kwargs : dict
-        Other keywords passed to nx.draw_networkx().
+        Other keywords passed to `nx.draw_networkx`.
 
     Returns
     -------
@@ -234,8 +216,6 @@ def plot_graphical_model(
     Examples
     --------
     .. image:: images/plot_graphical_model.png
-        :align: center
-        :alt: Graphical model
     """
 
     import matplotlib.pyplot as plt
@@ -247,11 +227,7 @@ def plot_graphical_model(
     if title is not None:
         ax.set_title(title)
 
-    nx.draw_networkx(
-        nx.from_numpy_matrix(partial_corrcoef),
-        ax    = ax,
-        **kwargs
-    )
+    nx.draw_networkx(nx.from_numpy_matrix(partial_corrcoef), ax=ax, **kwargs)
 
     if filepath is not None:
         ax.figure.savefig(filepath)
@@ -260,17 +236,12 @@ def plot_graphical_model(
 
 
 def plot_partial_corrcoef(
-    partial_corrcoef: TwoDimArray,
-    ax:               Axes     = None,
-    figsize:          Limits   = None,
-    cmap:             Colormap = None,
-    vmin:             float    = -1.,
-    vmax:             float    = 1.,
-    cbar:             bool     = True,
-    title:            str      = 'Partial correlation',
-    filepath:         str      = None,
-    **kwargs
-) -> Axes:
+    partial_corrcoef, ax=None,
+    figsize=None,     cmap=None,
+    vmin=-1.,         vmax=1.,
+    cbar=True,        title='Partial correlation',
+    filepath=None,    **kwargs
+):
     """Plot the partial correlation coefficient matrix.
 
     Parameters
@@ -303,7 +274,7 @@ def plot_partial_corrcoef(
         If provided, save the current figure.
 
     **kwargs : dict
-        Other keywords passed to ax.imshow().
+        Other keywords passed to `ax.imshow`.
 
     Returns
     -------
@@ -313,25 +284,19 @@ def plot_partial_corrcoef(
     Examples
     --------
     .. image:: images/plot_partial_corrcoef.png
-        :align: center
-        :alt: Partial correlation
     """
 
     import matplotlib.pyplot as plt
-
-    n_features, _ = partial_corrcoef.shape
+    from mpl_toolkits.axes_grid1 import make_axes_locatable
 
     if ax is None:
         _, ax     = plt.subplots(figsize=figsize)
 
     if cmap is None:
-        cmap      = plt.cm.RdYlBu
+        cmap      = plt.cm.RdBu
 
     if title is not None:
         ax.set_title(title)
-
-    ax.set_xticks(np.arange(n_features))
-    ax.set_yticks(np.arange(n_features))
 
     mappable      = ax.imshow(
         np.ma.masked_equal(partial_corrcoef, 0.),
@@ -341,8 +306,13 @@ def plot_partial_corrcoef(
         **kwargs
     )
 
+    ax.set_facecolor('grey')
+
     if cbar:
-        ax.figure.colorbar(mappable, ax=ax)
+        divider   = make_axes_locatable(ax)
+        cax       = divider.append_axes('right', size='5%', pad=0.05)
+
+        ax.figure.colorbar(mappable, cax=cax)
 
     if filepath is not None:
         ax.figure.savefig(filepath)
