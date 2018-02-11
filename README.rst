@@ -56,23 +56,44 @@ Usage
 .. code:: python
 
     import matplotlib.pyplot as plt
+    import numpy as np
     from kenchi.datasets import make_blobs
     from kenchi.outlier_detection import SparseStructureLearning
 
+    train_size       = 1000
+    test_size        = 250
+    n_outliers       = 10
+    n_features       = 25
+    centers          = np.zeros((1, n_features))
+
     # Generate the training data
-    X, _ = make_blobs(centers=1, random_state=1, shuffle=False)
+    X_train, y_train = make_blobs(
+        n_inliers    = train_size,
+        n_outliers   = 0,
+        n_features   = n_features,
+        centers      = centers,
+        random_state = 1
+    )
+
+    # Generate the test data that contains outliers
+    X_test, _        = make_blobs(
+        n_inliers    = test_size - n_outliers,
+        n_outliers   = n_outliers,
+        n_features   = n_features,
+        centers      = centers,
+        random_state = 2,
+        shuffle      = False
+    )
 
     # Fit the model according to the given training data
-    det  = SparseStructureLearning(glasso_params={'alpha': 0.2}).fit(X)
+    det              = SparseStructureLearning().fit(X_train)
 
     # Plot the anomaly score for each training sample
-    det.plot_anomaly_score(linestyle='', marker='.')
+    det.plot_anomaly_score(X_test, linestyle='', marker='.')
 
     plt.show()
 
 .. image:: https://raw.githubusercontent.com/Y-oHr-N/kenchi/master/docs/images/plot_anomaly_score.png
-    :align: center
-    :alt: Anomaly score
 
 License
 -------
