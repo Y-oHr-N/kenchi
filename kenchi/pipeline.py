@@ -1,8 +1,6 @@
 from sklearn.pipeline import Pipeline as SKLearnPipeline
 from sklearn.utils.metaestimators import if_delegate_has_method
 
-from .utils import Axes, OneDimArray, TwoDimArray
-
 __all__ = ['Pipeline']
 
 
@@ -34,7 +32,7 @@ class Pipeline(SKLearnPipeline):
     """
 
     @if_delegate_has_method(delegate='_final_estimator')
-    def anomaly_score(self, X: TwoDimArray = None) -> OneDimArray:
+    def anomaly_score(self, X=None):
         """Apply transforms, and compute the anomaly score for each sample with
         the final estimator.
 
@@ -58,7 +56,7 @@ class Pipeline(SKLearnPipeline):
         return self._final_estimator.anomaly_score(X)
 
     @if_delegate_has_method(delegate='_final_estimator')
-    def featurewise_anomaly_score(self, X: TwoDimArray = None) -> TwoDimArray:
+    def featurewise_anomaly_score(self, X=None):
         """Apply transforms, and compute the feature-wise anomaly scores for
         each sample with the final estimator.
 
@@ -82,7 +80,7 @@ class Pipeline(SKLearnPipeline):
         return self._final_estimator.featurewise_anomaly_score(X)
 
     @if_delegate_has_method(delegate='_final_estimator')
-    def plot_anomaly_score(self, X: TwoDimArray = None, **kwargs) -> Axes:
+    def plot_anomaly_score(self, X=None, **kwargs):
         """Apply transoforms, and plot the anomaly score for each sample with
         the final estimator.
 
@@ -95,14 +93,17 @@ class Pipeline(SKLearnPipeline):
         ax : matplotlib Axes, default None
             Target axes instance.
 
+        figsize: tuple, default None
+            Tuple denoting figure size of the plot.
+
         title : string, default None
             Axes title. To disable, pass None.
 
         xlim : tuple, default None
-            Tuple passed to ax.xlim().
+            Tuple passed to `ax.xlim`.
 
         ylim : tuple, default None
-            Tuple passed to ax.ylim().
+            Tuple passed to `ax.ylim`.
 
         xlabel : string, default 'Samples'
             X axis title label. To disable, pass None.
@@ -117,7 +118,7 @@ class Pipeline(SKLearnPipeline):
             If not None, save the current figure.
 
         **kwargs : dict
-            Other keywords passed to ax.plot().
+            Other keywords passed to `ax.plot`.
 
         Returns
         -------
@@ -133,7 +134,7 @@ class Pipeline(SKLearnPipeline):
         return self._final_estimator.plot_anomaly_score(X, **kwargs)
 
     @if_delegate_has_method(delegate='_final_estimator')
-    def plot_roc_curve(self, X: TwoDimArray, y: OneDimArray, **kwargs) -> Axes:
+    def plot_roc_curve(self, X, y, **kwargs):
         """Apply transoforms, and plot the Receiver Operating Characteristic
         (ROC) curve with the final estimator.
 
@@ -148,6 +149,9 @@ class Pipeline(SKLearnPipeline):
         ax : matplotlib Axes, default None
             Target axes instance.
 
+        figsize: tuple, default None
+            Tuple denoting figure size of the plot.
+
         label : str, default None
             Legend label.
 
@@ -161,7 +165,7 @@ class Pipeline(SKLearnPipeline):
             If not None, save the current figure.
 
         **kwargs : dict
-            Other keywords passed to ax.plot().
+            Other keywords passed to `ax.plot`.
 
         Returns
         -------
@@ -185,6 +189,9 @@ class Pipeline(SKLearnPipeline):
         ax : matplotlib Axes, default None
             Target axes instance.
 
+        figsize: tuple, default None
+            Tuple denoting figure size of the plot.
+
         title : string, default 'Graphical model'
             Axes title. To disable, pass None.
 
@@ -192,7 +199,7 @@ class Pipeline(SKLearnPipeline):
             If not None, save the current figure.
 
         **kwargs : dict
-            Other keywords passed to nx.draw_networkx().
+            Other keywords passed to `nx.draw_networkx`.
 
         Returns
         -------
@@ -212,14 +219,17 @@ class Pipeline(SKLearnPipeline):
         ax : matplotlib Axes, default None
             Target axes instance.
 
-        cmap : matplotlib Colormap, default None
-            If None, plt.cm.RdYlBu is used.
+        figsize: tuple, default None
+            Tuple denoting figure size of the plot.
 
-        vmin : float, default -1.0
-            Used in conjunction with norm to normalize luminance data.
+        cmap : str or matplotlib Colormap, default 'RdBu'
+            Colormap or Registered colormap name.
 
-        vmax : float, default 1.0
-            Used in conjunction with norm to normalize luminance data.
+        linecolor : str, default 'white'
+            Color of the lines that will divide each cell.
+
+        linewidths : float, default 0.5
+            Width of the lines that will divide each cell.
 
         cbar : bool, default True.
             Whether to draw a colorbar.
@@ -231,7 +241,7 @@ class Pipeline(SKLearnPipeline):
             If not None, save the current figure.
 
         **kwargs : dict
-            Other keywords passed to ax.imshow().
+            Other keywords passed to `ax.pcolormesh`.
 
         Returns
         -------

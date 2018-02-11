@@ -647,6 +647,9 @@ class SparseStructureLearning(BaseDetector):
         ax : matplotlib Axes, default None
             Target axes instance.
 
+        figsize: tuple, default None
+            Tuple denoting figure size of the plot.
+
         title : string, default 'Graphical model (n_clusters = %d)'
             Axes title. To disable, pass None.
 
@@ -681,14 +684,17 @@ class SparseStructureLearning(BaseDetector):
         ax : matplotlib Axes, default None
             Target axes instance.
 
-        cmap : matplotlib Colormap, default None
-            If None, `plt.cm.RdYlBu` is used.
+        figsize: tuple, default None
+            Tuple denoting figure size of the plot.
 
-        vmin : float, default -1.0
-            Used in conjunction with norm to normalize luminance data.
+        cmap : str or matplotlib Colormap, default 'RdBu'
+            Colormap or Registered colormap name.
 
-        vmax : float, default 1.0
-            Used in conjunction with norm to normalize luminance data.
+        linecolor : str, default 'white'
+            Color of the lines that will divide each cell.
+
+        linewidths : float, default 0.5
+            Width of the lines that will divide each cell.
 
         cbar : bool, default True.
             Whether to draw a colorbar.
@@ -700,7 +706,7 @@ class SparseStructureLearning(BaseDetector):
             If not None, save the current figure.
 
         **kwargs : dict
-            Other keywords passed to `ax.imshow`.
+            Other keywords passed to `ax.pcolormesh`.
 
         Returns
         -------

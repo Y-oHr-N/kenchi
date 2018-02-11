@@ -92,7 +92,7 @@ def plot_anomaly_score(
 
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
-    ax.grid(grid)
+    ax.grid(grid, linestyle=':')
     ax.plot(xlocs, anomaly_score, **kwargs)
 
     if threshold is not None:
@@ -171,7 +171,7 @@ def plot_roc_curve(
 
     ax.set_xlim(0., 1.)
     ax.set_ylim(0., 1.05)
-    ax.grid(grid)
+    ax.grid(grid, linestyle=':')
     ax.plot(fpr, tpr, label=label, **kwargs)
     ax.legend(loc='lower right')
 
@@ -182,10 +182,9 @@ def plot_roc_curve(
 
 
 def plot_graphical_model(
-    partial_corrcoef,        ax=None,
-    width=None,              figsize=None,
-    title='Graphical model', filepath=None,
-    **kwargs
+    partial_corrcoef, ax=None,
+    figsize=None,     title='Graphical model',
+    filepath=None,    **kwargs
 ):
     """Plot the Gaussian Graphical Model (GGM).
 
@@ -199,9 +198,6 @@ def plot_graphical_model(
 
     figsize: tuple, default None
         Tuple denoting figure size of the plot.
-
-    width: float or array-like, default None
-        Line width of edges.
 
     title : string, default 'Graphical model'
         Axes title. To disable, pass None.
@@ -225,18 +221,22 @@ def plot_graphical_model(
     import matplotlib.pyplot as plt
     import networkx as nx
 
-    tril      = np.tril(partial_corrcoef)
-
     if ax is None:
-        _, ax = plt.subplots(figsize=figsize)
-
-    if width is None:
-        width = np.abs(tril.flat[tril.flat[:] != 0.])
+        _, ax       = plt.subplots(figsize=figsize)
 
     if title is not None:
         ax.set_title(title)
 
-    nx.draw_networkx(nx.from_numpy_matrix(tril), ax=ax, width=width, **kwargs)
+    tril            = np.tril(partial_corrcoef)
+
+    # Add the draw_networkx kwargs here
+    kwargs['width'] = np.abs(tril.flat[tril.flat[:] != 0.])
+
+    # Draw the Gaussian grapchical model
+    nx.draw_networkx(nx.from_numpy_matrix(tril), ax=ax, **kwargs)
+
+    ax.get_xaxis().set_visible(False)
+    ax.get_yaxis().set_visible(False)
 
     if filepath is not None:
         ax.figure.savefig(filepath)
@@ -245,11 +245,11 @@ def plot_graphical_model(
 
 
 def plot_partial_corrcoef(
-    partial_corrcoef, ax=None,
-    figsize=None,     cmap=None,
-    vmin=-1.,         vmax=1.,
-    cbar=True,        title='Partial correlation',
-    filepath=None,    **kwargs
+    partial_corrcoef,   ax=None,
+    figsize=None,       cmap='RdBu',
+    linecolors='white', linewidths=0.5,
+    cbar=True,          title='Partial correlation',
+    filepath=None,      **kwargs
 ):
     """Plot the partial correlation coefficient matrix.
 
@@ -264,14 +264,14 @@ def plot_partial_corrcoef(
     figsize: tuple, default None
         Tuple denoting figure size of the plot.
 
-    cmap : matplotlib Colormap, default None
-        If None, plt.cm.RdYlBu is used.
+    cmap : str or matplotlib Colormap, default 'RdBu'
+        Colormap or Registered colormap name.
 
-    vmin : float, default -1.0
-        Used in conjunction with norm to normalize luminance data.
+    linecolor : str, default 'white'
+        Color of the lines that will divide each cell.
 
-    vmax : float, default 1.0
-        Used in conjunction with norm to normalize luminance data.
+    linewidths : float, default 0.5
+        Width of the lines that will divide each cell.
 
     cbar : bool, default True.
         Whether to draw a colorbar.
@@ -283,7 +283,7 @@ def plot_partial_corrcoef(
         If provided, save the current figure.
 
     **kwargs : dict
-        Other keywords passed to `ax.imshow`.
+        Other keywords passed to `ax.pcolormesh`.
 
     Returns
     -------
@@ -299,29 +299,35 @@ def plot_partial_corrcoef(
     from mpl_toolkits.axes_grid1 import make_axes_locatable
 
     if ax is None:
-        _, ax     = plt.subplots(figsize=figsize)
-
-    if cmap is None:
-        cmap      = plt.cm.RdBu
+        _, ax      = plt.subplots(figsize=figsize)
 
     if title is not None:
         ax.set_title(title)
 
-    mappable      = ax.imshow(
+    # Add the pcolormesh kwargs here
+    kwargs['vmin'] = -1.
+    kwargs['vmax'] = 1.
+
+    # Draw the heatmap
+    mesh           = ax.pcolormesh(
         np.ma.masked_equal(partial_corrcoef, 0.),
-        cmap      = cmap,
-        vmin      = vmin,
-        vmax      = vmax,
+        cmap       = cmap,
+        edgecolors = linecolors,
+        linewidths = linewidths,
         **kwargs
     )
 
+    ax.set_aspect('equal')
     ax.set_facecolor('grey')
 
-    if cbar:
-        divider   = make_axes_locatable(ax)
-        cax       = divider.append_axes('right', size='5%', pad=0.05)
+    # Invert the y axis to show the plot in matrix form
+    ax.invert_yaxis()
 
-        ax.figure.colorbar(mappable, cax=cax)
+    if cbar:
+        divider    = make_axes_locatable(ax)
+        cax        = divider.append_axes('right', size='5%', pad=0.05)
+
+        ax.figure.colorbar(mesh, cax=cax)
 
     if filepath is not None:
         ax.figure.savefig(filepath)

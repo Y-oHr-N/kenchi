@@ -4,13 +4,12 @@ import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.utils.validation import check_is_fitted
 
-from .utils import Axes, OneDimArray, TwoDimArray
 from .visualization import plot_anomaly_score, plot_roc_curve
 
 __all__ = ['is_detector', 'BaseDetector']
 
 
-def is_detector(estimator: object) -> bool:
+def is_detector(estimator):
     return getattr(estimator, '_estimator_type', None) == 'detector'
 
 
@@ -20,42 +19,29 @@ class BaseDetector(BaseEstimator, ABC):
     _estimator_type = 'detector'
 
     @abstractmethod
-    def __init__(
-        self,
-        contamination: float = 0.01,
-        verbose:       bool  = False
-    ) -> None:
+    def __init__(self, contamination=0.01, verbose=False):
         self.contamination = contamination
         self.verbose       = verbose
 
     @abstractmethod
-    def check_params(self, X: TwoDimArray, y: OneDimArray = None) -> None:
+    def check_params(self, X, y=None):
         """Check validity of parameters and raise ValueError if not valid."""
 
-        if self.contamination < 0. or self.contamination > 0.5:
+        if not 0. <= self.contamination <= 0.5:
             raise ValueError(
-                f'contamination must be between 0.0 and 0.5 inclusive ' \
-                + f'but was {self.contamination}'
+                f'contamination must be between 0.0 and 0.5 inclusive '
+                f'but was {self.contamination}'
             )
 
     @abstractmethod
-    def fit(
-        self,
-        X: TwoDimArray,
-        y: OneDimArray = None,
-        **fit_params
-    ) -> 'BaseDetector':
+    def fit(self, X, y=None, **fit_params):
         """Fit the model according to the given training data."""
 
     @abstractmethod
-    def anomaly_score(self, X: TwoDimArray = None) -> OneDimArray:
+    def anomaly_score(self, X=None):
         """Compute the anomaly score for each sample."""
 
-    def predict(
-        self,
-        X:         TwoDimArray = None,
-        threshold: float       = None
-    ) -> OneDimArray:
+    def predict(self, X=None, threshold=None):
         """Predict if a particular sample is an outlier or not.
 
         Parameters
@@ -79,13 +65,7 @@ class BaseDetector(BaseEstimator, ABC):
 
         return np.where(self.anomaly_score(X) <= threshold, 1, -1)
 
-    def fit_predict(
-        self,
-        X:         TwoDimArray,
-        y:         OneDimArray = None,
-        threshold: float       = None,
-        **fit_params
-    ) -> OneDimArray:
+    def fit_predict(self, X, y=None, threshold=None, **fit_params):
         """Fit the model according to the given training data and predict if a
         particular sample is an outlier or not.
 
@@ -107,7 +87,7 @@ class BaseDetector(BaseEstimator, ABC):
 
         return self.fit(X, **fit_params).predict(threshold=threshold)
 
-    def plot_anomaly_score(self, X: TwoDimArray = None, **kwargs) -> Axes:
+    def plot_anomaly_score(self, X=None, **kwargs):
         """Plot the anomaly score for each sample.
 
         Parameters
@@ -119,14 +99,17 @@ class BaseDetector(BaseEstimator, ABC):
         ax : matplotlib Axes, default None
             Target axes instance.
 
+        figsize: tuple, default None
+            Tuple denoting figure size of the plot.
+
         title : string, default None
             Axes title. To disable, pass None.
 
         xlim : tuple, default None
-            Tuple passed to ax.xlim().
+            Tuple passed to `ax.xlim`.
 
         ylim : tuple, default None
-            Tuple passed to ax.ylim().
+            Tuple passed to `ax.ylim`.
 
         xlabel : string, default 'Samples'
             X axis title label. To disable, pass None.
@@ -141,7 +124,7 @@ class BaseDetector(BaseEstimator, ABC):
             If not None, save the current figure.
 
         **kwargs : dict
-            Other keywords passed to ax.plot().
+            Other keywords passed to `ax.plot`.
 
         Returns
         -------
@@ -153,7 +136,7 @@ class BaseDetector(BaseEstimator, ABC):
             self.anomaly_score(X), self.threshold_, **kwargs
         )
 
-    def plot_roc_curve(self, X: TwoDimArray, y: OneDimArray, **kwargs) -> Axes:
+    def plot_roc_curve(self, X, y, **kwargs):
         """Plot the Receiver Operating Characteristic (ROC) curve.
 
         Parameters
@@ -166,6 +149,9 @@ class BaseDetector(BaseEstimator, ABC):
 
         ax : matplotlib Axes, default None
             Target axes instance.
+
+        figsize: tuple, default None
+            Tuple denoting figure size of the plot.
 
         label : str, default None
             Legend label.
@@ -180,7 +166,7 @@ class BaseDetector(BaseEstimator, ABC):
             If not None, save the current figure.
 
         **kwargs : dict
-            Other keywords passed to ax.plot().
+            Other keywords passed to `ax.plot`.
 
         Returns
         -------
