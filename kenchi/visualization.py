@@ -147,11 +147,15 @@ def plot_roc_curve(
     -------
     ax : matplotlib Axes
         Axes on which the plot was drawn.
+
+    Examples
+    --------
+    .. image:: images/plot_roc_curve.png
     """
 
     import matplotlib.pyplot as plt
 
-    fpr, tpr, _ = roc_curve(y_true, y_score)
+    fpr, tpr, _ = roc_curve(y_true, y_score, pos_label=-1)
     roc_auc     = auc(fpr, tpr)
 
     if ax is None:
