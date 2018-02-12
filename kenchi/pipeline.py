@@ -1,7 +1,26 @@
-from sklearn.pipeline import Pipeline as SKLearnPipeline
+from sklearn.pipeline import _name_estimators, Pipeline as SKLearnPipeline
 from sklearn.utils.metaestimators import if_delegate_has_method
 
-__all__ = ['Pipeline']
+__all__ = ['make_pipeline', 'Pipeline']
+
+
+def make_pipeline(*steps):
+    """Construct a Pipeline from the given estimators. This is a shorthand for
+    the Pipeline constructor; it does not require, and does not permit, naming
+    the estimators. Instead, their names will be set to the lowercase of their
+    types automatically.
+
+    Parameters
+    ----------
+    *steps : list
+        List of estimators.
+
+    Returns
+    -------
+    p : Pipeline
+    """
+
+    return Pipeline(_name_estimators(steps))
 
 
 class Pipeline(SKLearnPipeline):
