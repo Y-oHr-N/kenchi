@@ -1,24 +1,16 @@
-from typing import Union
-
 import numpy as np
 from sklearn.datasets import make_blobs as sklearn_make_blobs
 from sklearn.utils import check_random_state
-
-from .utils import Limits, OneDimArray, RandomState, TwoDimArray
 
 __all__ = ['make_blobs']
 
 
 def make_blobs(
-    n_inliers:    int                       = 490,
-    n_outliers:   int                       = 10,
-    n_features:   int                       = 25,
-    centers:      Union[int,   TwoDimArray] = 5,
-    cluster_std:  Union[float, OneDimArray] = 1.,
-    center_box:   Limits                    = (-10., 10.),
-    shuffle:      bool                      = True,
-    random_state: RandomState               = None
-) -> Union[TwoDimArray, OneDimArray]:
+    n_inliers=490,  n_outliers=10,
+    n_features=25,  centers=5,
+    cluster_std=1., center_box=(-10., 10.),
+    shuffle=True,   random_state=None
+):
     """Generate isotropic Gaussian blobs with outliers.
 
     Parameters

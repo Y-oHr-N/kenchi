@@ -1,42 +1,7 @@
 import functools
 import time
-from typing import Tuple, Union
 
-import numpy as np
-
-__all__     = [
-    'timeit',
-    'Limits',
-    'RandomState',
-    'OneDimArray',
-    'TwoDimArray',
-    'Axes',
-    'Colormap'
-]
-
-Limits          = Tuple[float, float]
-RandomState     = Union[int, np.random.RandomState]
-
-try:
-    import pandas as pd
-
-    OneDimArray = Union[np.ndarray, pd.Series]
-    TwoDimArray = Union[np.ndarray, pd.DataFrame]
-
-except ImportError:
-    OneDimArray = np.ndarray
-    TwoDimArray = np.ndarray
-
-try:
-    import matplotlib.axes
-    import matplotlib.colors
-
-    Axes        = matplotlib.axes.Axes
-    Colormap    = matplotlib.colors.Colormap
-
-except ImportError:
-    Axes        = object
-    Colormap    = object
+__all__ = ['timeit']
 
 
 def short_format_time(t: float) -> str:
