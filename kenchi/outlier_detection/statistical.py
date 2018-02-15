@@ -647,14 +647,20 @@ class SparseStructureLearning(BaseDetector):
         ax : matplotlib Axes, default None
             Target axes instance.
 
+        cmap : str or matplotlib Colormap, default 'Spectral'
+            Colormap or Registered colormap name.
+
         figsize: tuple, default None
             Tuple denoting figure size of the plot.
 
-        title : string, default 'Graphical model (n_clusters = %d)'
-            Axes title. To disable, pass None.
-
         filepath : str, default None
             If not None, save the current figure.
+
+        random_state : int, RandomState instance, default None
+            Seed of the pseudo random number generator.
+
+        title : string, default 'GGM (n_features=%d, n_clusters=%d)'
+            Axes title. To disable, pass None.
 
         **kwargs : dict
             Other keywords passed to `nx.draw_networkx`.
@@ -669,9 +675,10 @@ class SparseStructureLearning(BaseDetector):
             kwargs['node_color'] = self.labels_
 
         if 'title' not in kwargs:
+            n_features, _        = self.partial_corrcoef_.shape
             n_clusters           = np.max(self.labels_) + 1
             kwargs['title']      = (
-                f'Graphical model (n_clusters = {n_clusters})'
+                f'GGM (n_features={n_features}, n_clusters={n_clusters})'
             )
 
         return plot_graphical_model(self.partial_corrcoef_, **kwargs)
@@ -684,11 +691,17 @@ class SparseStructureLearning(BaseDetector):
         ax : matplotlib Axes, default None
             Target axes instance.
 
-        figsize: tuple, default None
-            Tuple denoting figure size of the plot.
+        cbar : bool, default True.
+            Whether to draw a colorbar.
 
         cmap : str or matplotlib Colormap, default 'RdBu'
             Colormap or Registered colormap name.
+
+        figsize: tuple, default None
+            Tuple denoting figure size of the plot.
+
+        filepath : str, default None
+            If not None, save the current figure.
 
         linecolor : str, default 'white'
             Color of the lines that will divide each cell.
@@ -696,14 +709,8 @@ class SparseStructureLearning(BaseDetector):
         linewidths : float, default 0.5
             Width of the lines that will divide each cell.
 
-        cbar : bool, default True.
-            Whether to draw a colorbar.
-
         title : string, default 'Partial correlation'
             Axes title. To disable, pass None.
-
-        filepath : str, default None
-            If not None, save the current figure.
 
         **kwargs : dict
             Other keywords passed to `ax.pcolormesh`.

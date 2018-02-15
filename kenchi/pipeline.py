@@ -115,26 +115,26 @@ class Pipeline(SKLearnPipeline):
         figsize: tuple, default None
             Tuple denoting figure size of the plot.
 
-        title : string, default None
-            Axes title. To disable, pass None.
-
-        xlim : tuple, default None
-            Tuple passed to `ax.xlim`.
-
-        ylim : tuple, default None
-            Tuple passed to `ax.ylim`.
-
-        xlabel : string, default 'Samples'
-            X axis title label. To disable, pass None.
-
-        ylabel : string, default 'Anomaly score'
-            Y axis title label. To disable, pass None.
+        filepath : str, default None
+            If not None, save the current figure.
 
         grid : boolean, default True
             If True, turn the axes grids on.
 
-        filepath : str, default None
-            If not None, save the current figure.
+        title : string, default None
+            Axes title. To disable, pass None.
+
+        xlabel : string, default 'Samples'
+            X axis title label. To disable, pass None.
+
+        xlim : tuple, default None
+            Tuple passed to `ax.xlim`.
+
+        ylabel : string, default 'Anomaly score'
+            Y axis title label. To disable, pass None.
+
+        ylim : tuple, default None
+            Tuple passed to `ax.ylim`.
 
         **kwargs : dict
             Other keywords passed to `ax.plot`.
@@ -171,17 +171,23 @@ class Pipeline(SKLearnPipeline):
         figsize: tuple, default None
             Tuple denoting figure size of the plot.
 
+        filepath : str, default None
+            If not None, save the current figure.
+
+        grid : boolean, default True
+            If True, turn the axes grids on.
+
         label : str, default None
             Legend label.
 
         title : string, default None
             Axes title. To disable, pass None.
 
-        grid : boolean, default True
-            If True, turn the axes grids on.
+        xlabel : string, default 'FPR'
+            X axis title label. To disable, pass None.
 
-        filepath : str, default None
-            If not None, save the current figure.
+        ylabel : string, default 'TPR'
+            Y axis title label. To disable, pass None.
 
         **kwargs : dict
             Other keywords passed to `ax.plot`.
@@ -208,14 +214,20 @@ class Pipeline(SKLearnPipeline):
         ax : matplotlib Axes, default None
             Target axes instance.
 
+        cmap : str or matplotlib Colormap, default 'Spectral'
+            Colormap or Registered colormap name.
+
         figsize: tuple, default None
             Tuple denoting figure size of the plot.
 
-        title : string, default 'Graphical model'
-            Axes title. To disable, pass None.
-
         filepath : str, default None
             If not None, save the current figure.
+
+        random_state : int, RandomState instance, default None
+            Seed of the pseudo random number generator.
+
+        title : string, default 'GGM (n_features=%d, n_clusters=%d)'
+            Axes title. To disable, pass None.
 
         **kwargs : dict
             Other keywords passed to `nx.draw_networkx`.
@@ -238,11 +250,17 @@ class Pipeline(SKLearnPipeline):
         ax : matplotlib Axes, default None
             Target axes instance.
 
-        figsize: tuple, default None
-            Tuple denoting figure size of the plot.
+        cbar : bool, default True.
+            Whether to draw a colorbar.
 
         cmap : str or matplotlib Colormap, default 'RdBu'
             Colormap or Registered colormap name.
+
+        figsize: tuple, default None
+            Tuple denoting figure size of the plot.
+
+        filepath : str, default None
+            If not None, save the current figure.
 
         linecolor : str, default 'white'
             Color of the lines that will divide each cell.
@@ -250,14 +268,8 @@ class Pipeline(SKLearnPipeline):
         linewidths : float, default 0.5
             Width of the lines that will divide each cell.
 
-        cbar : bool, default True.
-            Whether to draw a colorbar.
-
         title : string, default 'Partial correlation'
             Axes title. To disable, pass None.
-
-        filepath : str, default None
-            If not None, save the current figure.
 
         **kwargs : dict
             Other keywords passed to `ax.pcolormesh`.

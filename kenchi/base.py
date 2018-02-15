@@ -16,6 +16,9 @@ def is_detector(estimator):
 class BaseDetector(BaseEstimator, ABC):
     """Base class for all outlier detectors."""
 
+    # TODO: Update anomaly_score method so that the normalized score can be
+    # computed
+
     _estimator_type = 'detector'
 
     @abstractmethod
@@ -102,26 +105,26 @@ class BaseDetector(BaseEstimator, ABC):
         figsize: tuple, default None
             Tuple denoting figure size of the plot.
 
-        title : string, default None
-            Axes title. To disable, pass None.
-
-        xlim : tuple, default None
-            Tuple passed to `ax.xlim`.
-
-        ylim : tuple, default None
-            Tuple passed to `ax.ylim`.
-
-        xlabel : string, default 'Samples'
-            X axis title label. To disable, pass None.
-
-        ylabel : string, default 'Anomaly score'
-            Y axis title label. To disable, pass None.
+        filepath : str, default None
+            If not None, save the current figure.
 
         grid : boolean, default True
             If True, turn the axes grids on.
 
-        filepath : str, default None
-            If not None, save the current figure.
+        title : string, default None
+            Axes title. To disable, pass None.
+
+        xlabel : string, default 'Samples'
+            X axis title label. To disable, pass None.
+
+        xlim : tuple, default None
+            Tuple passed to `ax.xlim`.
+
+        ylabel : string, default 'Anomaly score'
+            Y axis title label. To disable, pass None.
+
+        ylim : tuple, default None
+            Tuple passed to `ax.ylim`.
 
         **kwargs : dict
             Other keywords passed to `ax.plot`.
@@ -153,17 +156,23 @@ class BaseDetector(BaseEstimator, ABC):
         figsize: tuple, default None
             Tuple denoting figure size of the plot.
 
+        filepath : str, default None
+            If not None, save the current figure.
+
+        grid : boolean, default True
+            If True, turn the axes grids on.
+
         label : str, default None
             Legend label.
 
         title : string, default None
             Axes title. To disable, pass None.
 
-        grid : boolean, default True
-            If True, turn the axes grids on.
+        xlabel : string, default 'FPR'
+            X axis title label. To disable, pass None.
 
-        filepath : str, default None
-            If not None, save the current figure.
+        ylabel : string, default 'TPR'
+            Y axis title label. To disable, pass None.
 
         **kwargs : dict
             Other keywords passed to `ax.plot`.

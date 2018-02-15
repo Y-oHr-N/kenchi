@@ -8,14 +8,13 @@ __all__ = [
     'plot_partial_corrcoef'
 ]
 
+# TODO: Implement plot_featurewise_anomaly_score function
+
 
 def plot_anomaly_score(
-    anomaly_score,          threshold=None,
-    ax=None,                figsize=None,
-    title=None,             xlim=None,
-    ylim=None,              xlabel='Samples',
-    ylabel='Anomaly score', grid=True,
-    filepath=None,          **kwargs
+    anomaly_score, threshold, ax=None, figsize=None,
+    filepath=None, grid=True, title=None, xlabel='Samples',
+    xlim=None, ylabel='Anomaly score', ylim=None, **kwargs
 ):
     """Plot the anomaly score for each sample.
 
@@ -24,7 +23,7 @@ def plot_anomaly_score(
     anomaly_score : array-like of shape (n_samples,)
         Anomaly score for each sample.
 
-    threshold : float, default None
+    threshold : float
         Threshold.
 
     ax : matplotlib Axes, default None
@@ -33,26 +32,26 @@ def plot_anomaly_score(
     figsize: tuple, default None
         Tuple denoting figure size of the plot.
 
-    title : string, default None
-        Axes title. To disable, pass None.
-
-    xlim : tuple, default None
-        Tuple passed to `ax.xlim`.
-
-    ylim : tuple, default None
-        Tuple passed to `ax.ylim`.
-
-    xlabel : string, default 'Samples'
-        X axis title label. To disable, pass None.
-
-    ylabel : string, default 'Anomaly score'
-        Y axis title label. To disable, pass None.
+    filepath : str, default None
+        If provided, save the current figure.
 
     grid : boolean, default True
         If True, turn the axes grids on.
 
-    filepath : str, default None
-        If provided, save the current figure.
+    title : string, default None
+        Axes title. To disable, pass None.
+
+    xlabel : string, default 'Samples'
+        X axis title label. To disable, pass None.
+
+    xlim : tuple, default None
+        Tuple passed to `ax.xlim`.
+
+    ylabel : string, default 'Anomaly score'
+        Y axis title label. To disable, pass None.
+
+    ylim : tuple, default None
+        Tuple passed to `ax.ylim`.
 
     **kwargs : dict
         Other keywords passed to `ax.plot`.
@@ -79,7 +78,7 @@ def plot_anomaly_score(
         xlim   = (0., n_samples - 1.)
 
     if ylim is None:
-        ylim   = (0., 1.1 * np.max(anomaly_score))
+        ylim   = (0., 2. * threshold)
 
     if title is not None:
         ax.set_title(title)
@@ -94,9 +93,7 @@ def plot_anomaly_score(
     ax.set_ylim(ylim)
     ax.grid(grid, linestyle=':')
     ax.plot(xlocs, anomaly_score, **kwargs)
-
-    if threshold is not None:
-        ax.hlines(threshold, xlim[0], xlim[1])
+    ax.hlines(threshold, xlim[0], xlim[1])
 
     if filepath is not None:
         ax.figure.savefig(filepath)
@@ -105,12 +102,9 @@ def plot_anomaly_score(
 
 
 def plot_roc_curve(
-    y_true,                       y_score,
-    ax=None,                      figsize=None,
-    label=None,                   title=None,
-    xlabel='False Positive Rate', ylabel='True Positive Rate',
-    grid=True,                    filepath=None,
-    **kwargs
+    y_true, y_score, ax=None, figsize=None,
+    filepath=None, grid=True, label=None, title=None,
+    xlabel='FPR', ylabel='TPR', **kwargs
 ):
     """Plot the Receiver Operating Characteristic (ROC) curve.
 
@@ -128,17 +122,23 @@ def plot_roc_curve(
     figsize: tuple, default None
         Tuple denoting figure size of the plot.
 
+    filepath : str, default None
+        If provided, save the current figure.
+
+    grid : boolean, default True
+        If True, turn the axes grids on.
+
     label : str, default None
         Legend label.
 
     title : string, default None
         Axes title. To disable, pass None.
 
-    grid : boolean, default True
-        If True, turn the axes grids on.
+    xlabel : string, default 'FPR'
+        X axis title label. To disable, pass None.
 
-    filepath : str, default None
-        If provided, save the current figure.
+    ylabel : string, default 'TPR'
+        Y axis title label. To disable, pass None.
 
     **kwargs : dict
         Other keywords passed to `ax.plot`.
@@ -162,7 +162,7 @@ def plot_roc_curve(
         _, ax   = plt.subplots(figsize=figsize)
 
     if label is None:
-        label   = f'(area = {roc_auc:1.3f})'
+        label   = f'area={roc_auc:1.3f}'
 
     if title is not None:
         ax.set_title(title)
@@ -186,9 +186,8 @@ def plot_roc_curve(
 
 
 def plot_graphical_model(
-    partial_corrcoef, ax=None,
-    figsize=None,     title='Graphical model',
-    filepath=None,    **kwargs
+    partial_corrcoef, ax=None, cmap='Spectral', figsize=None,
+    filepath=None, random_state=None, title='GGM', **kwargs
 ):
     """Plot the Gaussian Graphical Model (GGM).
 
@@ -200,14 +199,20 @@ def plot_graphical_model(
     ax : matplotlib Axes, default None
         Target axes instance.
 
+    cmap : str or matplotlib Colormap, default 'Spectral'
+        Colormap or Registered colormap name.
+
     figsize: tuple, default None
         Tuple denoting figure size of the plot.
 
-    title : string, default 'Graphical model'
-        Axes title. To disable, pass None.
-
     filepath : str, default None
         If provided, save the current figure.
+
+    random_state : int, RandomState instance, default None
+        Seed of the pseudo random number generator.
+
+    title : string, default 'GGM'
+        Axes title. To disable, pass None.
 
     **kwargs : dict
         Other keywords passed to `nx.draw_networkx`.
@@ -226,18 +231,25 @@ def plot_graphical_model(
     import networkx as nx
 
     if ax is None:
-        _, ax       = plt.subplots(figsize=figsize)
+        _, ax           = plt.subplots(figsize=figsize)
 
     if title is not None:
         ax.set_title(title)
 
-    tril            = np.tril(partial_corrcoef)
+    tril                = np.tril(partial_corrcoef)
+    G                   = nx.from_numpy_matrix(tril)
+
+    try:
+        pos             = nx.nx_agraph.graphviz_layout(G)
+    except ImportError:
+        pos             = nx.spling_layout(G, random_state=random_state)
 
     # Add the draw_networkx kwargs here
-    kwargs['width'] = np.abs(tril.flat[tril.flat[:] != 0.])
+    kwargs['node_size'] = np.array([10. * (d + 1.) for _, d in G.degree])
+    kwargs['width']     = np.abs(tril.flat[tril.flat[:] != 0.])
 
     # Draw the Gaussian grapchical model
-    nx.draw_networkx(nx.from_numpy_matrix(tril), ax=ax, **kwargs)
+    nx.draw_networkx(G, pos=pos, ax=ax, cmap=cmap, **kwargs)
 
     ax.get_xaxis().set_visible(False)
     ax.get_yaxis().set_visible(False)
@@ -249,11 +261,9 @@ def plot_graphical_model(
 
 
 def plot_partial_corrcoef(
-    partial_corrcoef,   ax=None,
-    figsize=None,       cmap='RdBu',
-    linecolors='white', linewidths=0.5,
-    cbar=True,          title='Partial correlation',
-    filepath=None,      **kwargs
+    partial_corrcoef, ax=None, cbar=True, cmap='RdBu',
+    figsize=None, filepath=None, linecolors='white', linewidths=0.5,
+    title='Partial correlation', **kwargs
 ):
     """Plot the partial correlation coefficient matrix.
 
@@ -265,11 +275,17 @@ def plot_partial_corrcoef(
     ax : matplotlib Axes, default None
         Target axes instance.
 
-    figsize: tuple, default None
-        Tuple denoting figure size of the plot.
+    cbar : bool, default True.
+        Whether to draw a colorbar.
 
     cmap : str or matplotlib Colormap, default 'RdBu'
         Colormap or Registered colormap name.
+
+    figsize: tuple, default None
+        Tuple denoting figure size of the plot.
+
+    filepath : str, default None
+        If provided, save the current figure.
 
     linecolor : str, default 'white'
         Color of the lines that will divide each cell.
@@ -277,14 +293,8 @@ def plot_partial_corrcoef(
     linewidths : float, default 0.5
         Width of the lines that will divide each cell.
 
-    cbar : bool, default True.
-        Whether to draw a colorbar.
-
     title : string, default 'Partial correlation'
         Axes title. To disable, pass None.
-
-    filepath : str, default None
-        If provided, save the current figure.
 
     **kwargs : dict
         Other keywords passed to `ax.pcolormesh`.
