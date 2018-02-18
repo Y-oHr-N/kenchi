@@ -6,39 +6,37 @@ __all__ = ['make_blobs']
 
 
 def make_blobs(
-    n_inliers=490,  n_outliers=10,
-    n_features=25,  centers=5,
-    cluster_std=1., center_box=(-10., 10.),
-    shuffle=True,   random_state=None
+    centers=5, center_box=(-10., 10.), cluster_std=1., n_features=25,
+    n_inliers=490, n_outliers=10, random_state=None, shuffle=True
 ):
     """Generate isotropic Gaussian blobs with outliers.
 
     Parameters
     ----------
+    centers : int or array-like of shape (n_centers, n_features), default 5
+        Number of centers to generate, or the fixed center locations.
+
+    center_box : pair of floats (min, max), default (-10.0, 10.0)
+        Bounding box for each cluster center when centers are generated at
+        random.
+
+    cluster_std : float or array-like of shape (n_centers,), default 1.0
+        Standard deviation of the clusters.
+
+    n_features : int, default 25
+        Number of features for each sample.
+
     n_inliers : int, default 490
         Number of inliers.
 
     n_outliers : int, default 10
         Number of outliers.
 
-    n_features : int, default 25
-        Number of features for each sample.
-
-    centers : int or array-like of shape (n_centers, n_features), default 5
-        Number of centers to generate, or the fixed center locations.
-
-    cluster_std : float or array-like of shape (n_centers,), default 1.0
-        Standard deviation of the clusters.
-
-    center_box : pair of floats (min, max), default (-10.0, 10.0)
-        Bounding box for each cluster center when centers are generated at
-        random.
+    random_state : int, RandomState instance, default None
+        Seed of the pseudo random number generator.
 
     shuffle : boolean, default True
         If True, shuffle samples.
-
-    random_state : int, RandomState instance, default None
-        Seed of the pseudo random number generator.
 
     Returns
     -------
@@ -62,12 +60,13 @@ def make_blobs(
     rnd              = check_random_state(random_state)
 
     X_inliers, _     = sklearn_make_blobs(
-        n_samples    = n_inliers,
-        n_features   = n_features,
         centers      = centers,
+        center_box   = center_box,
         cluster_std  = cluster_std,
-        shuffle      = False,
-        random_state = rnd
+        n_features   = n_features,
+        n_samples    = n_inliers,
+        random_state = rnd,
+        shuffle      = False
     )
 
     X_outliers       = rnd.uniform(
