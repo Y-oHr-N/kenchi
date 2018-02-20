@@ -2,7 +2,7 @@ from abc import abstractmethod, ABC
 
 import numpy as np
 from sklearn.base import BaseEstimator
-from sklearn.utils.validation import check_is_fitted
+from sklearn.utils.validation import check_is_fitted, check_X_y
 
 from .visualization import plot_anomaly_score, plot_roc_curve
 
@@ -50,7 +50,7 @@ class BaseDetector(BaseEstimator, ABC):
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features), default None
-            Data.
+            Data. If None, Labels on the given training data are returned.
 
         threshold : float, default None
             User-provided threshold.
@@ -96,20 +96,25 @@ class BaseDetector(BaseEstimator, ABC):
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features), default None
-            Data. If not provided, plot the anomaly score for each training
-            samples.
+            Data. If None, plot the anomaly score for each training samples.
 
         ax : matplotlib Axes, default None
             Target axes instance.
 
-        figsize: tuple, default None
+        bins : int, str or array-like, default 'fd'
+            Number of hist bins.
+
+        figsize : tuple, default None
             Tuple denoting figure size of the plot.
 
         filepath : str, default None
-            If not None, save the current figure.
+            If provided, save the current figure.
 
         grid : boolean, default True
             If True, turn the axes grids on.
+
+        hist : bool, default True
+            If True, plot a histogram of anomaly scores.
 
         title : string, default None
             Axes title. To disable, pass None.
@@ -135,9 +140,9 @@ class BaseDetector(BaseEstimator, ABC):
             Axes on which the plot was drawn.
         """
 
-        return plot_anomaly_score(
-            self.anomaly_score(X), self.threshold_, **kwargs
-        )
+        kwargs['threshold'] = self.threshold_
+
+        return plot_anomaly_score(self.anomaly_score(X), **kwargs)
 
     def plot_roc_curve(self, X, y, **kwargs):
         """Plot the Receiver Operating Characteristic (ROC) curve.
@@ -157,7 +162,7 @@ class BaseDetector(BaseEstimator, ABC):
             Tuple denoting figure size of the plot.
 
         filepath : str, default None
-            If not None, save the current figure.
+            If provided, save the current figure.
 
         grid : boolean, default True
             If True, turn the axes grids on.
@@ -182,5 +187,7 @@ class BaseDetector(BaseEstimator, ABC):
         ax : matplotlib Axes
             Axes on which the plot was drawn.
         """
+
+        X, y = check_X_y(X, y)
 
         return plot_roc_curve(y, self.anomaly_score(X), **kwargs)

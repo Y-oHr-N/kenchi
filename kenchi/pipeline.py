@@ -58,8 +58,8 @@ class Pipeline(SKLearnPipeline):
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features), default None
-            Data. If not provided, the anomaly score for each training sample
-            is returned.
+            Data. If None, the anomaly score for each training sample is
+            returned.
 
         Returns
         -------
@@ -82,8 +82,8 @@ class Pipeline(SKLearnPipeline):
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features), default None
-            Data. If not provided, the feature_wise anomaly scores for each
-            training sample are returned.
+            Data. If None, the feature_wise anomaly scores for each training
+            sample are returned.
 
         Returns
         -------
@@ -106,20 +106,25 @@ class Pipeline(SKLearnPipeline):
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features), default None
-            Data. If not provided, plot the anomaly score for each training
-            samples.
+            Data. If None, plot the anomaly score for each training samples.
 
         ax : matplotlib Axes, default None
             Target axes instance.
 
-        figsize: tuple, default None
+        bins : int, str or array-like, default 'fd'
+            Number of hist bins.
+
+        figsize : tuple, default None
             Tuple denoting figure size of the plot.
 
         filepath : str, default None
-            If not None, save the current figure.
+            If provided, save the current figure.
 
         grid : boolean, default True
             If True, turn the axes grids on.
+
+        hist : bool, default True
+            If True, plot a histogram of anomaly scores.
 
         title : string, default None
             Axes title. To disable, pass None.
@@ -172,7 +177,7 @@ class Pipeline(SKLearnPipeline):
             Tuple denoting figure size of the plot.
 
         filepath : str, default None
-            If not None, save the current figure.
+            If provided, save the current figure.
 
         grid : boolean, default True
             If True, turn the axes grids on.
@@ -217,11 +222,11 @@ class Pipeline(SKLearnPipeline):
         cmap : str or matplotlib Colormap, default 'Spectral'
             Colormap or Registered colormap name.
 
-        figsize: tuple, default None
+        figsize : tuple, default None
             Tuple denoting figure size of the plot.
 
         filepath : str, default None
-            If not None, save the current figure.
+            If provided, save the current figure.
 
         random_state : int, RandomState instance, default None
             Seed of the pseudo random number generator.
@@ -256,11 +261,11 @@ class Pipeline(SKLearnPipeline):
         cmap : str or matplotlib Colormap, default 'RdBu'
             Colormap or Registered colormap name.
 
-        figsize: tuple, default None
+        figsize : tuple, default None
             Tuple denoting figure size of the plot.
 
         filepath : str, default None
-            If not None, save the current figure.
+            If provided, save the current figure.
 
         linecolor : str, default 'white'
             Color of the lines that will divide each cell.

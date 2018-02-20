@@ -9,12 +9,15 @@ __all__ = [
 ]
 
 # TODO: Implement plot_featurewise_anomaly_score function
+# TODO: Update plot_anomaly_score function so that a gaussian kernel density
+# estimate can be plotted
 
 
 def plot_anomaly_score(
-    anomaly_score, threshold, ax=None, figsize=None,
-    filepath=None, grid=True, title=None, xlabel='Samples',
-    xlim=None, ylabel='Anomaly score', ylim=None, **kwargs
+    anomaly_score, ax=None, bins='fd', figsize=None,
+    filepath=None, grid=True, hist=True, threshold=None,
+    title=None, xlabel='Samples', xlim=None, ylabel='Anomaly score',
+    ylim=None, **kwargs
 ):
     """Plot the anomaly score for each sample.
 
@@ -23,20 +26,26 @@ def plot_anomaly_score(
     anomaly_score : array-like of shape (n_samples,)
         Anomaly score for each sample.
 
-    threshold : float
-        Threshold.
-
     ax : matplotlib Axes, default None
         Target axes instance.
 
-    figsize: tuple, default None
+    bins : int, str or array-like, default 'fd'
+        Number of hist bins.
+
+    figsize : tuple, default None
         Tuple denoting figure size of the plot.
 
     filepath : str, default None
         If provided, save the current figure.
 
-    grid : boolean, default True
+    grid : bool, default True
         If True, turn the axes grids on.
+
+    hist : bool, default True
+        If True, plot a histogram of anomaly scores.
+
+    threshold : float, default None
+        Threshold.
 
     title : string, default None
         Axes title. To disable, pass None.
@@ -67,18 +76,19 @@ def plot_anomaly_score(
     """
 
     import matplotlib.pyplot as plt
+    from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-    n_samples, = anomaly_score.shape
-    xlocs      = np.arange(n_samples)
+    n_samples,    = anomaly_score.shape
+    xlocs         = np.arange(n_samples)
 
     if ax is None:
-        _, ax  = plt.subplots(figsize=figsize)
+        _, ax     = plt.subplots(figsize=figsize)
 
     if xlim is None:
-        xlim   = (0., n_samples - 1.)
+        xlim      = (0., n_samples - 1.)
 
     if ylim is None:
-        ylim   = (0., 2. * threshold)
+        ylim      = (0., 1.1 * np.max(anomaly_score))
 
     if title is not None:
         ax.set_title(title)
@@ -89,11 +99,27 @@ def plot_anomaly_score(
     if ylabel is not None:
         ax.set_ylabel(ylabel)
 
+    if threshold is not None:
+        ax.hlines(threshold, xlim[0], xlim[1])
+
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
     ax.grid(grid, linestyle=':')
     ax.plot(xlocs, anomaly_score, **kwargs)
-    ax.hlines(threshold, xlim[0], xlim[1])
+
+    if hist:
+        # Create an axes on the right side of ax
+        divider   = make_axes_locatable(ax)
+        ax_hist_y = divider.append_axes(
+            'right', size='20%', pad=0.1, sharey=ax
+        )
+
+        ax_hist_y.set_ylim(ylim)
+        ax_hist_y.yaxis.set_tick_params(labelleft=False)
+        ax_hist_y.grid(grid, linestyle=':')
+        ax_hist_y.hist(
+            anomaly_score, bins=bins, density=True, orientation='horizontal'
+        )
 
     if filepath is not None:
         ax.figure.savefig(filepath)
@@ -119,13 +145,13 @@ def plot_roc_curve(
     ax : matplotlib Axes, default None
         Target axes instance.
 
-    figsize: tuple, default None
+    figsize : tuple, default None
         Tuple denoting figure size of the plot.
 
     filepath : str, default None
         If provided, save the current figure.
 
-    grid : boolean, default True
+    grid : bool, default True
         If True, turn the axes grids on.
 
     label : str, default None
@@ -202,7 +228,7 @@ def plot_graphical_model(
     cmap : str or matplotlib Colormap, default 'Spectral'
         Colormap or Registered colormap name.
 
-    figsize: tuple, default None
+    figsize : tuple, default None
         Tuple denoting figure size of the plot.
 
     filepath : str, default None
@@ -251,8 +277,9 @@ def plot_graphical_model(
     # Draw the Gaussian grapchical model
     nx.draw_networkx(G, pos=pos, ax=ax, cmap=cmap, **kwargs)
 
-    ax.get_xaxis().set_visible(False)
-    ax.get_yaxis().set_visible(False)
+    # Turn off tick visibility
+    ax.xaxis.set_tick_params(labelbottom=False, bottom=False)
+    ax.yaxis.set_tick_params(labelleft=False, left=False)
 
     if filepath is not None:
         ax.figure.savefig(filepath)
@@ -281,7 +308,7 @@ def plot_partial_corrcoef(
     cmap : str or matplotlib Colormap, default 'RdBu'
         Colormap or Registered colormap name.
 
-    figsize: tuple, default None
+    figsize : tuple, default None
         Tuple denoting figure size of the plot.
 
     filepath : str, default None
@@ -338,8 +365,9 @@ def plot_partial_corrcoef(
     ax.invert_yaxis()
 
     if cbar:
+        # Create an axes on the right side of ax
         divider    = make_axes_locatable(ax)
-        cax        = divider.append_axes('right', size='5%', pad=0.05)
+        cax        = divider.append_axes('right', size='5%', pad=0.1)
 
         ax.figure.colorbar(mesh, cax=cax)
 
