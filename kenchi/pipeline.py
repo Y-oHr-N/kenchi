@@ -50,6 +50,15 @@ class Pipeline(SKLearnPipeline):
         Keys are step names and values are steps parameters.
     """
 
+    def __len__(self):
+        return len(self.named_steps)
+
+    def __getitem__(self, key):
+        return self.named_steps[key]
+
+    def __iter__(self):
+        return iter(self.named_steps)
+
     @if_delegate_has_method(delegate='_final_estimator')
     def anomaly_score(self, X=None):
         """Apply transforms, and compute the anomaly score for each sample with
