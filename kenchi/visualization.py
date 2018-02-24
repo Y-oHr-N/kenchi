@@ -81,7 +81,6 @@ def plot_anomaly_score(
 
     anomaly_score = column_or_1d(anomaly_score)
     n_samples,    = anomaly_score.shape
-    xlocs         = np.arange(n_samples)
 
     if ax is None:
         _, ax     = plt.subplots(figsize=figsize)
@@ -107,7 +106,7 @@ def plot_anomaly_score(
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
     ax.grid(grid, linestyle=':')
-    ax.plot(xlocs, anomaly_score, **kwargs)
+    ax.plot(np.arange(n_samples), anomaly_score, **kwargs)
 
     if hist:
         # Create an axes on the right side of ax
@@ -214,15 +213,15 @@ def plot_roc_curve(
 
 
 def plot_graphical_model(
-    partial_corrcoef, ax=None, figsize=None, filepath=None,
-    random_state=None, title='GGM', **kwargs
+    graphical_model, ax=None, figsize=None, filepath=None,
+    pos=None, random_state=None, title='GGM', **kwargs
 ):
     """Plot the Gaussian Graphical Model (GGM).
 
     Parameters
     ----------
-    partial_corrcoef : array-like of shape (n_features, n_features)
-        Partial correlation coefficient matrix.
+    graphical_model : networkx Graph
+        GGM.
 
     ax : matplotlib Axes, default None
         Target axes instance.
@@ -232,6 +231,9 @@ def plot_graphical_model(
 
     filepath : str, default None
         If provided, save the current figure.
+
+    pos : dict, default None
+        Dictionary with nodes as keys and positions as values.
 
     random_state : int, RandomState instance, default None
         Seed of the pseudo random number generator.
@@ -255,17 +257,13 @@ def plot_graphical_model(
     import matplotlib.pyplot as plt
     import networkx as nx
 
-    partial_corrcoef    = check_array(partial_corrcoef)
-    partial_corrcoef    = check_symmetric(
-        partial_corrcoef, raise_exception=True
-    )
-    tril                = np.tril(partial_corrcoef)
-    G                   = nx.from_numpy_matrix(tril)
-
-    try:
-        pos             = nx.nx_agraph.graphviz_layout(G)
-    except ImportError:
-        pos             = nx.spling_layout(G, random_state=random_state)
+    if pos is None:
+        try:
+            pos         = nx.nx_agraph.graphviz_layout(graphical_model)
+        except ImportError:
+            pos         = nx.spling_layout(
+                graphical_model, random_state=random_state
+            )
 
     if ax is None:
         _, ax           = plt.subplots(figsize=figsize)
@@ -275,11 +273,15 @@ def plot_graphical_model(
 
     # Add the draw_networkx kwargs here
     kwargs['cmap']      = 'Spectral'
-    kwargs['node_size'] = np.array([10. * (d + 1.) for _, d in G.degree])
-    kwargs['width']     = np.abs(tril.flat[tril.flat[:] != 0.])
+    kwargs['node_size'] = np.array([
+        10. * (d + 1.) for _, d in graphical_model.degree
+    ])
+    kwargs['width']     = np.abs([
+        w for _, _, w in graphical_model.edges(data='weight')
+    ])
 
     # Draw the Gaussian grapchical model
-    nx.draw_networkx(G, pos=pos, ax=ax, **kwargs)
+    nx.draw_networkx(graphical_model, pos=pos, ax=ax, **kwargs)
 
     # Turn off tick visibility
     ax.xaxis.set_tick_params(labelbottom=False, bottom=False)

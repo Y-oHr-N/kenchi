@@ -454,6 +454,9 @@ class SparseStructureLearning(BaseDetector):
     fit_time_ : float
         Time spent for fitting in seconds.
 
+    graphical_model_ : networkx Graph
+        GGM.
+
     labels_ : array-like of shape (n_features,)
         Label of each feature.
 
@@ -485,6 +488,12 @@ class SparseStructureLearning(BaseDetector):
     @property
     def covariance_(self):
         return self._glasso.covariance_
+
+    @property
+    def graphical_model_(self):
+        import networkx as nx
+
+        return nx.from_numpy_matrix(np.tril(self.partial_corrcoef_, k=-1))
 
     @property
     def labels_(self):
@@ -662,6 +671,9 @@ class SparseStructureLearning(BaseDetector):
         filepath : str, default None
             If provided, save the current figure.
 
+        pos : dict, default None
+            Dictionary with nodes as keys and positions as values.
+
         random_state : int, RandomState instance, default None
             Seed of the pseudo random number generator.
 
@@ -677,17 +689,21 @@ class SparseStructureLearning(BaseDetector):
             Axes on which the plot was drawn.
         """
 
+        import networkx as nx
+
         if 'node_color' not in kwargs:
             kwargs['node_color'] = self.labels_
 
         if 'title' not in kwargs:
-            n_features, _        = self.partial_corrcoef_.shape
-            n_clusters           = np.max(self.labels_) + 1
             kwargs['title']      = (
-                f'GGM (n_features={n_features}, n_clusters={n_clusters})'
+                f'GGM ('
+                f'n_clusters={np.max(self.labels_) + 1}, '
+                f'n_features={self.precision_.shape[0]}, '
+                f'n_isolates={len(list(nx.isolates(self.graphical_model_)))}'
+                f')'
             )
 
-        return plot_graphical_model(self.partial_corrcoef_, **kwargs)
+        return plot_graphical_model(self.graphical_model_, **kwargs)
 
     def plot_partial_corrcoef(self, **kwargs):
         """Plot the partial correlation coefficient matrix.

@@ -234,6 +234,9 @@ class Pipeline(SKLearnPipeline):
         filepath : str, default None
             If provided, save the current figure.
 
+        pos : dict, default None
+            Dictionary with nodes as keys and positions as values.
+
         random_state : int, RandomState instance, default None
             Seed of the pseudo random number generator.
 
