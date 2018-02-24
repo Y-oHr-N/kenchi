@@ -129,9 +129,7 @@ class MiniBatchKMeans(BaseDetector):
             reassignment_ratio = self.reassignment_ratio,
             tol                = self.tol
         ).fit(X)
-        self.threshold_        = np.percentile(
-            self.anomaly_score(), 100. * (1. - self.contamination)
-        )
+        self.threshold_        = self._get_threshold()
 
         return self
 

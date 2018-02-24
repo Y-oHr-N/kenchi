@@ -124,9 +124,7 @@ class FastABOD(BaseDetector):
             p             = self.p,
             metric_params = self.metric_params
         ).fit(X)
-        self.threshold_   = np.percentile(
-            self.anomaly_score(), 100. * (1. - self.contamination)
-        )
+        self.threshold_   = self._get_threshold()
 
         return self
 

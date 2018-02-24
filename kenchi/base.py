@@ -71,6 +71,11 @@ class BaseDetector(BaseEstimator, ABC):
             Anomaly score for each sample.
         """
 
+    def _get_threshold(self):
+        return np.percentile(
+            self.anomaly_score(), 100. * (1. - self.contamination)
+        )
+
     def predict(self, X=None, threshold=None):
         """Predict if a particular sample is an outlier or not.
 
