@@ -110,27 +110,10 @@ class MiniBatchKMeans(BaseDetector):
         self.tol                = tol
 
     def check_params(self, X, y=None):
-        """Check validity of parameters and raise ValueError if not valid."""
-
         super().check_params(X)
 
     @timeit
     def fit(self, X, y=None):
-        """Fit the model according to the given training data.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Training data.
-
-        y : ignored
-
-        Returns
-        -------
-        self : MiniBatchKMeans
-            Return self.
-        """
-
         self.check_params(X)
 
         self.X_                = check_array(X, estimator=self)
@@ -153,20 +136,6 @@ class MiniBatchKMeans(BaseDetector):
         return self
 
     def anomaly_score(self, X=None):
-        """Compute the anomaly score for each sample.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features), default None
-            Data. If not provided, the anomaly score for each training sample
-            is returned.
-
-        Returns
-        -------
-        anomaly_score : array-like of shape (n_samples,)
-            Anomaly score for each sample.
-        """
-
         check_is_fitted(self, '_kmeans')
 
         if X is None:

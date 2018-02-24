@@ -159,27 +159,10 @@ class GMM(BaseDetector):
         self.weights_init    = weights_init
 
     def check_params(self, X, y=None):
-        """Check validity of parameters and raise ValueError if not valid."""
-
         super().check_params(X)
 
     @timeit
     def fit(self, X, y=None):
-        """Fit the model according to the given training data.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Training data.
-
-        y : ignored
-
-        Returns
-        -------
-        self : GMM
-            Return self.
-        """
-
         self.check_params(X)
 
         self.X_             = check_array(X, estimator=self)
@@ -204,20 +187,6 @@ class GMM(BaseDetector):
         return self
 
     def anomaly_score(self, X=None):
-        """Compute the anomaly score for each sample.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features), default None
-            Data. If None, the anomaly score for each training sample
-            is returned.
-
-        Returns
-        -------
-        anomaly_score : array-like of shape (n_samples,)
-            Anomaly score for each sample.
-        """
-
         check_is_fitted(self, '_gmm')
 
         if X is None:
@@ -326,27 +295,10 @@ class KDE(BaseDetector):
         self.metric_params = metric_params
 
     def check_params(self, X, y=None):
-        """Check validity of parameters and raise ValueError if not valid."""
-
         super().check_params(X)
 
     @timeit
     def fit(self, X, y=None):
-        """Fit the model according to the given training data.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Training data.
-
-        y : ignored
-
-        Returns
-        -------
-        self : KDE
-            Return self.
-        """
-
         self.check_params(X)
 
         self._kde         = KernelDensity(
@@ -367,20 +319,6 @@ class KDE(BaseDetector):
         return self
 
     def anomaly_score(self, X=None):
-        """Compute the anomaly score for each sample.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features), default None
-            Data. If None, the anomaly score for each training sample
-            is returned.
-
-        Returns
-        -------
-        anomaly_score : array-like of shape (n_samples,)
-            Anomaly score for each sample.
-        """
-
         check_is_fitted(self, '_kde')
 
         if X is None:
@@ -548,27 +486,10 @@ class SparseStructureLearning(BaseDetector):
         self.tol              = tol
 
     def check_params(self, X, y=None):
-        """Check validity of parameters and raise ValueError if not valid."""
-
         super().check_params(X)
 
     @timeit
     def fit(self, X, y=None):
-        """Fit the model according to the given training data.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Training Data.
-
-        y : ignored
-
-        Returns
-        -------
-        self : SparseStructureLearning
-            Return self.
-        """
-
         self.check_params(X)
 
         self.X_             = check_array(X, estimator=self)
@@ -586,20 +507,6 @@ class SparseStructureLearning(BaseDetector):
         return self
 
     def anomaly_score(self, X=None):
-        """Compute thre anomaly score for each sample.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features), default None
-            Data. If None, the anomaly score for each training sample is
-            returned.
-
-        Returns
-        -------
-        anomaly_score : array-like of shape (n_samples,)
-            Anomaly score for each sample.
-        """
-
         check_is_fitted(self, '_glasso')
 
         if X is None:

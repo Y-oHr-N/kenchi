@@ -10,6 +10,8 @@ __all__ = ['is_detector', 'BaseDetector']
 
 
 def is_detector(estimator):
+    """Return True if the given estimator is (probably) a outlier detector."""
+
     return getattr(estimator, '_estimator_type', None) == 'detector'
 
 
@@ -38,11 +40,36 @@ class BaseDetector(BaseEstimator, ABC):
 
     @abstractmethod
     def fit(self, X, y=None, **fit_params):
-        """Fit the model according to the given training data."""
+        """Fit the model according to the given training data.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Training data.
+
+        y : ignored
+
+        Returns
+        -------
+        self : object
+            Return self.
+        """
 
     @abstractmethod
     def anomaly_score(self, X=None):
-        """Compute the anomaly score for each sample."""
+        """Compute the anomaly score for each sample.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features), default None
+            Data. If not provided, the anomaly score for each training sample
+            is returned.
+
+        Returns
+        -------
+        anomaly_score : array-like of shape (n_samples,)
+            Anomaly score for each sample.
+        """
 
     def predict(self, X=None, threshold=None):
         """Predict if a particular sample is an outlier or not.

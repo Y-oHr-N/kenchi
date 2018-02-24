@@ -123,27 +123,10 @@ class PCA(BaseDetector):
         self.whiten         = whiten
 
     def check_params(self, X, y=None):
-        """Check validity of parameters and raise ValueError if not valid."""
-
         super().check_params(X)
 
     @timeit
     def fit(self, X, y=None):
-        """Fit the model according to the given training data.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Training data.
-
-        y : ignored
-
-        Returns
-        -------
-        self : PCA
-            Return self.
-        """
-
         self.check_params(X)
 
         self.X_            = check_array(X, estimator=self)
@@ -180,20 +163,6 @@ class PCA(BaseDetector):
         return self._pca.inverse_transform(self._pca.transform(X))
 
     def anomaly_score(self, X=None):
-        """Compute the anomaly score for each sample.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features), default None
-            Data. If not provided, the anomaly score for each training sample
-            is returned.
-
-        Returns
-        -------
-        anomaly_score : array-like of shape (n_samples,)
-            Anomaly score for each sample.
-        """
-
         return np.sqrt(np.sum(self.featurewise_anomaly_score(X), axis=1))
 
     def featurewise_anomaly_score(self, X=None):
