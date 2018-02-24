@@ -67,6 +67,9 @@ class FastABOD(BaseDetector):
     abof_max_ : float
         Maximum possible ABOF.
 
+    fit_time_ : float
+        Time spent for fitting in seconds.
+
     threshold_ : float
         Threshold.
 

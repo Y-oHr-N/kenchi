@@ -59,6 +59,9 @@ class MiniBatchKMeans(BaseDetector):
     cluster_centers_ : array-like of shape (n_clusters, n_features)
         Coordinates of cluster centers.
 
+    fit_time_ : float
+        Time spent for fitting in seconds.
+
     inertia_ : float
         Value of the inertia criterion associated with the chosen partition.
 

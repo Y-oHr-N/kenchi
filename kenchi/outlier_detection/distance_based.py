@@ -49,6 +49,9 @@ class KNN(BaseDetector):
 
     Attributes
     ----------
+    fit_time_ : float
+        Time spent for fitting in seconds.
+
     threshold_ : float
         Threshold.
 
@@ -178,6 +181,9 @@ class OneTimeSampling(BaseDetector):
 
     Attributes
     ----------
+    fit_time_ : float
+        Time spent for fitting in seconds.
+
     sampled_ : array-like of shape (n_samples,)
         Indices of subsamples.
 

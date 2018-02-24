@@ -72,6 +72,9 @@ class GMM(BaseDetector):
     covariances_ : array-like
         Covariance of each mixture component.
 
+    fit_time_ : float
+        Time spent for fitting in seconds.
+
     lower_bound_ : float
         Log-likelihood of the best fit of EM.
 
@@ -206,7 +209,7 @@ class GMM(BaseDetector):
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features), default None
-            Data. If not provided, the anomaly score for each training sample
+            Data. If None, the anomaly score for each training sample
             is returned.
 
         Returns
@@ -288,6 +291,9 @@ class KDE(BaseDetector):
 
     Attributes
     ----------
+    fit_time_ : float
+        Time spent for fitting in seconds.
+
     threshold_ : float
         Threshold.
 
@@ -366,7 +372,7 @@ class KDE(BaseDetector):
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features), default None
-            Data. If not provided, the anomaly score for each training sample
+            Data. If None, the anomaly score for each training sample
             is returned.
 
         Returns
@@ -444,6 +450,9 @@ class SparseStructureLearning(BaseDetector):
     ----------
     covariance_ : array-like of shape (n_features, n_features)
         Estimated covariance matrix.
+
+    fit_time_ : float
+        Time spent for fitting in seconds.
 
     labels_ : array-like of shape (n_features,)
         Label of each feature.
@@ -573,8 +582,8 @@ class SparseStructureLearning(BaseDetector):
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features), default None
-            Data. If not provided, the anomaly score for each training sample
-            is returned.
+            Data. If None, the anomaly score for each training sample is
+            returned.
 
         Returns
         -------
@@ -597,8 +606,8 @@ class SparseStructureLearning(BaseDetector):
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features), default None
-            Data. If not provided, the feature-wise anomaly scores for each
-            training sample are returned.
+            Data. If None, the feature-wise anomaly scores for each training
+            sample are returned.
 
         Returns
         -------
@@ -650,11 +659,11 @@ class SparseStructureLearning(BaseDetector):
         cmap : str or matplotlib Colormap, default 'Spectral'
             Colormap or Registered colormap name.
 
-        figsize: tuple, default None
+        figsize : tuple, default None
             Tuple denoting figure size of the plot.
 
         filepath : str, default None
-            If not None, save the current figure.
+            If provided, save the current figure.
 
         random_state : int, RandomState instance, default None
             Seed of the pseudo random number generator.
@@ -697,11 +706,11 @@ class SparseStructureLearning(BaseDetector):
         cmap : str or matplotlib Colormap, default 'RdBu'
             Colormap or Registered colormap name.
 
-        figsize: tuple, default None
+        figsize : tuple, default None
             Tuple denoting figure size of the plot.
 
         filepath : str, default None
-            If not None, save the current figure.
+            If provided, save the current figure.
 
         linecolor : str, default 'white'
             Color of the lines that will divide each cell.
