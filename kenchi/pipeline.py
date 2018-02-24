@@ -228,9 +228,6 @@ class Pipeline(SKLearnPipeline):
         ax : matplotlib Axes, default None
             Target axes instance.
 
-        cmap : str or matplotlib Colormap, default 'Spectral'
-            Colormap or Registered colormap name.
-
         figsize : tuple, default None
             Tuple denoting figure size of the plot.
 
@@ -267,19 +264,13 @@ class Pipeline(SKLearnPipeline):
         cbar : bool, default True.
             Whether to draw a colorbar.
 
-        cmap : str or matplotlib Colormap, default 'RdBu'
-            Colormap or Registered colormap name.
-
         figsize : tuple, default None
             Tuple denoting figure size of the plot.
 
         filepath : str, default None
             If provided, save the current figure.
 
-        linecolor : str, default 'white'
-            Color of the lines that will divide each cell.
-
-        linewidths : float, default 0.5
+        linewidth : float, default 0.1
             Width of the lines that will divide each cell.
 
         title : string, default 'Partial correlation'

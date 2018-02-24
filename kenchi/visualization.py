@@ -214,8 +214,8 @@ def plot_roc_curve(
 
 
 def plot_graphical_model(
-    partial_corrcoef, ax=None, cmap='Spectral', figsize=None,
-    filepath=None, random_state=None, title='GGM', **kwargs
+    partial_corrcoef, ax=None, figsize=None, filepath=None,
+    random_state=None, title='GGM', **kwargs
 ):
     """Plot the Gaussian Graphical Model (GGM).
 
@@ -226,9 +226,6 @@ def plot_graphical_model(
 
     ax : matplotlib Axes, default None
         Target axes instance.
-
-    cmap : str or matplotlib Colormap, default 'Spectral'
-        Colormap or Registered colormap name.
 
     figsize : tuple, default None
         Tuple denoting figure size of the plot.
@@ -277,11 +274,12 @@ def plot_graphical_model(
         ax.set_title(title)
 
     # Add the draw_networkx kwargs here
+    kwargs['cmap']      = 'Spectral'
     kwargs['node_size'] = np.array([10. * (d + 1.) for _, d in G.degree])
     kwargs['width']     = np.abs(tril.flat[tril.flat[:] != 0.])
 
     # Draw the Gaussian grapchical model
-    nx.draw_networkx(G, pos=pos, ax=ax, cmap=cmap, **kwargs)
+    nx.draw_networkx(G, pos=pos, ax=ax, **kwargs)
 
     # Turn off tick visibility
     ax.xaxis.set_tick_params(labelbottom=False, bottom=False)
@@ -294,9 +292,8 @@ def plot_graphical_model(
 
 
 def plot_partial_corrcoef(
-    partial_corrcoef, ax=None, cbar=True, cmap='RdBu',
-    figsize=None, filepath=None, linecolors='white', linewidths=0.5,
-    title='Partial correlation', **kwargs
+    partial_corrcoef, ax=None, cbar=True, figsize=None,
+    filepath=None, linewidth=0.1, title='Partial correlation', **kwargs
 ):
     """Plot the partial correlation coefficient matrix.
 
@@ -311,19 +308,13 @@ def plot_partial_corrcoef(
     cbar : bool, default True.
         Whether to draw a colorbar.
 
-    cmap : str or matplotlib Colormap, default 'RdBu'
-        Colormap or Registered colormap name.
-
     figsize : tuple, default None
         Tuple denoting figure size of the plot.
 
     filepath : str, default None
         If provided, save the current figure.
 
-    linecolor : str, default 'white'
-        Color of the lines that will divide each cell.
-
-    linewidths : float, default 0.5
+    linewidth : float, default 0.1
         Width of the lines that will divide each cell.
 
     title : string, default 'Partial correlation'
@@ -345,26 +336,26 @@ def plot_partial_corrcoef(
     import matplotlib.pyplot as plt
     from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-    partial_corrcoef = check_array(partial_corrcoef)
-    partial_corrcoef = check_symmetric(partial_corrcoef, raise_exception=True)
+    partial_corrcoef     = check_array(partial_corrcoef)
+    partial_corrcoef     = check_symmetric(
+        partial_corrcoef, raise_exception=True
+    )
 
     if ax is None:
-        _, ax        = plt.subplots(figsize=figsize)
+        _, ax            = plt.subplots(figsize=figsize)
 
     if title is not None:
         ax.set_title(title)
 
     # Add the pcolormesh kwargs here
-    kwargs['vmin']   = -1.
-    kwargs['vmax']   = 1.
+    kwargs['cmap']       = 'RdBu'
+    kwargs['edgecolors'] = 'white'
+    kwargs['vmin']       = -1.
+    kwargs['vmax']       = 1.
 
     # Draw the heatmap
-    mesh             = ax.pcolormesh(
-        np.ma.masked_equal(partial_corrcoef, 0.),
-        cmap         = cmap,
-        edgecolors   = linecolors,
-        linewidths   = linewidths,
-        **kwargs
+    mesh                 = ax.pcolormesh(
+        np.ma.masked_equal(partial_corrcoef, 0.), linewidth=linewidth, **kwargs
     )
 
     ax.set_aspect('equal')
@@ -375,8 +366,8 @@ def plot_partial_corrcoef(
 
     if cbar:
         # Create an axes on the right side of ax
-        divider      = make_axes_locatable(ax)
-        cax          = divider.append_axes('right', size='5%', pad=0.1)
+        divider          = make_axes_locatable(ax)
+        cax              = divider.append_axes('right', size='5%', pad=0.1)
 
         ax.figure.colorbar(mesh, cax=cax)
 
