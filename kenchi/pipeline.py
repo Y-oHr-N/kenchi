@@ -59,6 +59,13 @@ class Pipeline(SKLearnPipeline):
     def __iter__(self):
         return iter(self.named_steps)
 
+    def _pre_transform(self, X):
+        for _, transform in self.steps[:-1]:
+            if transform is not None:
+                X = transform.transform(X)
+
+        return X
+
     @if_delegate_has_method(delegate='_final_estimator')
     def anomaly_score(self, X=None):
         """Apply transforms, and compute the anomaly score for each sample with
@@ -77,9 +84,7 @@ class Pipeline(SKLearnPipeline):
         """
 
         if X is not None:
-            for _, transform in self.steps[:-1]:
-                if transform is not None:
-                    X = transform.transform(X)
+            X = self._pre_transform(X)
 
         return self._final_estimator.anomaly_score(X)
 
@@ -101,9 +106,7 @@ class Pipeline(SKLearnPipeline):
         """
 
         if X is not None:
-            for _, transform in self.steps[:-1]:
-                if transform is not None:
-                    X = transform.transform(X)
+            X = self._pre_transform(X)
 
         return self._final_estimator.featurewise_anomaly_score(X)
 
@@ -160,9 +163,7 @@ class Pipeline(SKLearnPipeline):
         """
 
         if X is not None:
-            for _, transform in self.steps[:-1]:
-                if transform is not None:
-                    X = transform.transform(X)
+            X = self._pre_transform(X)
 
         return self._final_estimator.plot_anomaly_score(X, **kwargs)
 
@@ -212,11 +213,9 @@ class Pipeline(SKLearnPipeline):
             Axes on which the plot was drawn.
         """
 
-        for _, transform in self.steps[:-1]:
-            if transform is not None:
-                X = transform.transform(X)
-
-        return self._final_estimator.plot_roc_curve(X, y, **kwargs)
+        return self._final_estimator.plot_roc_curve(
+            self._pre_transform(X), y, **kwargs
+        )
 
     @property
     def plot_graphical_model(self):
