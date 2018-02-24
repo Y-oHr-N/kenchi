@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.metrics import auc, roc_curve
+from sklearn.utils.validation import check_array, check_symmetric, column_or_1d
 
 __all__ = [
     'plot_anomaly_score',
@@ -78,6 +79,7 @@ def plot_anomaly_score(
     import matplotlib.pyplot as plt
     from mpl_toolkits.axes_grid1 import make_axes_locatable
 
+    anomaly_score = column_or_1d(anomaly_score)
     n_samples,    = anomaly_score.shape
     xlocs         = np.arange(n_samples)
 
@@ -256,12 +258,10 @@ def plot_graphical_model(
     import matplotlib.pyplot as plt
     import networkx as nx
 
-    if ax is None:
-        _, ax           = plt.subplots(figsize=figsize)
-
-    if title is not None:
-        ax.set_title(title)
-
+    partial_corrcoef    = check_array(partial_corrcoef)
+    partial_corrcoef    = check_symmetric(
+        partial_corrcoef, raise_exception=True
+    )
     tril                = np.tril(partial_corrcoef)
     G                   = nx.from_numpy_matrix(tril)
 
@@ -269,6 +269,12 @@ def plot_graphical_model(
         pos             = nx.nx_agraph.graphviz_layout(G)
     except ImportError:
         pos             = nx.spling_layout(G, random_state=random_state)
+
+    if ax is None:
+        _, ax           = plt.subplots(figsize=figsize)
+
+    if title is not None:
+        ax.set_title(title)
 
     # Add the draw_networkx kwargs here
     kwargs['node_size'] = np.array([10. * (d + 1.) for _, d in G.degree])
@@ -339,22 +345,25 @@ def plot_partial_corrcoef(
     import matplotlib.pyplot as plt
     from mpl_toolkits.axes_grid1 import make_axes_locatable
 
+    partial_corrcoef = check_array(partial_corrcoef)
+    partial_corrcoef = check_symmetric(partial_corrcoef, raise_exception=True)
+
     if ax is None:
-        _, ax      = plt.subplots(figsize=figsize)
+        _, ax        = plt.subplots(figsize=figsize)
 
     if title is not None:
         ax.set_title(title)
 
     # Add the pcolormesh kwargs here
-    kwargs['vmin'] = -1.
-    kwargs['vmax'] = 1.
+    kwargs['vmin']   = -1.
+    kwargs['vmax']   = 1.
 
     # Draw the heatmap
-    mesh           = ax.pcolormesh(
+    mesh             = ax.pcolormesh(
         np.ma.masked_equal(partial_corrcoef, 0.),
-        cmap       = cmap,
-        edgecolors = linecolors,
-        linewidths = linewidths,
+        cmap         = cmap,
+        edgecolors   = linecolors,
+        linewidths   = linewidths,
         **kwargs
     )
 
@@ -366,8 +375,8 @@ def plot_partial_corrcoef(
 
     if cbar:
         # Create an axes on the right side of ax
-        divider    = make_axes_locatable(ax)
-        cax        = divider.append_axes('right', size='5%', pad=0.1)
+        divider      = make_axes_locatable(ax)
+        cax          = divider.append_axes('right', size='5%', pad=0.1)
 
         ax.figure.colorbar(mesh, cax=cax)
 
