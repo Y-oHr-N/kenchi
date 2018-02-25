@@ -133,13 +133,13 @@ class BaseDetector(BaseEstimator, ABC):
         ax : matplotlib Axes, default None
             Target axes instance.
 
-        bins : int, str or array-like, default 'fd'
+        bins : int, str or array-like, default 'auto'
             Number of hist bins.
 
         figsize : tuple, default None
             Tuple denoting figure size of the plot.
 
-        filepath : str, default None
+        filename : str, default None
             If provided, save the current figure.
 
         grid : boolean, default True
@@ -193,7 +193,7 @@ class BaseDetector(BaseEstimator, ABC):
         figsize: tuple, default None
             Tuple denoting figure size of the plot.
 
-        filepath : str, default None
+        filename : str, default None
             If provided, save the current figure.
 
         grid : boolean, default True

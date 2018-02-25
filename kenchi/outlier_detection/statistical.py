@@ -571,7 +571,7 @@ class SparseStructureLearning(BaseDetector):
         figsize : tuple, default None
             Tuple denoting figure size of the plot.
 
-        filepath : str, default None
+        filename : str, default None
             If provided, save the current figure.
 
         pos : dict, default None
@@ -622,7 +622,7 @@ class SparseStructureLearning(BaseDetector):
         figsize : tuple, default None
             Tuple denoting figure size of the plot.
 
-        filepath : str, default None
+        filename : str, default None
             If provided, save the current figure.
 
         linewidth : float, default 0.1

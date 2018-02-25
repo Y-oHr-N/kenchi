@@ -123,13 +123,13 @@ class Pipeline(SKLearnPipeline):
         ax : matplotlib Axes, default None
             Target axes instance.
 
-        bins : int, str or array-like, default 'fd'
+        bins : int, str or array-like, default 'auto'
             Number of hist bins.
 
         figsize : tuple, default None
             Tuple denoting figure size of the plot.
 
-        filepath : str, default None
+        filename : str, default None
             If provided, save the current figure.
 
         grid : boolean, default True
@@ -186,7 +186,7 @@ class Pipeline(SKLearnPipeline):
         figsize: tuple, default None
             Tuple denoting figure size of the plot.
 
-        filepath : str, default None
+        filename : str, default None
             If provided, save the current figure.
 
         grid : boolean, default True
@@ -230,7 +230,7 @@ class Pipeline(SKLearnPipeline):
         figsize : tuple, default None
             Tuple denoting figure size of the plot.
 
-        filepath : str, default None
+        filename : str, default None
             If provided, save the current figure.
 
         pos : dict, default None
@@ -269,7 +269,7 @@ class Pipeline(SKLearnPipeline):
         figsize : tuple, default None
             Tuple denoting figure size of the plot.
 
-        filepath : str, default None
+        filename : str, default None
             If provided, save the current figure.
 
         linewidth : float, default 0.1

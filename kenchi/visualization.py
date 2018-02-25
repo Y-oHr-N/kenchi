@@ -15,8 +15,8 @@ __all__ = [
 
 
 def plot_anomaly_score(
-    anomaly_score, ax=None, bins='fd', figsize=None,
-    filepath=None, grid=True, hist=True, threshold=None,
+    anomaly_score, ax=None, bins='auto', figsize=None,
+    filename=None, grid=True, hist=True, threshold=None,
     title=None, xlabel='Samples', xlim=None, ylabel='Anomaly score',
     ylim=None, **kwargs
 ):
@@ -30,13 +30,13 @@ def plot_anomaly_score(
     ax : matplotlib Axes, default None
         Target axes instance.
 
-    bins : int, str or array-like, default 'fd'
+    bins : int, str or array-like, default 'auto'
         Number of hist bins.
 
     figsize : tuple, default None
         Tuple denoting figure size of the plot.
 
-    filepath : str, default None
+    filename : str, default None
         If provided, save the current figure.
 
     grid : bool, default True
@@ -122,15 +122,15 @@ def plot_anomaly_score(
             anomaly_score, bins=bins, density=True, orientation='horizontal'
         )
 
-    if filepath is not None:
-        ax.figure.savefig(filepath)
+    if filename is not None:
+        ax.figure.savefig(filename)
 
     return ax
 
 
 def plot_roc_curve(
     y_true, y_score, ax=None, figsize=None,
-    filepath=None, grid=True, label=None, title=None,
+    filename=None, grid=True, label=None, title=None,
     xlabel='FPR', ylabel='TPR', **kwargs
 ):
     """Plot the Receiver Operating Characteristic (ROC) curve.
@@ -149,7 +149,7 @@ def plot_roc_curve(
     figsize : tuple, default None
         Tuple denoting figure size of the plot.
 
-    filepath : str, default None
+    filename : str, default None
         If provided, save the current figure.
 
     grid : bool, default True
@@ -206,14 +206,14 @@ def plot_roc_curve(
     ax.plot(fpr, tpr, label=label, **kwargs)
     ax.legend(loc='lower right')
 
-    if filepath is not None:
-        ax.figure.savefig(filepath)
+    if filename is not None:
+        ax.figure.savefig(filename)
 
     return ax
 
 
 def plot_graphical_model(
-    graphical_model, ax=None, figsize=None, filepath=None,
+    graphical_model, ax=None, figsize=None, filename=None,
     pos=None, random_state=None, title='GGM', **kwargs
 ):
     """Plot the Gaussian Graphical Model (GGM).
@@ -229,7 +229,7 @@ def plot_graphical_model(
     figsize : tuple, default None
         Tuple denoting figure size of the plot.
 
-    filepath : str, default None
+    filename : str, default None
         If provided, save the current figure.
 
     pos : dict, default None
@@ -277,7 +277,7 @@ def plot_graphical_model(
         10. * (d + 1.) for _, d in graphical_model.degree
     ])
     kwargs['width']     = np.abs([
-        w for _, _, w in graphical_model.edges(data='weight')
+        10. * w for _, _, w in graphical_model.edges(data='weight')
     ])
 
     # Draw the Gaussian grapchical model
@@ -287,15 +287,15 @@ def plot_graphical_model(
     ax.xaxis.set_tick_params(labelbottom=False, bottom=False)
     ax.yaxis.set_tick_params(labelleft=False, left=False)
 
-    if filepath is not None:
-        ax.figure.savefig(filepath)
+    if filename is not None:
+        ax.figure.savefig(filename)
 
     return ax
 
 
 def plot_partial_corrcoef(
     partial_corrcoef, ax=None, cbar=True, figsize=None,
-    filepath=None, linewidth=0.1, title='Partial correlation', **kwargs
+    filename=None, linewidth=0.1, title='Partial correlation', **kwargs
 ):
     """Plot the partial correlation coefficient matrix.
 
@@ -313,7 +313,7 @@ def plot_partial_corrcoef(
     figsize : tuple, default None
         Tuple denoting figure size of the plot.
 
-    filepath : str, default None
+    filename : str, default None
         If provided, save the current figure.
 
     linewidth : float, default 0.1
@@ -373,7 +373,7 @@ def plot_partial_corrcoef(
 
         ax.figure.colorbar(mesh, cax=cax)
 
-    if filepath is not None:
-        ax.figure.savefig(filepath)
+    if filename is not None:
+        ax.figure.savefig(filename)
 
     return ax
