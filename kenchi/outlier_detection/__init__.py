@@ -2,7 +2,7 @@ from .angle_based import FastABOD
 from .clustering_based import MiniBatchKMeans
 from .distance_based import KNN, OneTimeSampling
 from .reconstruction_based import PCA
-from .statistical import GMM, KDE, SparseStructureLearning
+from .statistical import GMM, KDE, HBOS, SparseStructureLearning
 
 # TODO: Implement angle_based.ABOD class
 # TODO: Implement angle_based.LBABOD class
@@ -28,5 +28,6 @@ __all__ = [
     'PCA',
     'GMM',
     'KDE',
+    'HBOS',
     'SparseStructureLearning'
 ]

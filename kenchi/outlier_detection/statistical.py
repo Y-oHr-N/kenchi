@@ -11,7 +11,7 @@ from ..base import BaseDetector
 from ..utils import timeit
 from ..visualization import plot_graphical_model, plot_partial_corrcoef
 
-__all__ = ['GMM', 'KDE', 'SparseStructureLearning']
+__all__ = ['GMM', 'KDE', 'HBOS', 'SparseStructureLearning']
 
 
 class GMM(BaseDetector):
@@ -343,6 +343,63 @@ class KDE(BaseDetector):
         check_is_fitted(self, '_kde')
 
         return np.mean(self._kde.score_samples(X))
+
+
+class HBOS(BaseDetector):
+    """Histogram-based outlier detector."""
+
+    def __init__(self, contamination=0.01, verbose=False, n_bins='sqrt'):
+        super().__init__(contamination=contamination, verbose=verbose)
+
+        self.n_bins = n_bins
+
+    def check_params(self, X, y=None):
+        super().check_params(X)
+
+    def fit(self, X, y=None):
+        self.check_params(X)
+
+        self.X_               = check_array(X, estimator=self)
+        n_samples, n_features = self.X_.shape
+
+        if self.n_bins == 'sqrt':
+            n_bins = int(np.sqrt(n_samples))
+        else:
+            n_bins = self.n_bins
+
+        self.hist_ = np.empty((n_features, n_bins))
+        self.bins_ = np.empty((n_features, n_bins + 1))
+
+        for j in range(n_features):
+            self.hist_[j], self.bins_[j] = np.histogram(
+                self.X_[:, j], bins=n_bins, density=True
+            )
+
+        self.threshold_ = self._get_threshold()
+
+        return self
+
+    def anomaly_score(self, X=None):
+        return np.sum(self.featurewise_anomaly_score(X), axis=1)
+
+    def featurewise_anomaly_score(self, X=None):
+        check_is_fitted(self, ['hist_', 'bins_'])
+
+        if X is None:
+            X = self.X_
+        else:
+            raise NotImplementedError()
+
+        n_samples, n_features = X.shape
+        anomaly_score         = np.empty((n_samples, n_features))
+
+        for j in range(n_features):
+            ind                 = np.digitize(
+                X[:, j], self.bins_[j], right=True
+            )
+            anomaly_score[:, j] = -np.log(self.hist_[j, ind - 1])
+
+        return anomaly_score
 
 
 class SparseStructureLearning(BaseDetector):
