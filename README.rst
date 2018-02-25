@@ -32,6 +32,7 @@ Requirements
 -  networkx (>=2.0)
 -  numpy (>=1.14.0)
 -  pandas (>=0.22.0)
+-  pygraphviz (>=1.3.1)
 -  scikit-learn (>=0.19.1)
 -  scipy (>=1.0.0)
 
@@ -56,40 +57,17 @@ Usage
 .. code:: python
 
     import matplotlib.pyplot as plt
-    import numpy as np
     from kenchi.datasets import make_blobs
     from kenchi.outlier_detection import SparseStructureLearning
 
-    train_size       = 1000
-    test_size        = 250
-    n_outliers       = 10
-    n_features       = 25
-    centers          = np.zeros((1, n_features))
-
     # Generate the training data
-    X_train, y_train = make_blobs(
-        n_inliers    = train_size,
-        n_outliers   = 0,
-        n_features   = n_features,
-        centers      = centers,
-        random_state = 1
-    )
-
-    # Generate the test data that contains outliers
-    X_test, _        = make_blobs(
-        n_inliers    = test_size - n_outliers,
-        n_outliers   = n_outliers,
-        n_features   = n_features,
-        centers      = centers,
-        random_state = 2,
-        shuffle      = False
-    )
+    X, _ = make_blobs(centers=1, random_state=1)
 
     # Fit the model according to the given training data
-    det              = SparseStructureLearning().fit(X_train)
+    det  = SparseStructureLearning().fit(X)
 
     # Plot the anomaly score for each training sample
-    det.plot_anomaly_score(X_test, linestyle='', marker='.')
+    det.plot_anomaly_score(linestyle='', marker='.')
 
     plt.show()
 
