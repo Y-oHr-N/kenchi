@@ -3,13 +3,13 @@ from sklearn.decomposition import PCA as SKLearnPCA
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
-from ..base import BaseDetector
+from ..base import BaseOutlierDetector
 from ..utils import timeit
 
 __all__ = ['PCA']
 
 
-class PCA(BaseDetector):
+class PCA(BaseOutlierDetector):
     """Outlier detector using Principal Component Analysis (PCA).
 
     Parameters

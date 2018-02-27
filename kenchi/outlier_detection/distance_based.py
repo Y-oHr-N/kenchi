@@ -3,13 +3,13 @@ from sklearn.neighbors import DistanceMetric, NearestNeighbors
 from sklearn.utils import check_array, check_random_state
 from sklearn.utils.validation import check_is_fitted
 
-from ..base import BaseDetector
+from ..base import BaseOutlierDetector
 from ..utils import timeit
 
 __all__ = ['KNN', 'OneTimeSampling']
 
 
-class KNN(BaseDetector):
+class KNN(BaseOutlierDetector):
     """Outlier detector using k-nearest neighbors algorithm.
 
     Parameters
@@ -123,7 +123,7 @@ class KNN(BaseDetector):
             return np.max(dist, axis=1)
 
 
-class OneTimeSampling(BaseDetector):
+class OneTimeSampling(BaseOutlierDetector):
     """One-time sampling.
 
     Parameters

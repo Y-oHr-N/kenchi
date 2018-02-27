@@ -6,7 +6,7 @@ from sklearn.externals.joblib import delayed, Parallel
 from sklearn.utils import check_array, gen_even_slices
 from sklearn.utils.validation import check_is_fitted
 
-from ..base import BaseDetector
+from ..base import BaseOutlierDetector
 from ..utils import timeit
 
 __all__ = ['FastABOD']
@@ -28,7 +28,7 @@ def _approximate_abof(X, X_train, neigh_ind):
         ], axis=1)
 
 
-class FastABOD(BaseDetector):
+class FastABOD(BaseOutlierDetector):
     """Fast Angle-Based Outlier Detector (FastABOD).
 
     Parameters

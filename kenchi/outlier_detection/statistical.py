@@ -7,14 +7,14 @@ from sklearn.neighbors import KernelDensity
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
-from ..base import BaseDetector
+from ..base import BaseOutlierDetector
 from ..utils import timeit
 from ..visualization import plot_graphical_model, plot_partial_corrcoef
 
 __all__ = ['GMM', 'KDE', 'SparseStructureLearning']
 
 
-class GMM(BaseDetector):
+class GMM(BaseOutlierDetector):
     """Outlier detector using Gaussian Mixture Models (GMMs).
 
     Parameters
@@ -215,7 +215,7 @@ class GMM(BaseDetector):
         return self._gmm.score(X)
 
 
-class KDE(BaseDetector):
+class KDE(BaseOutlierDetector):
     """Outlier detector using Kernel Density Estimation (KDE).
 
     Parameters
@@ -345,7 +345,7 @@ class KDE(BaseDetector):
         return np.mean(self._kde.score_samples(X))
 
 
-class SparseStructureLearning(BaseDetector):
+class SparseStructureLearning(BaseOutlierDetector):
     """Outlier detector using sparse structure learning.
 
     Parameters

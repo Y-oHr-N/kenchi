@@ -3,13 +3,13 @@ from sklearn.cluster import MiniBatchKMeans as SKLearnMiniBatchKMeans
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
-from ..base import BaseDetector
+from ..base import BaseOutlierDetector
 from ..utils import timeit
 
 __all__ = ['MiniBatchKMeans']
 
 
-class MiniBatchKMeans(BaseDetector):
+class MiniBatchKMeans(BaseOutlierDetector):
     """Outlier detector using K-means clustering.
 
     Parameters

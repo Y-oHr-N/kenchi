@@ -6,22 +6,33 @@ from sklearn.utils.validation import check_is_fitted, check_X_y
 
 from .visualization import plot_anomaly_score, plot_roc_curve
 
-__all__ = ['is_detector', 'BaseDetector']
+__all__ = ['is_outlier_detector', 'BaseOutlierDetector']
 
 
-def is_detector(estimator):
-    """Return True if the given estimator is (probably) a outlier detector."""
+def is_outlier_detector(estimator):
+    """Return True if the given estimator is (probably) an outlier detector.
 
-    return getattr(estimator, '_estimator_type', None) == 'detector'
+    Parameters
+    ----------
+    estimator : object
+        Estimator object to test.
+
+    Returns
+    -------
+    out : bool
+        True if estimator is an outlier detector and False otherwise.
+    """
+
+    return getattr(estimator, '_estimator_type', None) == 'outlier_detector'
 
 
-class BaseDetector(BaseEstimator, ABC):
-    """Base class for all outlier detectors."""
+class BaseOutlierDetector(BaseEstimator, ABC):
+    """Base class for all outlier detectors in kenchi."""
 
     # TODO: Update anomaly_score method so that the normalized score can be
     # computed
 
-    _estimator_type = 'detector'
+    _estimator_type = 'outlier_detector'
 
     @abstractmethod
     def __init__(self, contamination=0.01, verbose=False):
