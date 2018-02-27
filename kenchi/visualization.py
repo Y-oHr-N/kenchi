@@ -258,12 +258,9 @@ def plot_graphical_model(
     import networkx as nx
 
     if pos is None:
-        try:
-            pos         = nx.nx_agraph.graphviz_layout(graphical_model)
-        except ImportError:
-            pos         = nx.spling_layout(
-                graphical_model, random_state=random_state
-            )
+        pos             = nx.spring_layout(
+            graphical_model, random_state=random_state
+        )
 
     if ax is None:
         _, ax           = plt.subplots(figsize=figsize)

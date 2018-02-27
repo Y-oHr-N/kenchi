@@ -32,7 +32,6 @@ Requirements
 -  networkx (>=2.0)
 -  numpy (>=1.14.0)
 -  pandas (>=0.22.0)
--  pygraphviz (>=1.3.1)
 -  scikit-learn (>=0.19.1)
 -  scipy (>=1.0.0)
 
