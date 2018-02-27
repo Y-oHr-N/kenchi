@@ -40,16 +40,6 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         self.verbose       = verbose
 
     @abstractmethod
-    def check_params(self, X, y=None):
-        """Check validity of parameters and raise ValueError if not valid."""
-
-        if not 0. <= self.contamination <= 0.5:
-            raise ValueError(
-                f'contamination must be between 0.0 and 0.5 inclusive '
-                f'but was {self.contamination}'
-            )
-
-    @abstractmethod
     def fit(self, X, y=None, **fit_params):
         """Fit the model according to the given training data.
 
@@ -82,7 +72,18 @@ class BaseOutlierDetector(BaseEstimator, ABC):
             Anomaly score for each sample.
         """
 
+    def _check_params(self):
+        """Check validity of parameters and raise ValueError if not valid."""
+
+        if not 0. <= self.contamination <= 0.5:
+            raise ValueError(
+                f'contamination must be between 0.0 and 0.5 inclusive '
+                f'but was {self.contamination}'
+            )
+
     def _get_threshold(self):
+        """Define the threshold according to the given training data."""
+
         return np.percentile(
             self.anomaly_score(), 100. * (1. - self.contamination)
         )

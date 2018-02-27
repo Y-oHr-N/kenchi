@@ -109,14 +109,10 @@ class MiniBatchKMeans(BaseOutlierDetector):
         self.reassignment_ratio = reassignment_ratio
         self.tol                = tol
 
-    def check_params(self, X, y=None):
-        super().check_params(X)
-
     @timeit
     def fit(self, X, y=None):
-        self.check_params(X)
+        self._check_params()
 
-        self.X_                = check_array(X, estimator=self)
         self._kmeans           = SKLearnMiniBatchKMeans(
             batch_size         = self.batch_size,
             init               = self.init,
@@ -129,6 +125,7 @@ class MiniBatchKMeans(BaseOutlierDetector):
             reassignment_ratio = self.reassignment_ratio,
             tol                = self.tol
         ).fit(X)
+        self.X_                = check_array(X, estimator=self)
         self.threshold_        = self._get_threshold()
 
         return self

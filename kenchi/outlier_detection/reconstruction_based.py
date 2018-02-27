@@ -122,14 +122,10 @@ class PCA(BaseOutlierDetector):
         self.tol            = tol
         self.whiten         = whiten
 
-    def check_params(self, X, y=None):
-        super().check_params(X)
-
     @timeit
     def fit(self, X, y=None):
-        self.check_params(X)
+        self._check_params()
 
-        self.X_            = check_array(X, estimator=self)
         self._pca          = SKLearnPCA(
             iterated_power = self.iterated_power,
             n_components   = self.n_components,
@@ -138,6 +134,7 @@ class PCA(BaseOutlierDetector):
             tol            = self.tol,
             whiten         = self.whiten
         ).fit(X)
+        self.X_            = check_array(X, estimator=self)
         self.threshold_    = self._get_threshold()
 
         return self

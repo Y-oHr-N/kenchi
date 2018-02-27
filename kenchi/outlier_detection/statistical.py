@@ -158,14 +158,10 @@ class GMM(BaseOutlierDetector):
         self.warm_start      = warm_start
         self.weights_init    = weights_init
 
-    def check_params(self, X, y=None):
-        super().check_params(X)
-
     @timeit
     def fit(self, X, y=None):
-        self.check_params(X)
+        self._check_params()
 
-        self.X_             = check_array(X, estimator=self)
         self._gmm           = GaussianMixture(
             covariance_type = self.covariance_type,
             init_params     = self.init_params,
@@ -180,6 +176,7 @@ class GMM(BaseOutlierDetector):
             warm_start      = self.warm_start,
             weights_init    = self.weights_init
         ).fit(X)
+        self.X_             = check_array(X, estimator=self)
         self.threshold_     = self._get_threshold()
 
         return self
@@ -292,12 +289,9 @@ class KDE(BaseOutlierDetector):
         self.rtol          = rtol
         self.metric_params = metric_params
 
-    def check_params(self, X, y=None):
-        super().check_params(X)
-
     @timeit
     def fit(self, X, y=None):
-        self.check_params(X)
+        self._check_params()
 
         self._kde         = KernelDensity(
             algorithm     = self.algorithm,
@@ -481,14 +475,10 @@ class SparseStructureLearning(BaseOutlierDetector):
         self.mode             = mode
         self.tol              = tol
 
-    def check_params(self, X, y=None):
-        super().check_params(X)
-
     @timeit
     def fit(self, X, y=None):
-        self.check_params(X)
+        self._check_params()
 
-        self.X_             = check_array(X, estimator=self)
         self._glasso        = GraphLasso(
             alpha           = self.alpha,
             assume_centered = self.assume_centered,
@@ -497,6 +487,7 @@ class SparseStructureLearning(BaseOutlierDetector):
             mode            = self.mode,
             tol             = self.tol
         ).fit(X)
+        self.X_             = check_array(X, estimator=self)
         df, loc, scale      = chi2.fit(self.anomaly_score())
         self.threshold_     = chi2.ppf(1. - self.contamination, df, loc, scale)
 

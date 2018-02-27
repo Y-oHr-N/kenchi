@@ -92,12 +92,9 @@ class KNN(BaseOutlierDetector):
         self.weight        = weight
         self.metric_params = metric_params
 
-    def check_params(self, X, y=None):
-        super().check_params(X)
-
     @timeit
     def fit(self, X, y=None):
-        self.check_params(X)
+        self._check_params()
 
         self._knn         = NearestNeighbors(
             algorithm     = self.algorithm,
@@ -187,28 +184,26 @@ class OneTimeSampling(BaseOutlierDetector):
         self.random_state  = random_state
         self.metric_params = metric_params
 
-    def check_params(self, X, y=None):
-        super().check_params(X)
-
-        n_samples, _ = X.shape
+    def _check_params(self):
+        super()._check_params()
 
         if self.n_samples <= 0:
             raise ValueError(
                 f'n_samples must be positive but was {self.n_samples}'
             )
 
+    @timeit
+    def fit(self, X, y=None):
+        self._check_params()
+
+        self.X_           = check_array(X, estimator=self)
+        n_samples, _      = self.X_.shape
+
         if self.n_samples >= n_samples:
             raise ValueError(
                 f'n_samples must be smaller than {n_samples} '
                 f'but was {self.n_samples}'
             )
-
-    @timeit
-    def fit(self, X, y=None):
-        self.check_params(X)
-
-        self.X_           = check_array(X, estimator=self)
-        n_samples, _      = self.X_.shape
 
         rnd               = check_random_state(self.random_state)
         self.sampled_     = rnd.choice(

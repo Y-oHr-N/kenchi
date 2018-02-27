@@ -108,12 +108,9 @@ class FastABOD(BaseOutlierDetector):
         self.p             = p
         self.metric_params = metric_params
 
-    def check_params(self, X, y=None):
-        super().check_params(X)
-
     @timeit
     def fit(self, X, y=None):
-        self.check_params(X)
+        self._check_params()
 
         self._knn         = NearestNeighbors(
             algorithm     = self.algorithm,
