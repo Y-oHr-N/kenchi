@@ -1,8 +1,8 @@
-from .angle_based import *
-from .clustering_based import *
-from .distance_based import *
-from .reconstruction_based import *
-from .statistical import *
+from .angle_based import * # noqa
+from .clustering_based import * # noqa
+from .distance_based import * # noqa
+from .reconstruction_based import * # noqa
+from .statistical import * # noqa
 
 # TODO: Implement angle_based.ABOD class
 # TODO: Implement angle_based.LBABOD class
