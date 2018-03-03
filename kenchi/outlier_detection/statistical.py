@@ -1,5 +1,4 @@
 import numpy as np
-from scipy.stats import chi2
 from sklearn.cluster import affinity_propagation
 from sklearn.covariance import GraphLasso
 from sklearn.mixture import GaussianMixture
@@ -488,8 +487,7 @@ class SparseStructureLearning(BaseOutlierDetector):
             tol             = self.tol
         ).fit(X)
         self.X_             = check_array(X, estimator=self)
-        df, loc, scale      = chi2.fit(self.anomaly_score())
-        self.threshold_     = chi2.ppf(1. - self.contamination, df, loc, scale)
+        self.threshold_     = self._get_threshold()
 
         return self
 
@@ -501,7 +499,7 @@ class SparseStructureLearning(BaseOutlierDetector):
         else:
             X = check_array(X, estimator=self)
 
-        return self._glasso.mahalanobis(X)
+        return np.sqrt(self._glasso.mahalanobis(X))
 
     def featurewise_anomaly_score(self, X=None):
         """Compute the feature-wise anomaly scores for each sample.
