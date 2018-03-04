@@ -45,6 +45,9 @@ class PCA(BaseOutlierDetector):
 
     Attributes
     ----------
+    anomaly_score_ : array-like of shape (n_samples,)
+        Anomaly score for each training data.
+
     components_ : array-like of shape (n_components, n_features)
         Principal axes in feature space, representing the directions of maximum
         variance in the data.
@@ -73,9 +76,6 @@ class PCA(BaseOutlierDetector):
 
     threshold_ : float
         Threshold.
-
-    X_ : array-like of shape (n_samples, n_features)
-        Training data.
     """
 
     @property
@@ -126,16 +126,16 @@ class PCA(BaseOutlierDetector):
     def fit(self, X, y=None):
         self._check_params()
 
-        self._pca          = SKLearnPCA(
-            iterated_power = self.iterated_power,
-            n_components   = self.n_components,
-            random_state   = self.random_state,
-            svd_solver     = self.svd_solver,
-            tol            = self.tol,
-            whiten         = self.whiten
+        self._pca           = SKLearnPCA(
+            iterated_power  = self.iterated_power,
+            n_components    = self.n_components,
+            random_state    = self.random_state,
+            svd_solver      = self.svd_solver,
+            tol             = self.tol,
+            whiten          = self.whiten
         ).fit(X)
-        self.X_            = check_array(X, estimator=self)
-        self.threshold_    = self._get_threshold()
+        self.anomaly_score_ = self.anomaly_score(X)
+        self.threshold_     = self._get_threshold()
 
         return self
 
@@ -157,17 +157,16 @@ class PCA(BaseOutlierDetector):
 
         return self._pca.inverse_transform(self._pca.transform(X))
 
-    def anomaly_score(self, X=None):
+    def anomaly_score(self, X):
         return np.sqrt(np.sum(self.featurewise_anomaly_score(X), axis=1))
 
-    def featurewise_anomaly_score(self, X=None):
+    def featurewise_anomaly_score(self, X):
         """Compute the feature-wise anomaly scores for each sample.
 
         Parameters
         ----------
-        X : array-like of shape (n_samples, n_features), default None
-            Data. If not provided, the feature-wise anomaly scores for each
-            training sample are returned.
+        X : array-like of shape (n_samples, n_features)
+            Data.
 
         Returns
         -------
@@ -177,10 +176,7 @@ class PCA(BaseOutlierDetector):
 
         check_is_fitted(self, '_pca')
 
-        if X is None:
-            X = self.X_
-        else:
-            X = check_array(X, estimator=self)
+        X = check_array(X, estimator=self)
 
         return (X - self.reconstruct(X)) ** 2
 

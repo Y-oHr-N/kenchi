@@ -49,6 +49,9 @@ class KNN(BaseOutlierDetector):
 
     Attributes
     ----------
+    anomaly_score_ : array-like of shape (n_samples,)
+        Anomaly score for each training data.
+
     fit_time_ : float
         Time spent for fitting in seconds.
 
@@ -96,23 +99,29 @@ class KNN(BaseOutlierDetector):
     def fit(self, X, y=None):
         self._check_params()
 
-        self._knn         = NearestNeighbors(
-            algorithm     = self.algorithm,
-            leaf_size     = self.leaf_size,
-            metric        = self.metric,
-            n_jobs        = self.n_jobs,
-            n_neighbors   = self.n_neighbors,
-            p             = self.p,
-            metric_params = self.metric_params
+        self._knn           = NearestNeighbors(
+            algorithm       = self.algorithm,
+            leaf_size       = self.leaf_size,
+            metric          = self.metric,
+            n_jobs          = self.n_jobs,
+            n_neighbors     = self.n_neighbors,
+            p               = self.p,
+            metric_params   = self.metric_params
         ).fit(X)
-        self.threshold_   = self._get_threshold()
+        self.anomaly_score_ = self.anomaly_score(X)
+        self.threshold_     = self._get_threshold()
 
         return self
 
-    def anomaly_score(self, X=None):
+    def anomaly_score(self, X):
         check_is_fitted(self, '_knn')
 
-        dist, _ = self._knn.kneighbors(X)
+        X           = check_array(X, estimator=self)
+
+        if np.array_equal(X, self.X_):
+            dist, _ = self._knn.kneighbors()
+        else:
+            dist, _ = self._knn.kneighbors(X)
 
         if self.weight:
             return np.sum(dist, axis=1)
@@ -145,6 +154,9 @@ class OneTimeSampling(BaseOutlierDetector):
 
     Attributes
     ----------
+    anomaly_score_ : array-like of shape (n_samples,)
+        Anomaly score for each training data.
+
     fit_time_ : float
         Time spent for fitting in seconds.
 
@@ -196,8 +208,8 @@ class OneTimeSampling(BaseOutlierDetector):
     def fit(self, X, y=None):
         self._check_params()
 
-        self.X_           = check_array(X, estimator=self)
-        n_samples, _      = self.X_.shape
+        self.X_             = check_array(X, estimator=self)
+        n_samples, _        = self.X_.shape
 
         if self.n_samples >= n_samples:
             raise ValueError(
@@ -205,33 +217,31 @@ class OneTimeSampling(BaseOutlierDetector):
                 f'but was {self.n_samples}'
             )
 
-        rnd               = check_random_state(self.random_state)
-        self.sampled_     = rnd.choice(
+        rnd                 = check_random_state(self.random_state)
+        self.sampled_       = rnd.choice(
             n_samples, size=self.n_samples, replace=False
         )
 
         # sort again as choice does not guarantee sorted order
-        self.sampled_     = np.sort(self.sampled_)
+        self.sampled_       = np.sort(self.sampled_)
 
         if self.metric_params is None:
-            metric_params = {}
+            metric_params   = {}
         else:
-            metric_params = self.metric_params
+            metric_params   = self.metric_params
 
-        self._metric      = DistanceMetric.get_metric(
+        self._metric        = DistanceMetric.get_metric(
             self.metric, **metric_params
         )
 
-        self.threshold_   = self._get_threshold()
+        self.anomaly_score_ = self.anomaly_score(X)
+        self.threshold_     = self._get_threshold()
 
         return self
 
-    def anomaly_score(self, X=None):
+    def anomaly_score(self, X):
         check_is_fitted(self, '_metric')
 
-        if X is None:
-            X = self.X_
-        else:
-            X = check_array(X, estimator=self)
+        X = check_array(X, estimator=self)
 
         return np.min(self._metric.pairwise(X, self.X_sampled_), axis=1)

@@ -16,10 +16,9 @@ import matplotlib.pyplot as plt
 
 class MiniBatchKMeansTest(unittest.TestCase):
     def setUp(self):
-        self.X_train, _          = make_blobs(random_state=1)
-        self.X_test, self.y_test = make_blobs(random_state=2)
-        self.sut                 = MiniBatchKMeans()
-        _, self.ax               = plt.subplots()
+        self.X, self.y = make_blobs(random_state=1)
+        self.sut       = MiniBatchKMeans()
+        _, self.ax     = plt.subplots()
 
     def tearDown(self):
         plt.close()
@@ -28,38 +27,34 @@ class MiniBatchKMeansTest(unittest.TestCase):
         self.assertIsNone(check_estimator(self.sut))
 
     def test_fit(self):
-        self.assertIsInstance(self.sut.fit(self.X_train), MiniBatchKMeans)
+        self.assertIsInstance(self.sut.fit(self.X), MiniBatchKMeans)
 
     def test_fit_predict(self):
-        self.assertIsInstance(self.sut.fit_predict(self.X_train), np.ndarray)
+        self.assertIsInstance(self.sut.fit_predict(self.X), np.ndarray)
 
     def test_anomaly_score_notfitted(self):
         with self.assertRaises(NotFittedError):
-            self.sut.anomaly_score(self.X_train)
+            self.sut.anomaly_score(self.X)
 
     def test_predict_notfitted(self):
         with self.assertRaises(NotFittedError):
-            self.sut.predict(self.X_train)
+            self.sut.predict(self.X)
 
     def test_score(self):
-        self.assertIsInstance(
-            self.sut.fit(self.X_train).score(self.X_test), float
-        )
+        self.assertIsInstance(self.sut.fit(self.X).score(self.X), float)
 
     def test_score_notfitted(self):
         with self.assertRaises(NotFittedError):
-            self.sut.score(self.X_train)
+            self.sut.score(self.X)
 
     def test_plot_anomaly_score(self):
         self.assertIsInstance(
-            self.sut.fit(self.X_train).plot_anomaly_score(ax=self.ax),
+            self.sut.fit(self.X).plot_anomaly_score(self.X, ax=self.ax),
             matplotlib.axes.Axes
         )
 
     def test_plot_roc_curve(self):
         self.assertIsInstance(
-            self.sut.fit(
-                self.X_train
-            ).plot_roc_curve(self.X_test, self.y_test, ax=self.ax),
+            self.sut.fit(self.X).plot_roc_curve(self.X, self.y, ax=self.ax),
             matplotlib.axes.Axes
         )

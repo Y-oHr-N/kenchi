@@ -64,6 +64,9 @@ class FastABOD(BaseOutlierDetector):
 
     Attributes
     ----------
+    anomaly_score_ : array-like of shape (n_samples,)
+        Anomaly score for each training data.
+
     abof_max_ : float
         Maximum possible ABOF.
 
@@ -112,32 +115,32 @@ class FastABOD(BaseOutlierDetector):
     def fit(self, X, y=None):
         self._check_params()
 
-        self._knn         = NearestNeighbors(
-            algorithm     = self.algorithm,
-            leaf_size     = self.leaf_size,
-            metric        = self.metric,
-            n_jobs        = self.n_jobs,
-            n_neighbors   = self.n_neighbors,
-            p             = self.p,
-            metric_params = self.metric_params
+        self._knn           = NearestNeighbors(
+            algorithm       = self.algorithm,
+            leaf_size       = self.leaf_size,
+            metric          = self.metric,
+            n_jobs          = self.n_jobs,
+            n_neighbors     = self.n_neighbors,
+            p               = self.p,
+            metric_params   = self.metric_params
         ).fit(X)
-        self.threshold_   = self._get_threshold()
+        self.anomaly_score_ = self.anomaly_score(X)
+        self.threshold_     = self._get_threshold()
 
         return self
 
-    def anomaly_score(self, X=None):
+    def anomaly_score(self, X):
         check_is_fitted(self, '_knn')
 
-        if X is None:
+        X                  = check_array(X, estimator=self)
+        n_samples, _       = X.shape
+
+        if np.array_equal(X, self.X_):
             query_is_train = True
-            X              = self.X_
-            neigh_ind      = self._knn.kneighbors(None, return_distance=False)
+            neigh_ind      = self._knn.kneighbors(return_distance=False)
         else:
             query_is_train = False
-            X              = check_array(X, estimator=self)
             neigh_ind      = self._knn.kneighbors(X, return_distance=False)
-
-        n_samples, _       = X.shape
 
         result             = Parallel(n_jobs=self.n_jobs)(
             delayed(_approximate_abof)(

@@ -57,14 +57,13 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         """
 
     @abstractmethod
-    def anomaly_score(self, X=None):
+    def anomaly_score(self, X):
         """Compute the anomaly score for each sample.
 
         Parameters
         ----------
-        X : array-like of shape (n_samples, n_features), default None
-            Data. If not provided, the anomaly score for each training sample
-            is returned.
+        X : array-like of shape (n_samples, n_features)
+            Data.
 
         Returns
         -------
@@ -85,16 +84,16 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         """Define the threshold according to the given training data."""
 
         return np.percentile(
-            self.anomaly_score(), 100. * (1. - self.contamination)
+            self.anomaly_score_, 100. * (1. - self.contamination)
         )
 
-    def predict(self, X=None, threshold=None):
+    def predict(self, X, threshold=None):
         """Predict if a particular sample is an outlier or not.
 
         Parameters
         ----------
-        X : array-like of shape (n_samples, n_features), default None
-            Data. If None, Labels on the given training data are returned.
+        X : array-like of shape (n_samples, n_features)
+            Data.
 
         threshold : float, default None
             User-provided threshold.
@@ -132,15 +131,15 @@ class BaseOutlierDetector(BaseEstimator, ABC):
             Return 1 for inliers and -1 for outliers.
         """
 
-        return self.fit(X, **fit_params).predict(threshold=threshold)
+        return self.fit(X, **fit_params).predict(X, threshold=threshold)
 
-    def plot_anomaly_score(self, X=None, **kwargs):
+    def plot_anomaly_score(self, X, **kwargs):
         """Plot the anomaly score for each sample.
 
         Parameters
         ----------
-        X : array-like of shape (n_samples, n_features), default None
-            Data. If None, plot the anomaly score for each training samples.
+        X : array-like of shape (n_samples, n_features)
+            Data.
 
         ax : matplotlib Axes, default None
             Target axes instance.

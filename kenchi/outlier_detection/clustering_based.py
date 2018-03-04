@@ -56,6 +56,9 @@ class MiniBatchKMeans(BaseOutlierDetector):
 
     Attributes
     ----------
+    anomaly_score_ : array-like of shape (n_samples,)
+        Anomaly score for each training data.
+
     cluster_centers_ : array-like of shape (n_clusters, n_features)
         Coordinates of cluster centers.
 
@@ -70,9 +73,6 @@ class MiniBatchKMeans(BaseOutlierDetector):
 
     threshold_ : float
         Threshold.
-
-    X_ : array-like of shape (n_samples, n_features)
-        Training data.
     """
 
     @property
@@ -125,18 +125,13 @@ class MiniBatchKMeans(BaseOutlierDetector):
             reassignment_ratio = self.reassignment_ratio,
             tol                = self.tol
         ).fit(X)
-        self.X_                = check_array(X, estimator=self)
+        self.anomaly_score_    = self.anomaly_score(X)
         self.threshold_        = self._get_threshold()
 
         return self
 
-    def anomaly_score(self, X=None):
+    def anomaly_score(self, X):
         check_is_fitted(self, '_kmeans')
-
-        if X is None:
-            X = self.X_
-        else:
-            X = check_array(X, estimator=self)
 
         return np.min(self._kmeans.transform(X), axis=1)
 

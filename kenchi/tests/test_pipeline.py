@@ -16,47 +16,44 @@ import matplotlib.pyplot as plt
 
 class PipelineTest(unittest.TestCase):
     def setUp(self):
-        self.X_train, _          = make_blobs(centers=1, random_state=1)
-        self.X_test, self.y_test = make_blobs(random_state=2)
-        self.sut                 = Pipeline([
+        self.X, self.y = make_blobs(centers=1, random_state=1)
+        self.sut       = Pipeline([
             ('standardize', StandardScaler()),
             ('detect',      SparseStructureLearning(assume_centered=True))
         ])
-        _, self.ax               = plt.subplots()
+        _, self.ax     = plt.subplots()
 
     def tearDown(self):
         plt.close()
 
     def test_anomaly_score_notfitted(self):
         with self.assertRaises(NotFittedError):
-            self.sut.anomaly_score(self.X_train)
+            self.sut.anomaly_score(self.X)
 
     def test_featurewise_anomaly_score_notfitted(self):
         with self.assertRaises(NotFittedError):
-            self.sut.featurewise_anomaly_score(self.X_train)
+            self.sut.featurewise_anomaly_score(self.X)
 
     def test_plot_anomaly_score(self):
         self.assertIsInstance(
-            self.sut.fit(self.X_train).plot_anomaly_score(ax=self.ax),
+            self.sut.fit(self.X).plot_anomaly_score(self.X, ax=self.ax),
             matplotlib.axes.Axes
         )
 
     def test_plot_roc_curve(self):
         self.assertIsInstance(
-            self.sut.fit(
-                self.X_train
-            ).plot_roc_curve(self.X_test, self.y_test, ax=self.ax),
+            self.sut.fit(self.X).plot_roc_curve(self.X, self.y, ax=self.ax),
             matplotlib.axes.Axes
         )
 
     def test_plot_graphical_model(self):
         self.assertIsInstance(
-            self.sut.fit(self.X_train).plot_graphical_model(ax=self.ax),
+            self.sut.fit(self.X).plot_graphical_model(ax=self.ax),
             matplotlib.axes.Axes
         )
 
     def test_plot_partial_corrcoef(self):
         self.assertIsInstance(
-            self.sut.fit(self.X_train).plot_partial_corrcoef(ax=self.ax),
+            self.sut.fit(self.X).plot_partial_corrcoef(ax=self.ax),
             matplotlib.axes.Axes
         )

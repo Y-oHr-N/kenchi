@@ -65,6 +65,9 @@ class GMM(BaseOutlierDetector):
 
     Attributes
     ----------
+    anomaly_score_ : array-like of shape (n_samples,)
+        Anomaly score for each training data.
+
     converged_ : bool
         True when convergence was reached in `fit`, False otherwise.
 
@@ -95,9 +98,6 @@ class GMM(BaseOutlierDetector):
 
     weights_ : array-like of shape (n_components,)
         Weight of each mixture components.
-
-    X_ : array-like of shape (n_samples, n_features)
-        Training data.
     """
 
     @property
@@ -175,18 +175,13 @@ class GMM(BaseOutlierDetector):
             warm_start      = self.warm_start,
             weights_init    = self.weights_init
         ).fit(X)
-        self.X_             = check_array(X, estimator=self)
+        self.anomaly_score_ = self.anomaly_score(X)
         self.threshold_     = self._get_threshold()
 
         return self
 
-    def anomaly_score(self, X=None):
+    def anomaly_score(self, X):
         check_is_fitted(self, '_gmm')
-
-        if X is None:
-            X = self.X_
-        else:
-            X = check_array(X, estimator=self)
 
         return -self._gmm.score_samples(X)
 
@@ -254,14 +249,14 @@ class KDE(BaseOutlierDetector):
 
     Attributes
     ----------
+    anomaly_score_ : array-like of shape (n_samples,)
+        Anomaly score for each training data.
+
     fit_time_ : float
         Time spent for fitting in seconds.
 
     threshold_ : float
         Threshold.
-
-    X_ : array-like of shape (n_samples, n_features)
-        Training data.
     """
 
     @property
@@ -292,28 +287,24 @@ class KDE(BaseOutlierDetector):
     def fit(self, X, y=None):
         self._check_params()
 
-        self._kde         = KernelDensity(
-            algorithm     = self.algorithm,
-            atol          = self.atol,
-            bandwidth     = self.bandwidth,
-            breadth_first = self.breadth_first,
-            kernel        = self.kernel,
-            leaf_size     = self.leaf_size,
-            metric        = self.metric,
-            rtol          = self.rtol,
-            metric_params = self.metric_params
+        self._kde           = KernelDensity(
+            algorithm       = self.algorithm,
+            atol            = self.atol,
+            bandwidth       = self.bandwidth,
+            breadth_first   = self.breadth_first,
+            kernel          = self.kernel,
+            leaf_size       = self.leaf_size,
+            metric          = self.metric,
+            rtol            = self.rtol,
+            metric_params   = self.metric_params
         ).fit(X)
-        self.threshold_   = self._get_threshold()
+        self.anomaly_score_ = self.anomaly_score(X)
+        self.threshold_     = self._get_threshold()
 
         return self
 
-    def anomaly_score(self, X=None):
+    def anomaly_score(self, X):
         check_is_fitted(self, '_kde')
-
-        if X is None:
-            X = self.X_
-        else:
-            X = check_array(X, estimator=self)
 
         return -self._kde.score_samples(X)
 
@@ -375,6 +366,9 @@ class SparseStructureLearning(BaseOutlierDetector):
 
     Attributes
     ----------
+    anomaly_score_ : array-like of shape (n_samples,)
+        Anomaly score for each training data.
+
     covariance_ : array-like of shape (n_features, n_features)
         Estimated covariance matrix.
 
@@ -401,9 +395,6 @@ class SparseStructureLearning(BaseOutlierDetector):
 
     threshold_ : float
         Threshold.
-
-    X_ : array-like of shape (n_samples, n_features)
-        Training data.
 
     References
     ----------
@@ -486,29 +477,25 @@ class SparseStructureLearning(BaseOutlierDetector):
             mode            = self.mode,
             tol             = self.tol
         ).fit(X)
-        self.X_             = check_array(X, estimator=self)
+        self.anomaly_score_ = self.anomaly_score(X)
         self.threshold_     = self._get_threshold()
 
         return self
 
-    def anomaly_score(self, X=None):
+    def anomaly_score(self, X):
         check_is_fitted(self, '_glasso')
 
-        if X is None:
-            X = self.X_
-        else:
-            X = check_array(X, estimator=self)
+        X = check_array(X, estimator=self)
 
         return np.sqrt(self._glasso.mahalanobis(X))
 
-    def featurewise_anomaly_score(self, X=None):
+    def featurewise_anomaly_score(self, X):
         """Compute the feature-wise anomaly scores for each sample.
 
         Parameters
         ----------
-        X : array-like of shape (n_samples, n_features), default None
-            Data. If None, the feature-wise anomaly scores for each training
-            sample are returned.
+        X : array-like of shape (n_samples, n_features)
+            Data.
 
         Returns
         -------
@@ -518,10 +505,7 @@ class SparseStructureLearning(BaseOutlierDetector):
 
         check_is_fitted(self, '_glasso')
 
-        if X is None:
-            X = self.X_
-        else:
-            X = check_array(X, estimator=self)
+        X = check_array(X, estimator=self)
 
         return 0.5 * np.log(
             2. * np.pi / np.diag(self.precision_)
