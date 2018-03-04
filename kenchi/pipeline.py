@@ -67,15 +67,14 @@ class Pipeline(SKLearnPipeline):
         return X
 
     @if_delegate_has_method(delegate='_final_estimator')
-    def anomaly_score(self, X=None):
+    def anomaly_score(self, X):
         """Apply transforms, and compute the anomaly score for each sample with
         the final estimator.
 
         Parameters
         ----------
-        X : array-like of shape (n_samples, n_features), default None
-            Data. If None, the anomaly score for each training sample is
-            returned.
+        X : array-like of shape (n_samples, n_features)
+            Data.
 
         Returns
         -------
@@ -83,21 +82,17 @@ class Pipeline(SKLearnPipeline):
             Anomaly score for each sample.
         """
 
-        if X is not None:
-            X = self._pre_transform(X)
-
-        return self._final_estimator.anomaly_score(X)
+        return self._final_estimator.anomaly_score(self._pre_transform(X))
 
     @if_delegate_has_method(delegate='_final_estimator')
-    def featurewise_anomaly_score(self, X=None):
+    def featurewise_anomaly_score(self, X):
         """Apply transforms, and compute the feature-wise anomaly scores for
         each sample with the final estimator.
 
         Parameters
         ----------
-        X : array-like of shape (n_samples, n_features), default None
-            Data. If None, the feature_wise anomaly scores for each training
-            sample are returned.
+        X : array-like of shape (n_samples, n_features)
+            Data.
 
         Returns
         -------
@@ -105,20 +100,19 @@ class Pipeline(SKLearnPipeline):
             Feature-wise anomaly scores for each sample.
         """
 
-        if X is not None:
-            X = self._pre_transform(X)
-
-        return self._final_estimator.featurewise_anomaly_score(X)
+        return self._final_estimator.featurewise_anomaly_score(
+            self._pre_transform(X)
+        )
 
     @if_delegate_has_method(delegate='_final_estimator')
-    def plot_anomaly_score(self, X=None, **kwargs):
+    def plot_anomaly_score(self, X, **kwargs):
         """Apply transoforms, and plot the anomaly score for each sample with
         the final estimator.
 
         Parameters
         ----------
-        X : array-like of shape (n_samples, n_features), default None
-            Data. If None, plot the anomaly score for each training samples.
+        X : array-like of shape (n_samples, n_features)
+            Data.
 
         ax : matplotlib Axes, default None
             Target axes instance.
@@ -162,10 +156,9 @@ class Pipeline(SKLearnPipeline):
             Axes on which the plot was drawn.
         """
 
-        if X is not None:
-            X = self._pre_transform(X)
-
-        return self._final_estimator.plot_anomaly_score(X, **kwargs)
+        return self._final_estimator.plot_anomaly_score(
+            self._pre_transform(X), **kwargs
+        )
 
     @if_delegate_has_method(delegate='_final_estimator')
     def plot_roc_curve(self, X, y, **kwargs):
