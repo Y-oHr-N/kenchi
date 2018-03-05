@@ -106,10 +106,8 @@ class PCA(BaseOutlierDetector):
         return self._pca.singular_values_
 
     def __init__(
-        self,                  contamination=0.01,
-        iterated_power='auto', n_components=None,
-        random_state=None,     svd_solver='auto',
-        tol=0.,                verbose=False,
+        self, contamination=0.01, iterated_power='auto', n_components=None,
+        random_state=None, svd_solver='auto', tol=0., verbose=False,
         whiten=False
     ):
         super().__init__(contamination=contamination, verbose=verbose)
@@ -122,13 +120,13 @@ class PCA(BaseOutlierDetector):
         self.whiten         = whiten
 
     def _fit(self, X):
-        self._pca           = SKLearnPCA(
-            iterated_power  = self.iterated_power,
-            n_components    = self.n_components,
-            random_state    = self.random_state,
-            svd_solver      = self.svd_solver,
-            tol             = self.tol,
-            whiten          = self.whiten
+        self._pca          = SKLearnPCA(
+            iterated_power = self.iterated_power,
+            n_components   = self.n_components,
+            random_state   = self.random_state,
+            svd_solver     = self.svd_solver,
+            tol            = self.tol,
+            whiten         = self.whiten
         ).fit(X)
 
         return self
@@ -136,18 +134,9 @@ class PCA(BaseOutlierDetector):
     def _anomaly_score(self, X):
         return np.sqrt(np.sum(self.featurewise_anomaly_score(X), axis=1))
 
-    def reconstruct(self, X):
+    def _reconstruct(self, X):
         """Apply dimensionality reduction to the given data, and transform the
         data back to its original space.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Data.
-
-        Returns
-        -------
-        X_rec : array-like of shape (n_samples, n_features)
         """
 
         check_is_fitted(self, '_pca')
@@ -170,7 +159,7 @@ class PCA(BaseOutlierDetector):
 
         X = check_array(X, estimator=self)
 
-        return (X - self.reconstruct(X)) ** 2
+        return (X - self._reconstruct(X)) ** 2
 
     def score(self, X, y=None):
         """Compute the mean log-likelihood of the given data.

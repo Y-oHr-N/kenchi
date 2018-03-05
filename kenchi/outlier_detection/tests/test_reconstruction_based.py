@@ -32,10 +32,6 @@ class PCATest(unittest.TestCase):
     def test_fit_predict(self):
         self.assertIsInstance(self.sut.fit_predict(self.X), np.ndarray)
 
-    def test_reconstruct_notfitted(self):
-        with self.assertRaises(NotFittedError):
-            self.sut.reconstruct(self.X)
-
     def test_anomaly_score_notfitted(self):
         with self.assertRaises(NotFittedError):
             self.sut.anomaly_score(self.X)
