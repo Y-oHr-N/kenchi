@@ -1,12 +1,45 @@
+import functools
+import time
 from abc import abstractmethod, ABC
 
 import numpy as np
 from sklearn.base import BaseEstimator
+from sklearn.externals.joblib import logger
 from sklearn.utils.validation import check_is_fitted
 
 from .visualization import plot_anomaly_score, plot_roc_curve
 
 __all__ = ['is_outlier_detector', 'BaseOutlierDetector', 'OutlierMixin']
+
+
+def _fit_decorator(func):
+    """Decorate a `fit` method.
+
+    Parameters
+    ----------
+    func : callable
+
+    Returns
+    -------
+    new_func : callable
+    """
+
+    @functools.wraps(func)
+    def wrapper(det, X, y=None):
+        det._check_params()
+
+        start_time         = time.time()
+        result             = func(det, X, y)
+        det.fit_time_      = time.time() - start_time
+        det.anomaly_score_ = det.anomaly_score(X)
+        det.threshold_     = det._get_threshold()
+
+        if getattr(det, 'verbose', False):
+            print(f'elaplsed: {logger.short_format_time(det.fit_time_)}')
+
+        return result
+
+    return wrapper
 
 
 def is_outlier_detector(estimator):

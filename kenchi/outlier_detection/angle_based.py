@@ -6,8 +6,7 @@ from sklearn.externals.joblib import delayed, Parallel
 from sklearn.utils import check_array, gen_even_slices
 from sklearn.utils.validation import check_is_fitted
 
-from ..base import BaseOutlierDetector
-from ..utils import timeit
+from ..base import _fit_decorator, BaseOutlierDetector
 
 __all__ = ['FastABOD']
 
@@ -67,14 +66,14 @@ class FastABOD(BaseOutlierDetector):
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
 
-    abof_max_ : float
-        Maximum possible ABOF.
-
     fit_time_ : float
         Time spent for fitting in seconds.
 
     threshold_ : float
         Threshold.
+
+    abof_max_ : float
+        Maximum possible ABOF.
 
     X_ : array-like of shape (n_samples, n_features)
         Training data.
@@ -111,10 +110,8 @@ class FastABOD(BaseOutlierDetector):
         self.p             = p
         self.metric_params = metric_params
 
-    @timeit
+    @_fit_decorator
     def fit(self, X, y=None):
-        self._check_params()
-
         self._knn           = NearestNeighbors(
             algorithm       = self.algorithm,
             leaf_size       = self.leaf_size,
@@ -124,8 +121,6 @@ class FastABOD(BaseOutlierDetector):
             p               = self.p,
             metric_params   = self.metric_params
         ).fit(X)
-        self.anomaly_score_ = self.anomaly_score(X)
-        self.threshold_     = self._get_threshold()
 
         return self
 

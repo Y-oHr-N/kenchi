@@ -3,8 +3,7 @@ from sklearn.neighbors import DistanceMetric, NearestNeighbors
 from sklearn.utils import check_array, check_random_state
 from sklearn.utils.validation import check_is_fitted
 
-from ..base import BaseOutlierDetector
-from ..utils import timeit
+from ..base import _fit_decorator, BaseOutlierDetector
 
 __all__ = ['KNN', 'OneTimeSampling']
 
@@ -95,10 +94,8 @@ class KNN(BaseOutlierDetector):
         self.weight        = weight
         self.metric_params = metric_params
 
-    @timeit
+    @_fit_decorator
     def fit(self, X, y=None):
-        self._check_params()
-
         self._knn           = NearestNeighbors(
             algorithm       = self.algorithm,
             leaf_size       = self.leaf_size,
@@ -108,8 +105,6 @@ class KNN(BaseOutlierDetector):
             p               = self.p,
             metric_params   = self.metric_params
         ).fit(X)
-        self.anomaly_score_ = self.anomaly_score(X)
-        self.threshold_     = self._get_threshold()
 
         return self
 
@@ -160,11 +155,11 @@ class OneTimeSampling(BaseOutlierDetector):
     fit_time_ : float
         Time spent for fitting in seconds.
 
-    sampled_ : array-like of shape (n_samples,)
-        Indices of subsamples.
-
     threshold_ : float
         Threshold.
+
+    sampled_ : array-like of shape (n_samples,)
+        Indices of subsamples.
 
     X_ : array-like of shape (n_samples, n_features)
         Training data.
@@ -204,10 +199,8 @@ class OneTimeSampling(BaseOutlierDetector):
                 f'n_samples must be positive but was {self.n_samples}'
             )
 
-    @timeit
+    @_fit_decorator
     def fit(self, X, y=None):
-        self._check_params()
-
         self.X_             = check_array(X, estimator=self)
         n_samples, _        = self.X_.shape
 
@@ -233,9 +226,6 @@ class OneTimeSampling(BaseOutlierDetector):
         self._metric        = DistanceMetric.get_metric(
             self.metric, **metric_params
         )
-
-        self.anomaly_score_ = self.anomaly_score(X)
-        self.threshold_     = self._get_threshold()
 
         return self
 

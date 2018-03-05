@@ -3,8 +3,7 @@ from sklearn.cluster import MiniBatchKMeans as SKLearnMiniBatchKMeans
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
-from ..base import BaseOutlierDetector
-from ..utils import timeit
+from ..base import _fit_decorator, BaseOutlierDetector
 
 __all__ = ['MiniBatchKMeans']
 
@@ -59,20 +58,20 @@ class MiniBatchKMeans(BaseOutlierDetector):
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
 
-    cluster_centers_ : array-like of shape (n_clusters, n_features)
-        Coordinates of cluster centers.
-
     fit_time_ : float
         Time spent for fitting in seconds.
+
+    threshold_ : float
+        Threshold.
+
+    cluster_centers_ : array-like of shape (n_clusters, n_features)
+        Coordinates of cluster centers.
 
     inertia_ : float
         Value of the inertia criterion associated with the chosen partition.
 
     labels_ : array-like of shape (n_samples,)
         Label of each point.
-
-    threshold_ : float
-        Threshold.
     """
 
     @property
@@ -109,10 +108,8 @@ class MiniBatchKMeans(BaseOutlierDetector):
         self.reassignment_ratio = reassignment_ratio
         self.tol                = tol
 
-    @timeit
+    @_fit_decorator
     def fit(self, X, y=None):
-        self._check_params()
-
         self._kmeans           = SKLearnMiniBatchKMeans(
             batch_size         = self.batch_size,
             init               = self.init,
@@ -125,8 +122,6 @@ class MiniBatchKMeans(BaseOutlierDetector):
             reassignment_ratio = self.reassignment_ratio,
             tol                = self.tol
         ).fit(X)
-        self.anomaly_score_    = self.anomaly_score(X)
-        self.threshold_        = self._get_threshold()
 
         return self
 

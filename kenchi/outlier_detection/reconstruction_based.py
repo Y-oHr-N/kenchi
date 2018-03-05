@@ -3,8 +3,7 @@ from sklearn.decomposition import PCA as SKLearnPCA
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
-from ..base import BaseOutlierDetector
-from ..utils import timeit
+from ..base import _fit_decorator, BaseOutlierDetector
 
 __all__ = ['PCA']
 
@@ -48,6 +47,12 @@ class PCA(BaseOutlierDetector):
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
 
+    fit_time_ : float
+        Time spent for fitting in seconds.
+
+    threshold_ : float
+        Threshold.
+
     components_ : array-like of shape (n_components, n_features)
         Principal axes in feature space, representing the directions of maximum
         variance in the data.
@@ -57,9 +62,6 @@ class PCA(BaseOutlierDetector):
 
     explained_variance_ratio_ : array-like of shape (n_components,)
         Percentage of variance explained by each of the selected components.
-
-    fit_time_ : float
-        Time spent for fitting in seconds.
 
     mean_ : array-like of shape (n_features,)
         Per-feature empirical mean, estimated from the training set.
@@ -73,9 +75,6 @@ class PCA(BaseOutlierDetector):
 
     singular_values_ : array-like of shape (n_components,)
         Singular values corresponding to each of the selected components.
-
-    threshold_ : float
-        Threshold.
     """
 
     @property
@@ -122,10 +121,8 @@ class PCA(BaseOutlierDetector):
         self.tol            = tol
         self.whiten         = whiten
 
-    @timeit
+    @_fit_decorator
     def fit(self, X, y=None):
-        self._check_params()
-
         self._pca           = SKLearnPCA(
             iterated_power  = self.iterated_power,
             n_components    = self.n_components,
@@ -134,10 +131,11 @@ class PCA(BaseOutlierDetector):
             tol             = self.tol,
             whiten          = self.whiten
         ).fit(X)
-        self.anomaly_score_ = self.anomaly_score(X)
-        self.threshold_     = self._get_threshold()
 
         return self
+
+    def anomaly_score(self, X):
+        return np.sqrt(np.sum(self.featurewise_anomaly_score(X), axis=1))
 
     def reconstruct(self, X):
         """Apply dimensionality reduction to the given data, and transform the
@@ -157,9 +155,6 @@ class PCA(BaseOutlierDetector):
 
         return self._pca.inverse_transform(self._pca.transform(X))
 
-    def anomaly_score(self, X):
-        return np.sqrt(np.sum(self.featurewise_anomaly_score(X), axis=1))
-
     def featurewise_anomaly_score(self, X):
         """Compute the feature-wise anomaly scores for each sample.
 
@@ -173,8 +168,6 @@ class PCA(BaseOutlierDetector):
         anomaly_score : array-like of shape (n_samples, n_features)
             Feature-wise anomaly scores for each sample.
         """
-
-        check_is_fitted(self, '_pca')
 
         X = check_array(X, estimator=self)
 

@@ -6,8 +6,7 @@ from sklearn.neighbors import KernelDensity
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
-from ..base import BaseOutlierDetector
-from ..utils import timeit
+from ..base import _fit_decorator, BaseOutlierDetector
 from ..visualization import plot_graphical_model, plot_partial_corrcoef
 
 __all__ = ['GMM', 'KDE', 'SparseStructureLearning']
@@ -68,14 +67,17 @@ class GMM(BaseOutlierDetector):
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
 
+    fit_time_ : float
+        Time spent for fitting in seconds.
+
+    threshold_ : float
+        Threshold.
+
     converged_ : bool
         True when convergence was reached in `fit`, False otherwise.
 
     covariances_ : array-like
         Covariance of each mixture component.
-
-    fit_time_ : float
-        Time spent for fitting in seconds.
 
     lower_bound_ : float
         Log-likelihood of the best fit of EM.
@@ -92,9 +94,6 @@ class GMM(BaseOutlierDetector):
     precisions_cholesky_ : array-like
         Cholesky decomposition of the precision matrices of each mixture
         component.
-
-    threshold_ : float
-        Threshold.
 
     weights_ : array-like of shape (n_components,)
         Weight of each mixture components.
@@ -157,10 +156,8 @@ class GMM(BaseOutlierDetector):
         self.warm_start      = warm_start
         self.weights_init    = weights_init
 
-    @timeit
+    @_fit_decorator
     def fit(self, X, y=None):
-        self._check_params()
-
         self._gmm           = GaussianMixture(
             covariance_type = self.covariance_type,
             init_params     = self.init_params,
@@ -175,8 +172,6 @@ class GMM(BaseOutlierDetector):
             warm_start      = self.warm_start,
             weights_init    = self.weights_init
         ).fit(X)
-        self.anomaly_score_ = self.anomaly_score(X)
-        self.threshold_     = self._get_threshold()
 
         return self
 
@@ -283,10 +278,8 @@ class KDE(BaseOutlierDetector):
         self.rtol          = rtol
         self.metric_params = metric_params
 
-    @timeit
+    @_fit_decorator
     def fit(self, X, y=None):
-        self._check_params()
-
         self._kde           = KernelDensity(
             algorithm       = self.algorithm,
             atol            = self.atol,
@@ -298,8 +291,6 @@ class KDE(BaseOutlierDetector):
             rtol            = self.rtol,
             metric_params   = self.metric_params
         ).fit(X)
-        self.anomaly_score_ = self.anomaly_score(X)
-        self.threshold_     = self._get_threshold()
 
         return self
 
@@ -369,11 +360,14 @@ class SparseStructureLearning(BaseOutlierDetector):
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
 
-    covariance_ : array-like of shape (n_features, n_features)
-        Estimated covariance matrix.
-
     fit_time_ : float
         Time spent for fitting in seconds.
+
+    threshold_ : float
+        Threshold.
+
+    covariance_ : array-like of shape (n_features, n_features)
+        Estimated covariance matrix.
 
     graphical_model_ : networkx Graph
         GGM.
@@ -392,9 +386,6 @@ class SparseStructureLearning(BaseOutlierDetector):
 
     precision_ : array-like of shape (n_features, n_features)
         Estimated pseudo inverse matrix.
-
-    threshold_ : float
-        Threshold.
 
     References
     ----------
@@ -465,10 +456,8 @@ class SparseStructureLearning(BaseOutlierDetector):
         self.mode             = mode
         self.tol              = tol
 
-    @timeit
+    @_fit_decorator
     def fit(self, X, y=None):
-        self._check_params()
-
         self._glasso        = GraphLasso(
             alpha           = self.alpha,
             assume_centered = self.assume_centered,
@@ -477,8 +466,6 @@ class SparseStructureLearning(BaseOutlierDetector):
             mode            = self.mode,
             tol             = self.tol
         ).fit(X)
-        self.anomaly_score_ = self.anomaly_score(X)
-        self.threshold_     = self._get_threshold()
 
         return self
 
