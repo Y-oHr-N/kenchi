@@ -1,45 +1,15 @@
-import functools
 import time
 from abc import abstractmethod, ABC
 
 import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.externals.joblib import logger
+from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
 from .visualization import plot_anomaly_score, plot_roc_curve
 
 __all__ = ['is_outlier_detector', 'BaseOutlierDetector', 'OutlierMixin']
-
-
-def _fit_decorator(func):
-    """Decorate a `fit` method.
-
-    Parameters
-    ----------
-    func : callable
-
-    Returns
-    -------
-    new_func : callable
-    """
-
-    @functools.wraps(func)
-    def wrapper(det, X, y=None):
-        det._check_params()
-
-        start_time         = time.time()
-        result             = func(det, X, y)
-        det.fit_time_      = time.time() - start_time
-        det.anomaly_score_ = det.anomaly_score(X)
-        det.threshold_     = det._get_threshold()
-
-        if getattr(det, 'verbose', False):
-            print(f'elaplsed: {logger.short_format_time(det.fit_time_)}')
-
-        return result
-
-    return wrapper
 
 
 def is_outlier_detector(estimator):
@@ -96,36 +66,8 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
         self.verbose       = verbose
 
     @abstractmethod
-    def fit(self, X, y=None):
-        """Fit the model according to the given training data.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Training data.
-
-        y : ignored
-
-        Returns
-        -------
-        self : object
-            Return self.
-        """
-
-    @abstractmethod
-    def anomaly_score(self, X):
-        """Compute the anomaly score for each sample.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Data.
-
-        Returns
-        -------
-        anomaly_score : array-like of shape (n_samples,)
-            Anomaly score for each sample.
-        """
+    def _fit(self, X):
+        """Fit the model according to the given training data."""
 
     def _check_params(self):
         """Check validity of parameters and raise ValueError if not valid."""
@@ -142,6 +84,52 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
         return np.percentile(
             self.anomaly_score_, 100. * (1. - self.contamination)
         )
+
+    @abstractmethod
+    def anomaly_score(self, X):
+        """Compute the anomaly score for each sample.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Data.
+
+        Returns
+        -------
+        anomaly_score : array-like of shape (n_samples,)
+            Anomaly score for each sample.
+        """
+
+    def fit(self, X, y=None):
+        """Fit the model according to the given training data.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Training data.
+
+        y : ignored
+
+        Returns
+        -------
+        self : object
+            Return self.
+        """
+
+        self._check_params()
+
+        X                   = check_array(X, estimator=self)
+        start_time          = time.time()
+        self._fit(X)
+        self.fit_time_      = time.time() - start_time
+
+        self.anomaly_score_ = self.anomaly_score(X)
+        self.threshold_     = self._get_threshold()
+
+        if getattr(self, 'verbose', False):
+            print(f'elaplsed: {logger.short_format_time(self.fit_time_)}')
+
+        return self
 
     def predict(self, X, threshold=None):
         """Predict if a particular sample is an outlier or not.

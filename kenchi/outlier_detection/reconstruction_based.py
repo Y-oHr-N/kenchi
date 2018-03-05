@@ -3,7 +3,7 @@ from sklearn.decomposition import PCA as SKLearnPCA
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
-from ..base import _fit_decorator, BaseOutlierDetector
+from ..base import BaseOutlierDetector
 
 __all__ = ['PCA']
 
@@ -121,8 +121,7 @@ class PCA(BaseOutlierDetector):
         self.tol            = tol
         self.whiten         = whiten
 
-    @_fit_decorator
-    def fit(self, X, y=None):
+    def _fit(self, X):
         self._pca           = SKLearnPCA(
             iterated_power  = self.iterated_power,
             n_components    = self.n_components,

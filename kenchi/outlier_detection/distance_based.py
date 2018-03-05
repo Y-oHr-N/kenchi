@@ -3,7 +3,7 @@ from sklearn.neighbors import DistanceMetric, NearestNeighbors
 from sklearn.utils import check_array, check_random_state
 from sklearn.utils.validation import check_is_fitted
 
-from ..base import _fit_decorator, BaseOutlierDetector
+from ..base import BaseOutlierDetector
 
 __all__ = ['KNN', 'OneTimeSampling']
 
@@ -94,8 +94,7 @@ class KNN(BaseOutlierDetector):
         self.weight        = weight
         self.metric_params = metric_params
 
-    @_fit_decorator
-    def fit(self, X, y=None):
+    def _fit(self, X):
         self._knn           = NearestNeighbors(
             algorithm       = self.algorithm,
             leaf_size       = self.leaf_size,
@@ -199,9 +198,8 @@ class OneTimeSampling(BaseOutlierDetector):
                 f'n_samples must be positive but was {self.n_samples}'
             )
 
-    @_fit_decorator
-    def fit(self, X, y=None):
-        self.X_             = check_array(X, estimator=self)
+    def _fit(self, X):
+        self.X_             = X
         n_samples, _        = self.X_.shape
 
         if self.n_samples >= n_samples:

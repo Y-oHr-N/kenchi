@@ -6,7 +6,7 @@ from sklearn.externals.joblib import delayed, Parallel
 from sklearn.utils import check_array, gen_even_slices
 from sklearn.utils.validation import check_is_fitted
 
-from ..base import _fit_decorator, BaseOutlierDetector
+from ..base import BaseOutlierDetector
 
 __all__ = ['FastABOD']
 
@@ -110,8 +110,7 @@ class FastABOD(BaseOutlierDetector):
         self.p             = p
         self.metric_params = metric_params
 
-    @_fit_decorator
-    def fit(self, X, y=None):
+    def _fit(self, X):
         self._knn           = NearestNeighbors(
             algorithm       = self.algorithm,
             leaf_size       = self.leaf_size,

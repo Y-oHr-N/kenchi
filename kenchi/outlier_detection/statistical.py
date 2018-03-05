@@ -6,7 +6,7 @@ from sklearn.neighbors import KernelDensity
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
-from ..base import _fit_decorator, BaseOutlierDetector
+from ..base import BaseOutlierDetector
 from ..visualization import plot_graphical_model, plot_partial_corrcoef
 
 __all__ = ['GMM', 'KDE', 'SparseStructureLearning']
@@ -156,8 +156,7 @@ class GMM(BaseOutlierDetector):
         self.warm_start      = warm_start
         self.weights_init    = weights_init
 
-    @_fit_decorator
-    def fit(self, X, y=None):
+    def _fit(self, X):
         self._gmm           = GaussianMixture(
             covariance_type = self.covariance_type,
             init_params     = self.init_params,
@@ -278,8 +277,7 @@ class KDE(BaseOutlierDetector):
         self.rtol          = rtol
         self.metric_params = metric_params
 
-    @_fit_decorator
-    def fit(self, X, y=None):
+    def _fit(self, X):
         self._kde           = KernelDensity(
             algorithm       = self.algorithm,
             atol            = self.atol,
@@ -456,8 +454,7 @@ class SparseStructureLearning(BaseOutlierDetector):
         self.mode             = mode
         self.tol              = tol
 
-    @_fit_decorator
-    def fit(self, X, y=None):
+    def _fit(self, X):
         self._glasso        = GraphLasso(
             alpha           = self.alpha,
             assume_centered = self.assume_centered,
