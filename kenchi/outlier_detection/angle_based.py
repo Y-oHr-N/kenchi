@@ -11,11 +11,7 @@ from ..base import BaseOutlierDetector
 __all__ = ['FastABOD']
 
 
-def _approximate_abof(X, X_train, neigh_ind):
-    """Compute the approximate Angle-Based Outlier Factor (ABOF) for each
-    sample.
-    """
-
+def _abof(X, X_train, neigh_ind):
     with np.errstate(invalid='raise'):
         return np.var([
             [
@@ -73,7 +69,7 @@ class FastABOD(BaseOutlierDetector):
         Threshold.
 
     abof_max_ : float
-        Maximum possible ABOF.
+        Maximum possible ABOF. Used to compute the regularized anomaly score.
 
     X_ : array-like of shape (n_samples, n_features)
         Training data.
@@ -94,11 +90,9 @@ class FastABOD(BaseOutlierDetector):
         return self._knn._fit_X
 
     def __init__(
-        self,               algorithm='auto',
-        contamination=0.01, leaf_size=30,
-        metric='minkowski', n_jobs=1,
-        n_neighbors=5,      p=2,
-        verbose=False,      metric_params=None
+        self, algorithm='auto', contamination=0.01, leaf_size=30,
+        metric='minkowski', n_jobs=1, n_neighbors=5, p=2,
+        verbose=False, metric_params=None
     ):
         super().__init__(contamination=contamination, verbose=verbose)
 
@@ -111,39 +105,42 @@ class FastABOD(BaseOutlierDetector):
         self.metric_params = metric_params
 
     def _fit(self, X):
-        self._knn           = NearestNeighbors(
-            algorithm       = self.algorithm,
-            leaf_size       = self.leaf_size,
-            metric          = self.metric,
-            n_jobs          = self.n_jobs,
-            n_neighbors     = self.n_neighbors,
-            p               = self.p,
-            metric_params   = self.metric_params
+        self._knn         = NearestNeighbors(
+            algorithm     = self.algorithm,
+            leaf_size     = self.leaf_size,
+            metric        = self.metric,
+            n_jobs        = self.n_jobs,
+            n_neighbors   = self.n_neighbors,
+            p             = self.p,
+            metric_params = self.metric_params
         ).fit(X)
+        self.abof_max_    = np.max(self._abof(X))
 
         return self
 
-    def _anomaly_score(self, X):
+    def _anomaly_score(self, X, regularized=True):
+        abof = self._abof(X)
+
+        if regularized:
+            return -np.log(abof / self.abof_max_)
+        else:
+            return abof
+
+    def _abof(self, X):
+        """Compute the Angle-Based Outlier Factor (ABOF) for each sample."""
+
         check_is_fitted(self, '_knn')
 
         if np.array_equal(X, self.X_):
-            query_is_train = True
-            neigh_ind      = self._knn.kneighbors(return_distance=False)
+            neigh_ind = self._knn.kneighbors(return_distance=False)
         else:
-            query_is_train = False
-            neigh_ind      = self._knn.kneighbors(X, return_distance=False)
+            neigh_ind = self._knn.kneighbors(X, return_distance=False)
 
-        n_samples, _       = X.shape
-        result             = Parallel(n_jobs=self.n_jobs)(
-            delayed(_approximate_abof)(
+        n_samples, _  = X.shape
+        result        = Parallel(n_jobs=self.n_jobs)(
+            delayed(_abof)(
                 X[s], self.X_, neigh_ind[s]
             ) for s in gen_even_slices(n_samples, self.n_jobs)
         )
 
-        approximate_abof   = np.concatenate(result)
-
-        if query_is_train:
-            self.abof_max_ = np.max(approximate_abof)
-
-        # transform raw scores into regular scores
-        return np.maximum(0., -np.log(approximate_abof / self.abof_max_))
+        return np.concatenate(result)
