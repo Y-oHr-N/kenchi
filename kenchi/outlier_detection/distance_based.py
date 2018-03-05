@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.neighbors import DistanceMetric, NearestNeighbors
-from sklearn.utils import check_array, check_random_state
+from sklearn.utils import check_random_state
 from sklearn.utils.validation import check_is_fitted
 
 from ..base import BaseOutlierDetector
@@ -107,10 +107,8 @@ class KNN(BaseOutlierDetector):
 
         return self
 
-    def anomaly_score(self, X):
+    def _anomaly_score(self, X):
         check_is_fitted(self, '_knn')
-
-        X           = check_array(X, estimator=self)
 
         if np.array_equal(X, self.X_):
             dist, _ = self._knn.kneighbors()
@@ -227,9 +225,7 @@ class OneTimeSampling(BaseOutlierDetector):
 
         return self
 
-    def anomaly_score(self, X):
+    def _anomaly_score(self, X):
         check_is_fitted(self, '_metric')
-
-        X = check_array(X, estimator=self)
 
         return np.min(self._metric.pairwise(X, self.X_sampled_), axis=1)

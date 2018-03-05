@@ -4,6 +4,7 @@ from abc import abstractmethod, ABC
 import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.externals.joblib import logger
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
@@ -57,8 +58,8 @@ class OutlierMixin:
 class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
     """Base class for all outlier detectors in kenchi."""
 
-    # TODO: Update anomaly_score method so that the normalized score can be
-    # computed
+    # TODO: Implement score_samples method
+    # TODO: Implement decision_function method
 
     @abstractmethod
     def __init__(self, contamination=0.01, verbose=False):
@@ -68,6 +69,10 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
     @abstractmethod
     def _fit(self, X):
         """Fit the model according to the given training data."""
+
+    @abstractmethod
+    def _anomaly_score(self, X):
+        """Compute the anomaly score for each sample."""
 
     def _check_params(self):
         """Check validity of parameters and raise ValueError if not valid."""
@@ -84,21 +89,6 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
         return np.percentile(
             self.anomaly_score_, 100. * (1. - self.contamination)
         )
-
-    @abstractmethod
-    def anomaly_score(self, X):
-        """Compute the anomaly score for each sample.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Data.
-
-        Returns
-        -------
-        anomaly_score : array-like of shape (n_samples,)
-            Anomaly score for each sample.
-        """
 
     def fit(self, X, y=None):
         """Fit the model according to the given training data.
@@ -125,11 +115,38 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
 
         self.anomaly_score_ = self.anomaly_score(X)
         self.threshold_     = self._get_threshold()
+        self._scaler        = MinMaxScaler(
+        ).fit(self.anomaly_score_[:, np.newaxis])
 
         if getattr(self, 'verbose', False):
             print(f'elaplsed: {logger.short_format_time(self.fit_time_)}')
 
         return self
+
+    def anomaly_score(self, X, normalized=False):
+        """Compute the anomaly score for each sample.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Data.
+
+        normalized : bool, default False
+            If True, return the normalized anomaly score.
+
+        Returns
+        -------
+        anomaly_score : array-like of shape (n_samples,)
+            Anomaly score for each sample.
+        """
+
+        X             = check_array(X, estimator=self)
+        anomaly_score = self._anomaly_score(X)
+
+        if normalized:
+            return self._scaler.transform(anomaly_score[:, np.newaxis]).flat[:]
+        else:
+            return anomaly_score
 
     def predict(self, X, threshold=None):
         """Predict if a particular sample is an outlier or not.

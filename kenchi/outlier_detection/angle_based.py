@@ -3,7 +3,7 @@ import itertools
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
 from sklearn.externals.joblib import delayed, Parallel
-from sklearn.utils import check_array, gen_even_slices
+from sklearn.utils import gen_even_slices
 from sklearn.utils.validation import check_is_fitted
 
 from ..base import BaseOutlierDetector
@@ -123,11 +123,8 @@ class FastABOD(BaseOutlierDetector):
 
         return self
 
-    def anomaly_score(self, X):
+    def _anomaly_score(self, X):
         check_is_fitted(self, '_knn')
-
-        X                  = check_array(X, estimator=self)
-        n_samples, _       = X.shape
 
         if np.array_equal(X, self.X_):
             query_is_train = True
@@ -136,6 +133,7 @@ class FastABOD(BaseOutlierDetector):
             query_is_train = False
             neigh_ind      = self._knn.kneighbors(X, return_distance=False)
 
+        n_samples, _       = X.shape
         result             = Parallel(n_jobs=self.n_jobs)(
             delayed(_approximate_abof)(
                 X[s], self.X_, neigh_ind[s]

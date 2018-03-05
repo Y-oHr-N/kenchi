@@ -174,7 +174,7 @@ class GMM(BaseOutlierDetector):
 
         return self
 
-    def anomaly_score(self, X):
+    def _anomaly_score(self, X):
         check_is_fitted(self, '_gmm')
 
         return -self._gmm.score_samples(X)
@@ -292,7 +292,7 @@ class KDE(BaseOutlierDetector):
 
         return self
 
-    def anomaly_score(self, X):
+    def _anomaly_score(self, X):
         check_is_fitted(self, '_kde')
 
         return -self._kde.score_samples(X)
@@ -466,10 +466,8 @@ class SparseStructureLearning(BaseOutlierDetector):
 
         return self
 
-    def anomaly_score(self, X):
+    def _anomaly_score(self, X):
         check_is_fitted(self, '_glasso')
-
-        X = check_array(X, estimator=self)
 
         return np.sqrt(self._glasso.mahalanobis(X))
 

@@ -133,7 +133,7 @@ class PCA(BaseOutlierDetector):
 
         return self
 
-    def anomaly_score(self, X):
+    def _anomaly_score(self, X):
         return np.sqrt(np.sum(self.featurewise_anomaly_score(X), axis=1))
 
     def reconstruct(self, X):

@@ -123,7 +123,7 @@ class MiniBatchKMeans(BaseOutlierDetector):
 
         return self
 
-    def anomaly_score(self, X):
+    def _anomaly_score(self, X):
         check_is_fitted(self, '_kmeans')
 
         return np.min(self._kmeans.transform(X), axis=1)
