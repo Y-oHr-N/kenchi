@@ -13,7 +13,7 @@ class PCA(BaseOutlierDetector):
 
     Parameters
     ----------
-    contamination : float, default 0.01
+    contamination : float, default 0.1
         Proportion of outliers in the data set. Used to define the threshold.
 
     iterated_power : int, default 'auto'
@@ -106,7 +106,7 @@ class PCA(BaseOutlierDetector):
         return self._pca.singular_values_
 
     def __init__(
-        self, contamination=0.01, iterated_power='auto', n_components=None,
+        self, contamination=0.1, iterated_power='auto', n_components=None,
         random_state=None, svd_solver='auto', tol=0., verbose=False,
         whiten=False
     ):

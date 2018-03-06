@@ -31,7 +31,7 @@ class FastABOD(BaseOutlierDetector):
         Tree algorithm to use. Valid algorithms are
         ['kd_tree'|'ball_tree'|'auto'].
 
-    contamination : float, default 0.01
+    contamination : float, default 0.1
         Proportion of outliers in the data set. Used to define the threshold.
 
     leaf_size : int, default 30
@@ -89,7 +89,7 @@ class FastABOD(BaseOutlierDetector):
         return self._knn._fit_X
 
     def __init__(
-        self, algorithm='auto', contamination=0.01, leaf_size=30,
+        self, algorithm='auto', contamination=0.1, leaf_size=30,
         metric='minkowski', n_jobs=1, n_neighbors=5, p=2,
         verbose=False, metric_params=None
     ):

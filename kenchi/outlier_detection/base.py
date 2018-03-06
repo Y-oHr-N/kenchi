@@ -69,7 +69,7 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
     # TODO: Implement decision_function method
 
     @abstractmethod
-    def __init__(self, contamination=0.01, verbose=False):
+    def __init__(self, contamination=0.1, verbose=False):
         self.contamination = contamination
         self.verbose       = verbose
 
@@ -175,12 +175,12 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
             Return 1 for inliers and -1 for outliers.
         """
 
-        check_is_fitted(self, 'threshold_')
+        anomaly_score = self.anomaly_score(X)
 
         if threshold is None:
             threshold = self.threshold_
 
-        return np.where(self.anomaly_score(X) <= threshold, 1, -1)
+        return np.where(anomaly_score <= threshold, 1, -1)
 
     def plot_anomaly_score(self, X, **kwargs):
         """Plot the anomaly score for each sample.

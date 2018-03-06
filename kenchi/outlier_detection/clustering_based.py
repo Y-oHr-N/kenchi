@@ -15,7 +15,7 @@ class MiniBatchKMeans(BaseOutlierDetector):
     batch_size : int, optional, default 100
         Size of the mini batches.
 
-    contamination : float, default 0.01
+    contamination : float, default 0.1
         Proportion of outliers in the data set. Used to define the threshold.
 
     init : str or array-like, default 'k-means++'
@@ -86,7 +86,7 @@ class MiniBatchKMeans(BaseOutlierDetector):
         return self._kmeans.labels_
 
     def __init__(
-        self, batch_size=100, contamination=0.01, init='k-means++',
+        self, batch_size=100, contamination=0.1, init='k-means++',
         init_size=None, max_iter=100, max_no_improvement=10, n_clusters=8,
         n_init=3, random_state=None, reassignment_ratio=0.01, tol=0.0,
         verbose=False

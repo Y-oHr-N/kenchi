@@ -17,7 +17,7 @@ class GMM(BaseOutlierDetector):
 
     Parameters
     ----------
-    contamination : float, default 0.01
+    contamination : float, default 0.1
         Proportion of outliers in the data set. Used to define the threshold.
 
     covariance_type : str, default 'full'
@@ -132,7 +132,7 @@ class GMM(BaseOutlierDetector):
         return self._gmm.weights_
 
     def __init__(
-        self, contamination=0.01, covariance_type='full', init_params='kmeans',
+        self, contamination=0.1, covariance_type='full', init_params='kmeans',
         max_iter=100, means_init=None, n_components=1, n_init=1,
         precisions_init=None, random_state=None, reg_covar=1e-06, tol=1e-03,
         verbose=False, warm_start=False, weights_init=None
@@ -213,7 +213,7 @@ class KDE(BaseOutlierDetector):
         If true, use a breadth-first approach to the problem. Otherwise use a
         depth-first approach.
 
-    contamination : float, default 0.01
+    contamination : float, default 0.1
         Proportion of outliers in the data set. Used to define the threshold.
 
     kernel : str, default 'gaussian'
@@ -253,7 +253,7 @@ class KDE(BaseOutlierDetector):
 
     def __init__(
         self, algorithm='auto', atol=0., bandwidth=1.,
-        breadth_first=True, contamination=0.01, kernel='gaussian', leaf_size=40,
+        breadth_first=True, contamination=0.1, kernel='gaussian', leaf_size=40,
         metric='euclidean', rtol=0., verbose=False, metric_params=None
     ):
         super().__init__(contamination=contamination, verbose=verbose)
@@ -318,7 +318,7 @@ class SparseStructureLearning(BaseOutlierDetector):
     assume_centered : bool, default False
         If True, data are not centered before computation.
 
-    contamination : float, default 0.01
+    contamination : float, default 0.1
         Proportion of outliers in the data set. Used to define the threshold.
 
     enet_tol : float, default 1e-04
@@ -427,7 +427,7 @@ class SparseStructureLearning(BaseOutlierDetector):
         return self._glasso.precision_
 
     def __init__(
-        self, alpha=0.01, assume_centered=False, contamination=0.01,
+        self, alpha=0.01, assume_centered=False, contamination=0.1,
         enet_tol=1e-04, max_iter=100, mode='cd', tol=1e-04,
         verbose=False, apcluster_params=None
     ):
