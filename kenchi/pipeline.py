@@ -67,7 +67,7 @@ class Pipeline(SKLearnPipeline):
         return X
 
     @if_delegate_has_method(delegate='_final_estimator')
-    def anomaly_score(self, X):
+    def anomaly_score(self, X, normalize=False):
         """Apply transforms, and compute the anomaly score for each sample with
         the final estimator.
 
@@ -76,13 +76,18 @@ class Pipeline(SKLearnPipeline):
         X : array-like of shape (n_samples, n_features)
             Data.
 
+        normalize : bool, default False
+            If True, return the normalized anomaly score.
+
         Returns
         -------
         anomaly_score : array-like of shape (n_samples,)
             Anomaly score for each sample.
         """
 
-        return self._final_estimator.anomaly_score(self._pre_transform(X))
+        return self._final_estimator.anomaly_score(
+            self._pre_transform(X), normalize=normalize
+        )
 
     @if_delegate_has_method(delegate='_final_estimator')
     def featurewise_anomaly_score(self, X):

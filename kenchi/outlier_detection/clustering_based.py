@@ -86,12 +86,9 @@ class MiniBatchKMeans(BaseOutlierDetector):
         return self._kmeans.labels_
 
     def __init__(
-        self,                    batch_size=100,
-        contamination=0.01,      init='k-means++',
-        init_size=None,          max_iter=100,
-        max_no_improvement=10,   n_clusters=8,
-        n_init=3,                random_state=None,
-        reassignment_ratio=0.01, tol=0.0,
+        self, batch_size=100, contamination=0.01, init='k-means++',
+        init_size=None, max_iter=100, max_no_improvement=10, n_clusters=8,
+        n_init=3, random_state=None, reassignment_ratio=0.01, tol=0.0,
         verbose=False
     ):
         super().__init__(contamination=contamination, verbose=verbose)
@@ -124,8 +121,6 @@ class MiniBatchKMeans(BaseOutlierDetector):
         return self
 
     def _anomaly_score(self, X):
-        check_is_fitted(self, '_kmeans')
-
         return np.min(self._kmeans.transform(X), axis=1)
 
     def score(self, X, y=None):

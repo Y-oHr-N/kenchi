@@ -1,7 +1,6 @@
 import numpy as np
 from sklearn.neighbors import DistanceMetric, NearestNeighbors
 from sklearn.utils import check_random_state
-from sklearn.utils.validation import check_is_fitted
 
 from ..base import BaseOutlierDetector
 
@@ -76,12 +75,9 @@ class KNN(BaseOutlierDetector):
         return self._knn._fit_X
 
     def __init__(
-        self,               algorithm='auto',
-        contamination=0.01, leaf_size=30,
-        metric='minkowski', n_jobs=1,
-        n_neighbors=5,      p=2,
-        verbose=False,      weight=False,
-        metric_params=None
+        self, algorithm='auto', contamination=0.01, leaf_size=30,
+        metric='minkowski', n_jobs=1, n_neighbors=5, p=2,
+        verbose=False, weight=False, metric_params=None
     ):
         super().__init__(contamination=contamination, verbose=verbose)
 
@@ -95,21 +91,19 @@ class KNN(BaseOutlierDetector):
         self.metric_params = metric_params
 
     def _fit(self, X):
-        self._knn           = NearestNeighbors(
-            algorithm       = self.algorithm,
-            leaf_size       = self.leaf_size,
-            metric          = self.metric,
-            n_jobs          = self.n_jobs,
-            n_neighbors     = self.n_neighbors,
-            p               = self.p,
-            metric_params   = self.metric_params
+        self._knn         = NearestNeighbors(
+            algorithm     = self.algorithm,
+            leaf_size     = self.leaf_size,
+            metric        = self.metric,
+            n_jobs        = self.n_jobs,
+            n_neighbors   = self.n_neighbors,
+            p             = self.p,
+            metric_params = self.metric_params
         ).fit(X)
 
         return self
 
     def _anomaly_score(self, X):
-        check_is_fitted(self, '_knn')
-
         if np.array_equal(X, self.X_):
             dist, _ = self._knn.kneighbors()
         else:
@@ -176,10 +170,8 @@ class OneTimeSampling(BaseOutlierDetector):
         return self.X_[self.sampled_]
 
     def __init__(
-        self,               contamination=0.01,
-        metric='euclidean', n_samples=20,
-        random_state=None,  verbose=False,
-        metric_params=None
+        self, contamination=0.01, metric='euclidean', n_samples=20,
+        random_state=None, verbose=False, metric_params=None
     ):
         super().__init__(contamination=contamination, verbose=verbose)
 
@@ -197,8 +189,8 @@ class OneTimeSampling(BaseOutlierDetector):
             )
 
     def _fit(self, X):
-        self.X_             = X
-        n_samples, _        = self.X_.shape
+        self.X_           = X
+        n_samples, _      = self.X_.shape
 
         if self.n_samples >= n_samples:
             raise ValueError(
@@ -206,26 +198,24 @@ class OneTimeSampling(BaseOutlierDetector):
                 f'but was {self.n_samples}'
             )
 
-        rnd                 = check_random_state(self.random_state)
-        self.sampled_       = rnd.choice(
+        rnd               = check_random_state(self.random_state)
+        self.sampled_     = rnd.choice(
             n_samples, size=self.n_samples, replace=False
         )
 
         # sort again as choice does not guarantee sorted order
-        self.sampled_       = np.sort(self.sampled_)
+        self.sampled_     = np.sort(self.sampled_)
 
         if self.metric_params is None:
-            metric_params   = {}
+            metric_params = {}
         else:
-            metric_params   = self.metric_params
+            metric_params = self.metric_params
 
-        self._metric        = DistanceMetric.get_metric(
+        self._metric      = DistanceMetric.get_metric(
             self.metric, **metric_params
         )
 
         return self
 
     def _anomaly_score(self, X):
-        check_is_fitted(self, '_metric')
-
         return np.min(self._metric.pairwise(X, self.X_sampled_), axis=1)

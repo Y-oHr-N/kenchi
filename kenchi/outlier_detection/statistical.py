@@ -132,14 +132,10 @@ class GMM(BaseOutlierDetector):
         return self._gmm.weights_
 
     def __init__(
-        self,                   contamination=0.01,
-        covariance_type='full', init_params='kmeans',
-        max_iter=100,           means_init=None,
-        n_components=1,         n_init=1,
-        precisions_init=None,   random_state=None,
-        reg_covar=1e-06,        tol=1e-03,
-        verbose=False,          warm_start=False,
-        weights_init=None
+        self, contamination=0.01, covariance_type='full', init_params='kmeans',
+        max_iter=100, means_init=None, n_components=1, n_init=1,
+        precisions_init=None, random_state=None, reg_covar=1e-06, tol=1e-03,
+        verbose=False, warm_start=False, weights_init=None
     ):
         super().__init__(contamination=contamination, verbose=verbose)
 
@@ -175,8 +171,6 @@ class GMM(BaseOutlierDetector):
         return self
 
     def _anomaly_score(self, X):
-        check_is_fitted(self, '_gmm')
-
         return -self._gmm.score_samples(X)
 
     def score(self, X, y=None):
@@ -258,12 +252,9 @@ class KDE(BaseOutlierDetector):
         return self._kde.tree_.data
 
     def __init__(
-        self,               algorithm='auto',
-        atol=0.,            bandwidth=1.,
-        breadth_first=True, contamination=0.01,
-        kernel='gaussian',  leaf_size=40,
-        metric='euclidean', rtol=0.,
-        verbose=False,      metric_params=None
+        self, algorithm='auto', atol=0., bandwidth=1.,
+        breadth_first=True, contamination=0.01, kernel='gaussian', leaf_size=40,
+        metric='euclidean', rtol=0., verbose=False, metric_params=None
     ):
         super().__init__(contamination=contamination, verbose=verbose)
 
@@ -278,23 +269,21 @@ class KDE(BaseOutlierDetector):
         self.metric_params = metric_params
 
     def _fit(self, X):
-        self._kde           = KernelDensity(
-            algorithm       = self.algorithm,
-            atol            = self.atol,
-            bandwidth       = self.bandwidth,
-            breadth_first   = self.breadth_first,
-            kernel          = self.kernel,
-            leaf_size       = self.leaf_size,
-            metric          = self.metric,
-            rtol            = self.rtol,
-            metric_params   = self.metric_params
+        self._kde         = KernelDensity(
+            algorithm     = self.algorithm,
+            atol          = self.atol,
+            bandwidth     = self.bandwidth,
+            breadth_first = self.breadth_first,
+            kernel        = self.kernel,
+            leaf_size     = self.leaf_size,
+            metric        = self.metric,
+            rtol          = self.rtol,
+            metric_params = self.metric_params
         ).fit(X)
 
         return self
 
     def _anomaly_score(self, X):
-        check_is_fitted(self, '_kde')
-
         return -self._kde.score_samples(X)
 
     def score(self, X, y=None):
@@ -438,11 +427,9 @@ class SparseStructureLearning(BaseOutlierDetector):
         return self._glasso.precision_
 
     def __init__(
-        self,                  alpha=0.01,
-        assume_centered=False, contamination=0.01,
-        enet_tol=1e-04,        max_iter=100,
-        mode='cd',             tol=1e-04,
-        verbose=False,         apcluster_params=None
+        self, alpha=0.01, assume_centered=False, contamination=0.01,
+        enet_tol=1e-04, max_iter=100, mode='cd', tol=1e-04,
+        verbose=False, apcluster_params=None
     ):
         super().__init__(contamination=contamination, verbose=verbose)
 
@@ -467,8 +454,6 @@ class SparseStructureLearning(BaseOutlierDetector):
         return self
 
     def _anomaly_score(self, X):
-        check_is_fitted(self, '_glasso')
-
         return np.sqrt(self._glasso.mahalanobis(X))
 
     def featurewise_anomaly_score(self, X):

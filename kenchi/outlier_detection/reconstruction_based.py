@@ -139,8 +139,6 @@ class PCA(BaseOutlierDetector):
         data back to its original space.
         """
 
-        check_is_fitted(self, '_pca')
-
         return self._pca.inverse_transform(self._pca.transform(X))
 
     def featurewise_anomaly_score(self, X):
@@ -156,6 +154,8 @@ class PCA(BaseOutlierDetector):
         anomaly_score : array-like of shape (n_samples, n_features)
             Feature-wise anomaly scores for each sample.
         """
+
+        check_is_fitted(self, '_pca')
 
         X = check_array(X, estimator=self)
 

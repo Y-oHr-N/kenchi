@@ -56,7 +56,14 @@ class OutlierMixin:
 
 
 class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
-    """Base class for all outlier detectors in kenchi."""
+    """Base class for all outlier detectors in kenchi.
+
+    References
+    ----------
+    H.-P. Kriegel, P. Kroger, E. Schubert and A. Zimek,
+    "Interpreting and unifying outlier scores,"
+    In Proceedings of SDM'11, pp. 13-24, 2011.
+    """
 
     # TODO: Implement score_samples method
     # TODO: Implement decision_function method
@@ -109,11 +116,12 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
         self._check_params()
 
         X                   = check_array(X, estimator=self)
+
         start_time          = time.time()
         self._fit(X)
         self.fit_time_      = time.time() - start_time
 
-        self.anomaly_score_ = self.anomaly_score(X)
+        self.anomaly_score_ = self._anomaly_score(X)
         self.threshold_     = self._get_threshold()
         self._scaler        = MinMaxScaler(
         ).fit(self.anomaly_score_[:, np.newaxis])
@@ -123,7 +131,7 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
 
         return self
 
-    def anomaly_score(self, X, normalized=False):
+    def anomaly_score(self, X, normalize=False):
         """Compute the anomaly score for each sample.
 
         Parameters
@@ -131,7 +139,7 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
         X : array-like of shape (n_samples, n_features)
             Data.
 
-        normalized : bool, default False
+        normalize : bool, default False
             If True, return the normalized anomaly score.
 
         Returns
@@ -140,10 +148,12 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
             Anomaly score for each sample.
         """
 
+        check_is_fitted(self, '_scaler')
+
         X             = check_array(X, estimator=self)
         anomaly_score = self._anomaly_score(X)
 
-        if normalized:
+        if normalize:
             return self._scaler.transform(anomaly_score[:, np.newaxis]).flat[:]
         else:
             return anomaly_score

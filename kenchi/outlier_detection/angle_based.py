@@ -4,7 +4,6 @@ import numpy as np
 from sklearn.neighbors import NearestNeighbors
 from sklearn.externals.joblib import delayed, Parallel
 from sklearn.utils import gen_even_slices
-from sklearn.utils.validation import check_is_fitted
 
 from ..base import BaseOutlierDetector
 
@@ -118,18 +117,16 @@ class FastABOD(BaseOutlierDetector):
 
         return self
 
-    def _anomaly_score(self, X, regularized=True):
+    def _anomaly_score(self, X, regularize=True):
         abof = self._abof(X)
 
-        if regularized:
+        if regularize:
             return -np.log(abof / self.abof_max_)
         else:
             return abof
 
     def _abof(self, X):
         """Compute the Angle-Based Outlier Factor (ABOF) for each sample."""
-
-        check_is_fitted(self, '_knn')
 
         if np.array_equal(X, self.X_):
             neigh_ind = self._knn.kneighbors(return_distance=False)
