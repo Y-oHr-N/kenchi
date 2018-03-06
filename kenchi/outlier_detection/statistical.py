@@ -359,6 +359,9 @@ class SparseStructureLearning(BaseOutlierDetector):
     graphical_model_ : networkx Graph
         GGM.
 
+    isolates_ : array-like of shape (n_isolates,)
+        Indices of isolates.
+
     labels_ : array-like of shape (n_features,)
         Label of each feature.
 
@@ -390,6 +393,12 @@ class SparseStructureLearning(BaseOutlierDetector):
         import networkx as nx
 
         return nx.from_numpy_matrix(np.tril(self.partial_corrcoef_, k=-1))
+
+    @property
+    def isolates_(self):
+        import networkx as nx
+
+        return np.array(list(nx.isolates(self.graphical_model_)))
 
     @property
     def labels_(self):
@@ -532,17 +541,16 @@ class SparseStructureLearning(BaseOutlierDetector):
             Axes on which the plot was drawn.
         """
 
-        import networkx as nx
-
         if 'node_color' not in kwargs:
             kwargs['node_color'] = self.labels_
 
         if 'title' not in kwargs:
+            n_features, _        = self.precision_.shape
             kwargs['title']      = (
                 f'GGM ('
                 f'n_clusters={np.max(self.labels_) + 1}, '
-                f'n_features={self.precision_.shape[0]}, '
-                f'n_isolates={len(list(nx.isolates(self.graphical_model_)))}'
+                f'n_features={n_features}, '
+                f'n_isolates={self.isolates_.size}'
                 f')'
             )
 
