@@ -56,7 +56,7 @@ class KNNTest(unittest.TestCase):
 class OneTimeSamplingTest(unittest.TestCase):
     def setUp(self):
         self.X, self.y = make_blobs(random_state=1)
-        self.sut       = OneTimeSampling(n_samples=2, random_state=1)
+        self.sut       = OneTimeSampling(n_subsamples=2, random_state=1)
         _, self.ax     = plt.subplots()
 
     def tearDown(self):

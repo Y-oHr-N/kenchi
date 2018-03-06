@@ -126,7 +126,7 @@ class OneTimeSampling(BaseOutlierDetector):
     metric : str, default 'euclidean'
         Distance metric to use.
 
-    n_samples : int, default 20
+    n_subsamples : int, default 20
         Number of random samples to be used.
 
     random_state : int, RandomState instance, default None
@@ -149,13 +149,10 @@ class OneTimeSampling(BaseOutlierDetector):
     threshold_ : float
         Threshold.
 
-    sampled_ : array-like of shape (n_samples,)
+    sampled_ : array-like of shape (n_subsamples,)
         Indices of subsamples.
 
-    X_ : array-like of shape (n_samples, n_features)
-        Training data.
-
-    X_sampled_ : array-like of shape (n_samples, n_features)
+    X_sampled_ : array-like of shape (n_subsamples, n_features)
         Subset of the given training data.
 
     References
@@ -166,53 +163,51 @@ class OneTimeSampling(BaseOutlierDetector):
     """
 
     @property
-    def X_sampled_(self):
-        return self.X_[self.sampled_]
+    def _metric_params(self):
+        if self.metric_params is None:
+            return dict()
+        else:
+            return self.metric_params
 
     def __init__(
-        self, contamination=0.1, metric='euclidean', n_samples=20,
+        self, contamination=0.1, metric='euclidean', n_subsamples=20,
         random_state=None, verbose=False, metric_params=None
     ):
         super().__init__(contamination=contamination, verbose=verbose)
 
         self.metric        = metric
-        self.n_samples     = n_samples
+        self.n_subsamples  = n_subsamples
         self.random_state  = random_state
         self.metric_params = metric_params
 
     def _check_params(self):
         super()._check_params()
 
-        if self.n_samples <= 0:
+        if self.n_subsamples <= 0:
             raise ValueError(
-                f'n_samples must be positive but was {self.n_samples}'
+                f'n_subsamples must be positive but was {self.n_subsamples}'
             )
 
     def _fit(self, X):
-        self.X_           = X
-        n_samples, _      = self.X_.shape
+        n_samples, _    = X.shape
+        rnd             = check_random_state(self.random_state)
 
-        if self.n_samples >= n_samples:
+        if self.n_subsamples >= n_samples:
             raise ValueError(
-                f'n_samples must be smaller than {n_samples} '
-                f'but was {self.n_samples}'
+                f'n_subsamples must be smaller than {n_samples} '
+                f'but was {self.n_subsamples}'
             )
 
-        rnd               = check_random_state(self.random_state)
-        self.sampled_     = rnd.choice(
-            n_samples, size=self.n_samples, replace=False
+        sampled         = rnd.choice(
+            n_samples, size=self.n_subsamples, replace=False
         )
 
         # sort again as choice does not guarantee sorted order
-        self.sampled_     = np.sort(self.sampled_)
+        self.sampled_   = np.sort(sampled)
+        self.X_sampled_ = X[self.sampled_]
 
-        if self.metric_params is None:
-            metric_params = {}
-        else:
-            metric_params = self.metric_params
-
-        self._metric      = DistanceMetric.get_metric(
-            self.metric, **metric_params
+        self._metric    = DistanceMetric.get_metric(
+            self.metric, **self._metric_params
         )
 
         return self
