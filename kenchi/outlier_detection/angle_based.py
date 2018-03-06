@@ -5,7 +5,7 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.externals.joblib import delayed, Parallel
 from sklearn.utils import gen_even_slices
 
-from ..base import BaseOutlierDetector
+from .base import BaseOutlierDetector
 
 __all__ = ['FastABOD']
 

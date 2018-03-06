@@ -8,7 +8,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
-from .visualization import plot_anomaly_score, plot_roc_curve
+from ..visualization import plot_anomaly_score, plot_roc_curve
 
 __all__ = ['is_outlier_detector', 'BaseOutlierDetector', 'OutlierMixin']
 
@@ -75,11 +75,11 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
 
     @abstractmethod
     def _fit(self, X):
-        """Fit the model according to the given training data."""
+        pass
 
     @abstractmethod
     def _anomaly_score(self, X):
-        """Compute the anomaly score for each sample."""
+        pass
 
     def _check_params(self):
         """Check validity of parameters and raise ValueError if not valid."""

@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.cluster import MiniBatchKMeans as SKLearnMiniBatchKMeans
 from sklearn.utils.validation import check_is_fitted
 
-from ..base import BaseOutlierDetector
+from .base import BaseOutlierDetector
 
 __all__ = ['MiniBatchKMeans']
 

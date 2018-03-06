@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.neighbors import DistanceMetric, NearestNeighbors
 from sklearn.utils import check_random_state
 
-from ..base import BaseOutlierDetector
+from .base import BaseOutlierDetector
 
 __all__ = ['KNN', 'OneTimeSampling']
 
