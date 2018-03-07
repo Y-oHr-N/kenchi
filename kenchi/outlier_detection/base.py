@@ -66,7 +66,9 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
     """
 
     # TODO: Add offset_ attribute
-    # TODO: Implement score_samples method
+    # TODO: Add score_samples method
+    # TODO: Add score method
+    # TODO: Implement a logging decorator
 
     @property
     def normalized_threshold_(self):
@@ -97,9 +99,7 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
     def _normalized_anomaly_score(self, X):
         """Compute the normalized anomaly score for each sample."""
 
-        anomaly_score = self._anomaly_score(X)
-
-        return np.maximum(0., 2. * self._rv.cdf(anomaly_score) - 1.)
+        return np.maximum(0., 2. * self._rv.cdf(self._anomaly_score(X)) - 1.)
 
     def _get_threshold(self):
         """Get the threshold according to the derived anomaly scores."""
@@ -216,9 +216,9 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
             Return -1 for outliers and +1 for inliers.
         """
 
-        y_score = self.decision_function(X, threshold=threshold)
-
-        return np.where(y_score >= 0., 1, -1)
+        return np.where(
+            self.decision_function(X, threshold=threshold) >= 0., 1, -1
+        )
 
     def plot_anomaly_score(self, X, normalize=False, **kwargs):
         """Plot the anomaly score for each sample.
