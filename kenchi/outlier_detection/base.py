@@ -49,7 +49,7 @@ class OutlierMixin:
         Returns
         -------
         y_pred : array-like of shape (n_samples,)
-            Return 1 for inliers and -1 for outliers.
+            Return -1 for outliers and +1 for inliers.
         """
 
         return self.fit(X).predict(X)
@@ -65,8 +65,8 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
     In Proceedings of SDM'11, pp. 13-24, 2011.
     """
 
+    # TODO: Add offset_ attribute
     # TODO: Implement score_samples method
-    # TODO: Implement decision_function method
 
     @abstractmethod
     def __init__(self, contamination=0.1, verbose=False):
@@ -158,6 +158,31 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
         else:
             return anomaly_score
 
+    def decision_function(self, X, threshold=None):
+        """Compute the decision function of the given samples.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Data.
+
+        threshold : float, default None
+            User-provided threshold.
+
+        Returns
+        -------
+        y_score : array-like of shape (n_samples,)
+            Shifted opposite of the anomaly score for each sample. Negative
+            scores represent outliers and positive scores represent inliers.
+        """
+
+        anomaly_score = self.anomaly_score(X)
+
+        if threshold is None:
+            threshold = self.threshold_
+
+        return threshold - anomaly_score
+
     def predict(self, X, threshold=None):
         """Predict if a particular sample is an outlier or not.
 
@@ -172,15 +197,12 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
         Returns
         -------
         y_pred : array-like of shape (n_samples,)
-            Return 1 for inliers and -1 for outliers.
+            Return -1 for outliers and +1 for inliers.
         """
 
-        anomaly_score = self.anomaly_score(X)
+        y_score = self.decision_function(X, threshold=threshold)
 
-        if threshold is None:
-            threshold = self.threshold_
-
-        return np.where(anomaly_score <= threshold, 1, -1)
+        return np.where(y_score >= 0., 1, -1)
 
     def plot_anomaly_score(self, X, **kwargs):
         """Plot the anomaly score for each sample.
