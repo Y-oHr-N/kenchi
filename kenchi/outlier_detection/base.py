@@ -2,9 +2,9 @@ import time
 from abc import abstractmethod, ABC
 
 import numpy as np
+from scipy.stats import norm
 from sklearn.base import BaseEstimator
 from sklearn.externals.joblib import logger
-from sklearn.preprocessing import MinMaxScaler
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
@@ -95,19 +95,21 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
 
         anomaly_score = self._anomaly_score(X)
 
-        return self._scaler.transform(anomaly_score[:, np.newaxis]).flat[:]
+        return np.maximum(0., 2. * self._rv.cdf(anomaly_score) - 1.)
 
     def _get_threshold(self):
-        """Define the threshold according to the given training data."""
+        """Get the threshold according to the derived anomaly scores."""
 
         return np.percentile(
             self.anomaly_score_, 100. * (1. - self.contamination)
         )
 
-    def _get_scaler(self):
-        """Define the scaler according to the given training data."""
+    def _get_rv(self):
+        """Get the RV object according to the derived anomaly scores."""
 
-        return MinMaxScaler().fit(self.anomaly_score_[:, np.newaxis])
+        loc, scale = norm.fit(self.anomaly_score_)
+
+        return norm(loc=loc, scale=scale)
 
     def fit(self, X, y=None):
         """Fit the model according to the given training data.
@@ -135,7 +137,7 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
 
         self.anomaly_score_ = self._anomaly_score(X)
         self.threshold_     = self._get_threshold()
-        self._scaler        = self._get_scaler()
+        self._rv            = self._get_rv()
 
         if getattr(self, 'verbose', False):
             print(f'elaplsed: {logger.short_format_time(self.fit_time_)}')
@@ -159,7 +161,7 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
             Anomaly score for each sample.
         """
 
-        check_is_fitted(self, '_scaler')
+        check_is_fitted(self, '_rv')
 
         X = check_array(X, estimator=self)
 
