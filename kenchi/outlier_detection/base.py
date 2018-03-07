@@ -73,14 +73,6 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
         self.contamination = contamination
         self.verbose       = verbose
 
-    @abstractmethod
-    def _fit(self, X):
-        pass
-
-    @abstractmethod
-    def _anomaly_score(self, X):
-        pass
-
     def _check_params(self):
         """Check validity of parameters and raise ValueError if not valid."""
 
@@ -90,12 +82,32 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
                 f'but was {self.contamination}'
             )
 
+    @abstractmethod
+    def _fit(self, X):
+        pass
+
+    @abstractmethod
+    def _anomaly_score(self, X):
+        pass
+
+    def _normalize_anomaly_score(self, X):
+        """Compute the normalize anomaly score for each sample."""
+
+        anomaly_score = self._anomaly_score(X)
+
+        return self._scaler.transform(anomaly_score[:, np.newaxis]).flat[:]
+
     def _get_threshold(self):
         """Define the threshold according to the given training data."""
 
         return np.percentile(
             self.anomaly_score_, 100. * (1. - self.contamination)
         )
+
+    def _get_scaler(self):
+        """Define the scaler according to the given training data."""
+
+        return MinMaxScaler().fit(self.anomaly_score_[:, np.newaxis])
 
     def fit(self, X, y=None):
         """Fit the model according to the given training data.
@@ -123,8 +135,7 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
 
         self.anomaly_score_ = self._anomaly_score(X)
         self.threshold_     = self._get_threshold()
-        self._scaler        = MinMaxScaler(
-        ).fit(self.anomaly_score_[:, np.newaxis])
+        self._scaler        = self._get_scaler()
 
         if getattr(self, 'verbose', False):
             print(f'elaplsed: {logger.short_format_time(self.fit_time_)}')
@@ -150,13 +161,12 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
 
         check_is_fitted(self, '_scaler')
 
-        X             = check_array(X, estimator=self)
-        anomaly_score = self._anomaly_score(X)
+        X = check_array(X, estimator=self)
 
         if normalize:
-            return self._scaler.transform(anomaly_score[:, np.newaxis]).flat[:]
+            return self._normalize_anomaly_score(X)
         else:
-            return anomaly_score
+            return self._anomaly_score(X)
 
     def decision_function(self, X, threshold=None):
         """Compute the decision function of the given samples.
