@@ -94,8 +94,8 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
     def _anomaly_score(self, X):
         pass
 
-    def _normalize_anomaly_score(self, X):
-        """Compute the normalize anomaly score for each sample."""
+    def _normalized_anomaly_score(self, X):
+        """Compute the normalized anomaly score for each sample."""
 
         anomaly_score = self._anomaly_score(X)
 
@@ -170,7 +170,7 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
         X = check_array(X, estimator=self)
 
         if normalize:
-            return self._normalize_anomaly_score(X)
+            return self._normalized_anomaly_score(X)
         else:
             return self._anomaly_score(X)
 
