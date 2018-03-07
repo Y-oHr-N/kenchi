@@ -68,6 +68,10 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
     # TODO: Add offset_ attribute
     # TODO: Implement score_samples method
 
+    @property
+    def normalized_threshold_(self):
+        return np.maximum(0., 2. * self._rv.cdf(self.threshold_) - 1.)
+
     @abstractmethod
     def __init__(self, contamination=0.1, verbose=False):
         self.contamination = contamination
@@ -216,13 +220,16 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
 
         return np.where(y_score >= 0., 1, -1)
 
-    def plot_anomaly_score(self, X, **kwargs):
+    def plot_anomaly_score(self, X, normalize=False, **kwargs):
         """Plot the anomaly score for each sample.
 
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features)
             Data.
+
+        normalize : bool, default False
+            If True, return the normalized anomaly score.
 
         ax : matplotlib Axes, default None
             Target axes instance.
@@ -266,9 +273,17 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
             Axes on which the plot was drawn.
         """
 
-        kwargs['threshold'] = self.threshold_
+        kwargs['label']         = self.__class__.__name__
 
-        return plot_anomaly_score(self.anomaly_score(X), **kwargs)
+        if normalize:
+            kwargs['ylim']      = (0., 1.)
+            kwargs['threshold'] = self.normalized_threshold_
+        else:
+            kwargs['threshold'] = self.threshold_
+
+        return plot_anomaly_score(
+            self.anomaly_score(X, normalize=normalize), **kwargs
+        )
 
     def plot_roc_curve(self, X, y, **kwargs):
         """Plot the Receiver Operating Characteristic (ROC) curve.

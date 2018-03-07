@@ -122,6 +122,9 @@ def plot_anomaly_score(
             anomaly_score, bins=bins, density=True, orientation='horizontal'
         )
 
+    if 'label' in kwargs:
+        ax.legend(loc='upper left')
+
     if filename is not None:
         ax.figure.savefig(filename)
 
