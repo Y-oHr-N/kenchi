@@ -60,13 +60,13 @@ Usage
     from kenchi.outlier_detection import SparseStructureLearning
 
     # Generate the training data
-    X, _ = make_blobs(centers=1, random_state=1)
+    X, _ = make_blobs(centers=1, random_state=1, shuffle=False)
 
     # Fit the model according to the given training data
-    det  = SparseStructureLearning().fit(X)
+    det  = SparseStructureLearning(contamination=0.02).fit(X)
 
     # Plot the anomaly score for each training sample
-    det.plot_anomaly_score(linestyle='', marker='.')
+    det.plot_anomaly_score(X, normalize=True, linestyle='', marker='.')
 
     plt.show()
 
