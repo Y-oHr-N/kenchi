@@ -67,7 +67,6 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
 
     # TODO: Add offset_ attribute
     # TODO: Add score_samples method
-    # TODO: Add score method
     # TODO: Implement a logging decorator
 
     @property
@@ -82,9 +81,9 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
     def _check_params(self):
         """Check validity of parameters and raise ValueError if not valid."""
 
-        if not 0. <= self.contamination <= 0.5:
+        if not 0. < self.contamination <= 0.5:
             raise ValueError(
-                f'contamination must be between 0.0 and 0.5 inclusive '
+                f'contamination must be in (0.0, 0.5] '
                 f'but was {self.contamination}'
             )
 
