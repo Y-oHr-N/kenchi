@@ -275,10 +275,12 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
         kwargs['label']         = self.__class__.__name__
 
         if normalize:
-            kwargs['ylim']      = (0., 1.)
+            kwargs['ylim']      = (0., 1.05)
             kwargs['threshold'] = self.normalized_threshold_
         else:
             kwargs['threshold'] = self.threshold_
+
+        kwargs.setdefault('ylim', (0., 2. * self.threshold_))
 
         return plot_anomaly_score(
             self.anomaly_score(X, normalize=normalize), **kwargs

@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.stats import gaussian_kde
 from sklearn.metrics import auc, roc_curve
 from sklearn.utils.validation import check_array, check_symmetric, column_or_1d
 
@@ -9,9 +10,7 @@ __all__ = [
     'plot_partial_corrcoef'
 ]
 
-# TODO: Implement plot_featurewise_anomaly_score function
-# TODO: Update plot_anomaly_score function so that a gaussian kernel density
-# estimate can be plotted
+# TODO: Add plot_featurewise_anomaly_score function
 
 
 def plot_anomaly_score(
@@ -79,17 +78,18 @@ def plot_anomaly_score(
     import matplotlib.pyplot as plt
     from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-    anomaly_score = column_or_1d(anomaly_score)
-    n_samples,    = anomaly_score.shape
+    anomaly_score       = column_or_1d(anomaly_score)
+    n_samples,          = anomaly_score.shape
+    xlocs               = np.arange(n_samples)
 
     if ax is None:
-        _, ax     = plt.subplots(figsize=figsize)
+        _, ax           = plt.subplots(figsize=figsize)
 
     if xlim is None:
-        xlim      = (0., n_samples - 1.)
+        xlim            = (0., n_samples - 1.)
 
     if ylim is None:
-        ylim      = (0., 1.1 * np.max(anomaly_score))
+        ylim            = (0., 1.05 * np.max(anomaly_score))
 
     if title is not None:
         ax.set_title(title)
@@ -100,27 +100,42 @@ def plot_anomaly_score(
     if ylabel is not None:
         ax.set_ylabel(ylabel)
 
+    line,               = ax.plot(xlocs, anomaly_score, **kwargs)
+    color               = line.get_color()
+
     if threshold is not None:
-        ax.hlines(threshold, xlim[0], xlim[1])
+        ax.hlines(threshold, xlim[0], xlim[1], color=color)
 
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
     ax.grid(grid, linestyle=':')
-    ax.plot(np.arange(n_samples), anomaly_score, **kwargs)
 
     if hist:
         # Create an axes on the right side of ax
-        divider   = make_axes_locatable(ax)
-        ax_hist_y = divider.append_axes(
+        divider         = make_axes_locatable(ax)
+        ax_hist_y       = divider.append_axes(
             'right', size='20%', pad=0.1, sharey=ax
         )
 
-        ax_hist_y.set_ylim(ylim)
-        ax_hist_y.yaxis.set_tick_params(labelleft=False)
-        ax_hist_y.grid(grid, linestyle=':')
+        kde             = gaussian_kde(anomaly_score)
+        ylocs           = np.linspace(ylim[0], ylim[1])
+
+        # Draw a histogram
         ax_hist_y.hist(
-            anomaly_score, bins=bins, density=True, orientation='horizontal'
+            anomaly_score,
+            alpha       = 0.4,
+            bins        = bins,
+            color       = color,
+            density     = True,
+            orientation = 'horizontal'
         )
+
+        # Draw a gaussian kernel density estimate
+        ax_hist_y.plot(kde(ylocs), ylocs, color=color)
+
+        ax_hist_y.yaxis.set_tick_params(labelleft=False)
+        ax_hist_y.set_ylim(ylim)
+        ax_hist_y.grid(grid, linestyle=':')
 
     if 'label' in kwargs:
         ax.legend(loc='upper left')
