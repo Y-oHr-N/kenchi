@@ -242,9 +242,6 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
         filename : str, default None
             If provided, save the current figure.
 
-        grid : boolean, default True
-            If True, turn the axes grids on.
-
         hist : bool, default True
             If True, plot a histogram of anomaly scores.
 
@@ -308,9 +305,6 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
 
         filename : str, default None
             If provided, save the current figure.
-
-        grid : boolean, default True
-            If True, turn the axes grids on.
 
         label : str, default None
             Legend label.

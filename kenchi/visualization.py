@@ -15,9 +15,9 @@ __all__ = [
 
 def plot_anomaly_score(
     anomaly_score, ax=None, bins='auto', figsize=None,
-    filename=None, grid=True, hist=True, kde=True,
-    threshold=None, title=None, xlabel='Samples', xlim=None,
-    ylabel='Anomaly score', ylim=None, **kwargs
+    filename=None, hist=True, kde=True, threshold=None,
+    title=None, xlabel='Samples', xlim=None, ylabel='Anomaly score',
+    ylim=None, **kwargs
 ):
     """Plot the anomaly score for each sample.
 
@@ -37,9 +37,6 @@ def plot_anomaly_score(
 
     filename : str, default None
         If provided, save the current figure.
-
-    grid : bool, default True
-        If True, turn the axes grids on.
 
     hist : bool, default True
         If True, plot a histogram of anomaly scores.
@@ -111,7 +108,7 @@ def plot_anomaly_score(
 
     ax.set_xlim(xlim)
     ax.set_ylim(ylim)
-    ax.grid(grid, linestyle=':')
+    ax.grid(True, linestyle=':')
 
     if hist or kde:
         # Create an axes on the right side of ax
@@ -122,7 +119,7 @@ def plot_anomaly_score(
 
         ax_hist_y.yaxis.set_tick_params(labelleft=False)
         ax_hist_y.set_ylim(ylim)
-        ax_hist_y.grid(grid, linestyle=':')
+        ax_hist_y.grid(True, linestyle=':')
 
     if hist:
         # Draw a histogram
@@ -153,8 +150,8 @@ def plot_anomaly_score(
 
 def plot_roc_curve(
     y_true, y_score, ax=None, figsize=None,
-    filename=None, grid=True, label=None, title=None,
-    xlabel='FPR', ylabel='TPR', **kwargs
+    filename=None, label=None, title=None, xlabel='FPR',
+    ylabel='TPR', **kwargs
 ):
     """Plot the Receiver Operating Characteristic (ROC) curve.
 
@@ -174,9 +171,6 @@ def plot_roc_curve(
 
     filename : str, default None
         If provided, save the current figure.
-
-    grid : bool, default True
-        If True, turn the axes grids on.
 
     label : str, default None
         Legend label.
@@ -225,7 +219,7 @@ def plot_roc_curve(
 
     ax.set_xlim(0., 1.)
     ax.set_ylim(0., 1.05)
-    ax.grid(grid, linestyle=':')
+    ax.grid(True, linestyle=':')
     ax.plot(fpr, tpr, label=label, **kwargs)
     ax.legend(loc='lower right')
 

@@ -131,11 +131,11 @@ class Pipeline(SKLearnPipeline):
         filename : str, default None
             If provided, save the current figure.
 
-        grid : boolean, default True
-            If True, turn the axes grids on.
-
         hist : bool, default True
             If True, plot a histogram of anomaly scores.
+
+        kde : bool, default True
+            If True, plot a gaussian kernel density estimate.
 
         title : string, default None
             Axes title. To disable, pass None.
@@ -186,9 +186,6 @@ class Pipeline(SKLearnPipeline):
 
         filename : str, default None
             If provided, save the current figure.
-
-        grid : boolean, default True
-            If True, turn the axes grids on.
 
         label : str, default None
             Legend label.
