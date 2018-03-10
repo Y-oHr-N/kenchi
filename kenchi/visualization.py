@@ -78,18 +78,48 @@ def plot_anomaly_score(
     import matplotlib.pyplot as plt
     from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-    anomaly_score       = column_or_1d(anomaly_score)
-    n_samples,          = anomaly_score.shape
-    xlocs               = np.arange(n_samples)
+    def _get_ax_hist(ax):
+        locator          = ax.get_axes_locator()
+
+        if locator is None:
+            # Create an axes on the right side of ax
+            divider      = make_axes_locatable(ax)
+            ax_hist      = divider.append_axes(
+                'right', '20%', pad=0.1, sharey=ax
+            )
+
+            return ax_hist
+
+        for ax_hist in ax.get_figure().get_axes():
+            locator_hist = ax_hist.get_axes_locator()
+
+            if ax_hist == ax:
+                continue
+
+            if locator_hist is None:
+                continue
+
+            if locator_hist._axes_divider == locator._axes_divider:
+                return ax_hist
+
+    anomaly_score        = column_or_1d(anomaly_score)
+    n_samples,           = anomaly_score.shape
+    xlocs                = np.arange(n_samples)
 
     if ax is None:
-        _, ax           = plt.subplots(figsize=figsize)
+        _, ax            = plt.subplots(figsize=figsize)
+
+    ax.grid(True, linestyle=':')
 
     if xlim is None:
-        xlim            = (0., n_samples - 1.)
+        xlim             = (0., n_samples - 1.)
+
+    ax.set_xlim(xlim)
 
     if ylim is None:
-        ylim            = (0., 1.05 * np.max(anomaly_score))
+        ylim             = (0., 1.05 * np.max(anomaly_score))
+
+    ax.set_ylim(ylim)
 
     if title is not None:
         ax.set_title(title)
@@ -100,50 +130,42 @@ def plot_anomaly_score(
     if ylabel is not None:
         ax.set_ylabel(ylabel)
 
-    line,               = ax.plot(xlocs, anomaly_score, **kwargs)
-    color               = line.get_color()
+    line,                = ax.plot(xlocs, anomaly_score, **kwargs)
+    color                = line.get_color()
 
     if threshold is not None:
         ax.hlines(threshold, xlim[0], xlim[1], color=color)
 
-    ax.set_xlim(xlim)
-    ax.set_ylim(ylim)
-    ax.grid(True, linestyle=':')
-
     if hist or kde:
-        # Create an axes on the right side of ax
-        divider         = make_axes_locatable(ax)
-        ax_hist_y       = divider.append_axes(
-            'right', size='20%', pad=0.1, sharey=ax
-        )
+        ax_hist          = _get_ax_hist(ax)
 
-        ax_hist_y.yaxis.set_tick_params(labelleft=False)
-        ax_hist_y.set_ylim(ylim)
-        ax_hist_y.grid(True, linestyle=':')
+        ax_hist.grid(True, linestyle=':')
+        ax_hist.tick_params(axis='y', labelleft=False)
+        ax_hist.set_ylim(ylim)
 
     if hist:
         # Draw a histogram
-        ax_hist_y.hist(
+        ax_hist.hist(
             anomaly_score,
-            alpha       = 0.4,
-            bins        = bins,
-            color       = color,
-            density     = True,
-            orientation = 'horizontal'
+            alpha        = 0.4,
+            bins         = bins,
+            color        = color,
+            density      = True,
+            orientation  = 'horizontal'
         )
 
     if kde:
-        kernel          = gaussian_kde(anomaly_score)
-        ylocs           = np.linspace(ylim[0], ylim[1])
+        kernel           = gaussian_kde(anomaly_score)
+        ylocs            = np.linspace(ylim[0], ylim[1])
 
         # Draw a gaussian kernel density estimate
-        ax_hist_y.plot(kernel(ylocs), ylocs, color=color)
+        ax_hist.plot(kernel(ylocs), ylocs, color=color)
 
     if 'label' in kwargs:
         ax.legend(loc='upper left')
 
     if filename is not None:
-        ax.figure.savefig(filename)
+        ax.get_figure().savefig(filename)
 
     return ax
 
@@ -224,7 +246,7 @@ def plot_roc_curve(
     ax.legend(loc='lower right')
 
     if filename is not None:
-        ax.figure.savefig(filename)
+        ax.get_figure().savefig(filename)
 
     return ax
 
@@ -302,7 +324,7 @@ def plot_graphical_model(
     ax.yaxis.set_tick_params(labelleft=False, left=False)
 
     if filename is not None:
-        ax.figure.savefig(filename)
+        ax.get_figure().savefig(filename)
 
     return ax
 
@@ -385,9 +407,9 @@ def plot_partial_corrcoef(
         divider          = make_axes_locatable(ax)
         cax              = divider.append_axes('right', size='5%', pad=0.1)
 
-        ax.figure.colorbar(mesh, cax=cax)
+        ax.get_figure().colorbar(mesh, cax=cax)
 
     if filename is not None:
-        ax.figure.savefig(filename)
+        ax.get_figure().savefig(filename)
 
     return ax
