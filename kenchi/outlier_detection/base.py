@@ -248,6 +248,9 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
         hist : bool, default True
             If True, plot a histogram of anomaly scores.
 
+        kde : bool, default True
+            If True, plot a gaussian kernel density estimate.
+
         title : string, default None
             Axes title. To disable, pass None.
 

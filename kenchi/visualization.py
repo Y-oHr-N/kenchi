@@ -15,9 +15,9 @@ __all__ = [
 
 def plot_anomaly_score(
     anomaly_score, ax=None, bins='auto', figsize=None,
-    filename=None, grid=True, hist=True, threshold=None,
-    title=None, xlabel='Samples', xlim=None, ylabel='Anomaly score',
-    ylim=None, **kwargs
+    filename=None, grid=True, hist=True, kde=True,
+    threshold=None, title=None, xlabel='Samples', xlim=None,
+    ylabel='Anomaly score', ylim=None, **kwargs
 ):
     """Plot the anomaly score for each sample.
 
@@ -43,6 +43,9 @@ def plot_anomaly_score(
 
     hist : bool, default True
         If True, plot a histogram of anomaly scores.
+
+    kde : bool, default True
+        If True, plot a gaussian kernel density estimate.
 
     threshold : float, default None
         Threshold.
@@ -110,16 +113,18 @@ def plot_anomaly_score(
     ax.set_ylim(ylim)
     ax.grid(grid, linestyle=':')
 
-    if hist:
+    if hist or kde:
         # Create an axes on the right side of ax
         divider         = make_axes_locatable(ax)
         ax_hist_y       = divider.append_axes(
             'right', size='20%', pad=0.1, sharey=ax
         )
 
-        kde             = gaussian_kde(anomaly_score)
-        ylocs           = np.linspace(ylim[0], ylim[1])
+        ax_hist_y.yaxis.set_tick_params(labelleft=False)
+        ax_hist_y.set_ylim(ylim)
+        ax_hist_y.grid(grid, linestyle=':')
 
+    if hist:
         # Draw a histogram
         ax_hist_y.hist(
             anomaly_score,
@@ -130,12 +135,12 @@ def plot_anomaly_score(
             orientation = 'horizontal'
         )
 
-        # Draw a gaussian kernel density estimate
-        ax_hist_y.plot(kde(ylocs), ylocs, color=color)
+    if kde:
+        kernel          = gaussian_kde(anomaly_score)
+        ylocs           = np.linspace(ylim[0], ylim[1])
 
-        ax_hist_y.yaxis.set_tick_params(labelleft=False)
-        ax_hist_y.set_ylim(ylim)
-        ax_hist_y.grid(grid, linestyle=':')
+        # Draw a gaussian kernel density estimate
+        ax_hist_y.plot(kernel(ylocs), ylocs, color=color)
 
     if 'label' in kwargs:
         ax.legend(loc='upper left')
