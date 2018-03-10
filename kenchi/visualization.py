@@ -172,8 +172,8 @@ def plot_anomaly_score(
 
 def plot_roc_curve(
     y_true, y_score, ax=None, figsize=None,
-    filename=None, label=None, title=None, xlabel='FPR',
-    ylabel='TPR', **kwargs
+    filename=None, title='ROC curve', xlabel='FPR', ylabel='TPR',
+    **kwargs
 ):
     """Plot the Receiver Operating Characteristic (ROC) curve.
 
@@ -194,10 +194,7 @@ def plot_roc_curve(
     filename : str, default None
         If provided, save the current figure.
 
-    label : str, default None
-        Legend label.
-
-    title : string, default None
+    title : string, default 'ROC curve'
         Axes title. To disable, pass None.
 
     xlabel : string, default 'FPR'
@@ -221,14 +218,15 @@ def plot_roc_curve(
 
     import matplotlib.pyplot as plt
 
-    fpr, tpr, _ = roc_curve(y_true, y_score, pos_label=-1)
-    roc_auc     = auc(fpr, tpr)
+    fpr, tpr, _          = roc_curve(y_true, y_score)
+    roc_auc              = auc(fpr, tpr)
 
     if ax is None:
-        _, ax   = plt.subplots(figsize=figsize)
+        _, ax            = plt.subplots(figsize=figsize)
 
-    if label is None:
-        label   = f'area={roc_auc:1.3f}'
+    ax.grid(True, linestyle=':')
+    ax.set_xlim(0., 1.)
+    ax.set_ylim(0., 1.05)
 
     if title is not None:
         ax.set_title(title)
@@ -239,10 +237,13 @@ def plot_roc_curve(
     if ylabel is not None:
         ax.set_ylabel(ylabel)
 
-    ax.set_xlim(0., 1.)
-    ax.set_ylim(0., 1.05)
-    ax.grid(True, linestyle=':')
-    ax.plot(fpr, tpr, label=label, **kwargs)
+    if 'label' in kwargs:
+        kwargs['label'] += f' (area={roc_auc:1.3f})'
+    else:
+        kwargs['label']  = f'area={roc_auc:1.3f}'
+
+    ax.plot(fpr, tpr, **kwargs)
+
     ax.legend(loc='lower right')
 
     if filename is not None:

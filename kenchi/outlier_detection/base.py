@@ -306,10 +306,7 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
         filename : str, default None
             If provided, save the current figure.
 
-        label : str, default None
-            Legend label.
-
-        title : string, default None
+        title : string, default 'ROC curve'
             Axes title. To disable, pass None.
 
         xlabel : string, default 'FPR'
@@ -327,4 +324,6 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
             Axes on which the plot was drawn.
         """
 
-        return plot_roc_curve(y, self.anomaly_score(X), **kwargs)
+        kwargs['label'] = self.__class__.__name__
+
+        return plot_roc_curve(y, self.decision_function(X), **kwargs)
