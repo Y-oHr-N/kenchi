@@ -161,9 +161,9 @@ class Pipeline(SKLearnPipeline):
             Axes on which the plot was drawn.
         """
 
-        return self._final_estimator.plot_anomaly_score(
-            self._pre_transform(X), **kwargs
-        )
+        kwargs['X'] = self._pre_transform(X)
+
+        return self._final_estimator.plot_anomaly_score(**kwargs)
 
     @if_delegate_has_method(delegate='_final_estimator')
     def plot_roc_curve(self, X, y, **kwargs):
@@ -187,9 +187,6 @@ class Pipeline(SKLearnPipeline):
         filename : str, default None
             If provided, save the current figure.
 
-        label : str, default None
-            Legend label.
-
         title : string, default None
             Axes title. To disable, pass None.
 
@@ -208,9 +205,10 @@ class Pipeline(SKLearnPipeline):
             Axes on which the plot was drawn.
         """
 
-        return self._final_estimator.plot_roc_curve(
-            self._pre_transform(X), y, **kwargs
-        )
+        kwargs['X'] = self._pre_transform(X)
+        kwargs['y'] = y
+
+        return self._final_estimator.plot_roc_curve(**kwargs)
 
     @property
     def plot_graphical_model(self):
@@ -227,9 +225,6 @@ class Pipeline(SKLearnPipeline):
 
         filename : str, default None
             If provided, save the current figure.
-
-        pos : dict, default None
-            Dictionary with nodes as keys and positions as values.
 
         random_state : int, RandomState instance, default None
             Seed of the pseudo random number generator.
@@ -266,9 +261,6 @@ class Pipeline(SKLearnPipeline):
 
         filename : str, default None
             If provided, save the current figure.
-
-        linewidth : float, default 0.1
-            Width of the lines that will divide each cell.
 
         title : string, default 'Partial correlation'
             Axes title. To disable, pass None.

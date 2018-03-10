@@ -523,9 +523,6 @@ class SparseStructureLearning(BaseOutlierDetector):
         filename : str, default None
             If provided, save the current figure.
 
-        pos : dict, default None
-            Dictionary with nodes as keys and positions as values.
-
         random_state : int, RandomState instance, default None
             Seed of the pseudo random number generator.
 
@@ -541,20 +538,20 @@ class SparseStructureLearning(BaseOutlierDetector):
             Axes on which the plot was drawn.
         """
 
-        if 'node_color' not in kwargs:
-            kwargs['node_color'] = self.labels_
+        n_features  = self.location_.size
+        title       = (
+            f'GGM ('
+            f'n_clusters={np.max(self.labels_) + 1}, '
+            f'n_features={n_features}, '
+            f'n_isolates={self.isolates_.size}'
+            f')'
+        )
+        kwargs['G'] = self.graphical_model_
 
-        if 'title' not in kwargs:
-            n_features, _        = self.precision_.shape
-            kwargs['title']      = (
-                f'GGM ('
-                f'n_clusters={np.max(self.labels_) + 1}, '
-                f'n_features={n_features}, '
-                f'n_isolates={self.isolates_.size}'
-                f')'
-            )
+        kwargs.setdefault('node_color', self.labels_)
+        kwargs.setdefault('title', title)
 
-        return plot_graphical_model(self.graphical_model_, **kwargs)
+        return plot_graphical_model(**kwargs)
 
     def plot_partial_corrcoef(self, **kwargs):
         """Plot the partial correlation coefficient matrix.
@@ -573,9 +570,6 @@ class SparseStructureLearning(BaseOutlierDetector):
         filename : str, default None
             If provided, save the current figure.
 
-        linewidth : float, default 0.1
-            Width of the lines that will divide each cell.
-
         title : string, default 'Partial correlation'
             Axes title. To disable, pass None.
 
@@ -588,4 +582,6 @@ class SparseStructureLearning(BaseOutlierDetector):
             Axes on which the plot was drawn.
         """
 
-        return plot_partial_corrcoef(self.partial_corrcoef_, **kwargs)
+        kwargs['partial_corrcoef'] = self.partial_corrcoef_
+
+        return plot_partial_corrcoef(**kwargs)

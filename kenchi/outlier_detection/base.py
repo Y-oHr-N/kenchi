@@ -65,10 +65,6 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
     In Proceedings of SDM'11, pp. 13-24, 2011.
     """
 
-    # TODO: Add offset_ attribute
-    # TODO: Add score_samples method
-    # TODO: Implement a logging decorator
-
     @property
     def normalized_threshold_(self):
         return np.maximum(0., 2. * self._rv.cdf(self.threshold_) - 1.)
@@ -272,19 +268,21 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
             Axes on which the plot was drawn.
         """
 
-        kwargs['label']         = self.__class__.__name__
+        kwargs['anomaly_score'] = self.anomaly_score(X, normalize=normalize)
+
+        kwargs.setdefault('label', self.__class__.__name__)
 
         if normalize:
-            kwargs['ylim']      = (0., 1.05)
             kwargs['threshold'] = self.normalized_threshold_
+
+            kwargs.setdefault('ylim', (0., 1.05))
+
         else:
             kwargs['threshold'] = self.threshold_
 
-        kwargs.setdefault('ylim', (0., 2. * self.threshold_))
+            kwargs.setdefault('ylim', (0., 2. * self.threshold_))
 
-        return plot_anomaly_score(
-            self.anomaly_score(X, normalize=normalize), **kwargs
-        )
+        return plot_anomaly_score(**kwargs)
 
     def plot_roc_curve(self, X, y, **kwargs):
         """Plot the Receiver Operating Characteristic (ROC) curve.
@@ -324,6 +322,9 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
             Axes on which the plot was drawn.
         """
 
-        kwargs['label'] = self.__class__.__name__
+        kwargs['y_true']  = y
+        kwargs['y_score'] = self.decision_function(X)
 
-        return plot_roc_curve(y, self.decision_function(X), **kwargs)
+        kwargs.setdefault('label', self.__class__.__name__)
+
+        return plot_roc_curve(**kwargs)

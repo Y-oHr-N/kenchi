@@ -10,8 +10,6 @@ __all__ = [
     'plot_partial_corrcoef'
 ]
 
-# TODO: Add plot_featurewise_anomaly_score function
-
 
 def plot_anomaly_score(
     anomaly_score, ax=None, bins='auto', figsize=None,
@@ -253,14 +251,14 @@ def plot_roc_curve(
 
 
 def plot_graphical_model(
-    graphical_model, ax=None, figsize=None, filename=None,
-    pos=None, random_state=None, title='GGM', **kwargs
+    G, ax=None, figsize=None, filename=None,
+    random_state=None, title='GGM', **kwargs
 ):
     """Plot the Gaussian Graphical Model (GGM).
 
     Parameters
     ----------
-    graphical_model : networkx Graph
+    G : networkx Graph
         GGM.
 
     ax : matplotlib Axes, default None
@@ -271,9 +269,6 @@ def plot_graphical_model(
 
     filename : str, default None
         If provided, save the current figure.
-
-    pos : dict, default None
-        Dictionary with nodes as keys and positions as values.
 
     random_state : int, RandomState instance, default None
         Seed of the pseudo random number generator.
@@ -297,32 +292,28 @@ def plot_graphical_model(
     import matplotlib.pyplot as plt
     import networkx as nx
 
-    if pos is None:
-        pos             = nx.spring_layout(
-            graphical_model, random_state=random_state
-        )
-
     if ax is None:
-        _, ax           = plt.subplots(figsize=figsize)
+        _, ax = plt.subplots(figsize=figsize)
 
     if title is not None:
         ax.set_title(title)
 
+    node_size = np.array([30. * (d + 1.) for _, d in G.degree])
+    pos       = nx.spring_layout(G, random_state=random_state)
+    width     = np.abs([3. * w for _, _, w in G.edges(data='weight')])
+
     # Add the draw_networkx kwargs here
-    kwargs['cmap']      = 'Spectral'
-    kwargs['node_size'] = np.array([
-        10. * (d + 1.) for _, d in graphical_model.degree
-    ])
-    kwargs['width']     = np.abs([
-        10. * w for _, _, w in graphical_model.edges(data='weight')
-    ])
+    kwargs.setdefault('cmap', 'Spectral')
+    kwargs.setdefault('node_size', node_size)
+    kwargs.setdefault('pos', pos)
+    kwargs.setdefault('width', width)
 
     # Draw the Gaussian grapchical model
-    nx.draw_networkx(graphical_model, pos=pos, ax=ax, **kwargs)
+    nx.draw_networkx(G, ax=ax, **kwargs)
 
     # Turn off tick visibility
-    ax.xaxis.set_tick_params(labelbottom=False, bottom=False)
-    ax.yaxis.set_tick_params(labelleft=False, left=False)
+    ax.tick_params('x', labelbottom=False, bottom=False)
+    ax.tick_params('y', labelleft=False, left=False)
 
     if filename is not None:
         ax.get_figure().savefig(filename)
@@ -332,7 +323,7 @@ def plot_graphical_model(
 
 def plot_partial_corrcoef(
     partial_corrcoef, ax=None, cbar=True, figsize=None,
-    filename=None, linewidth=0.1, title='Partial correlation', **kwargs
+    filename=None, title='Partial correlation', **kwargs
 ):
     """Plot the partial correlation coefficient matrix.
 
@@ -353,9 +344,6 @@ def plot_partial_corrcoef(
     filename : str, default None
         If provided, save the current figure.
 
-    linewidth : float, default 0.1
-        Width of the lines that will divide each cell.
-
     title : string, default 'Partial correlation'
         Axes title. To disable, pass None.
 
@@ -375,26 +363,24 @@ def plot_partial_corrcoef(
     import matplotlib.pyplot as plt
     from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-    partial_corrcoef     = check_array(partial_corrcoef)
-    partial_corrcoef     = check_symmetric(
-        partial_corrcoef, raise_exception=True
-    )
+    partial_corrcoef = check_array(partial_corrcoef)
+    partial_corrcoef = check_symmetric(partial_corrcoef, raise_exception=True)
 
     if ax is None:
-        _, ax            = plt.subplots(figsize=figsize)
+        _, ax        = plt.subplots(figsize=figsize)
 
     if title is not None:
         ax.set_title(title)
 
     # Add the pcolormesh kwargs here
-    kwargs['cmap']       = 'RdBu'
-    kwargs['edgecolors'] = 'white'
-    kwargs['vmin']       = -1.
-    kwargs['vmax']       = 1.
+    kwargs.setdefault('cmap', 'RdBu')
+    kwargs.setdefault('edgecolors', 'white')
+    kwargs.setdefault('vmin', -1.)
+    kwargs.setdefault('vmax', 1.)
 
     # Draw the heatmap
-    mesh                 = ax.pcolormesh(
-        np.ma.masked_equal(partial_corrcoef, 0.), linewidth=linewidth, **kwargs
+    mesh             = ax.pcolormesh(
+        np.ma.masked_equal(partial_corrcoef, 0.), **kwargs
     )
 
     ax.set_aspect('equal')
@@ -405,8 +391,8 @@ def plot_partial_corrcoef(
 
     if cbar:
         # Create an axes on the right side of ax
-        divider          = make_axes_locatable(ax)
-        cax              = divider.append_axes('right', size='5%', pad=0.1)
+        divider      = make_axes_locatable(ax)
+        cax          = divider.append_axes('right', '5%', pad=0.1)
 
         ax.get_figure().colorbar(mesh, cax=cax)
 
