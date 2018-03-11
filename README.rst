@@ -56,21 +56,21 @@ Usage
 .. code:: python
 
     import matplotlib.pyplot as plt
-    from kenchi.datasets import make_blobs
-    from kenchi.outlier_detection import SparseStructureLearning
+    from kenchi.datasets import load_breast_cancer
+    from kenchi.outlier_detection import *
 
-    # Generate the training data
-    X, _ = make_blobs(centers=1, random_state=1, shuffle=False)
+    f, ax = plt.subplots()
 
-    # Fit the model according to the given training data
-    det  = SparseStructureLearning(contamination=0.02).fit(X)
+    # Load the breast cancer wisconsin dataset
+    X, y  = load_breast_cancer(random_state=0)
 
-    # Plot the anomaly score for each training sample
-    det.plot_anomaly_score(X, normalize=True, linestyle='', marker='.')
+    for det in [FastABOD(), KNN(), MiniBatchKMeans(), PCA(), KDE()]:
+        # Fit the model, and plot the ROC curve
+        det.fit(X).plot_roc_curve(X, y, ax=ax)
 
     plt.show()
 
-.. image:: https://raw.githubusercontent.com/Y-oHr-N/kenchi/master/docs/images/plot_anomaly_score.png
+.. image:: https://raw.githubusercontent.com/Y-oHr-N/kenchi/master/docs/images/plot_roc_curve.png
 
 License
 -------
