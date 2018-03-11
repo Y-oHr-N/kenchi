@@ -187,7 +187,7 @@ class Pipeline(SKLearnPipeline):
         filename : str, default None
             If provided, save the current figure.
 
-        title : string, default None
+        title : string, default 'ROC curve'
             Axes title. To disable, pass None.
 
         xlabel : string, default 'FPR'
@@ -229,7 +229,7 @@ class Pipeline(SKLearnPipeline):
         random_state : int, RandomState instance, default None
             Seed of the pseudo random number generator.
 
-        title : string, default 'GGM (n_features=%d, n_clusters=%d)'
+        title : string, default 'GGM (n_clusters, n_features, n_isolates)'
             Axes title. To disable, pass None.
 
         **kwargs : dict
