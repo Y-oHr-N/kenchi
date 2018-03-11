@@ -6,8 +6,8 @@ __all__ = ['make_blobs']
 
 
 def make_blobs(
-    centers=5, center_box=(-10., 10.), cluster_std=1., n_features=25,
-    n_inliers=490, n_outliers=10, random_state=None, shuffle=True
+    centers=5, center_box=(-10., 10.), cluster_std=1., contamination=0.02,
+    n_features=25, n_samples=500, random_state=None, shuffle=True
 ):
     """Generate isotropic Gaussian blobs with outliers.
 
@@ -23,14 +23,14 @@ def make_blobs(
     cluster_std : float or array-like of shape (n_centers,), default 1.0
         Standard deviation of the clusters.
 
+    contamination : float, default 0.02
+        Proportion of outliers in the data set.
+
     n_features : int, default 25
         Number of features for each sample.
 
-    n_inliers : int, default 490
-        Number of inliers.
-
-    n_outliers : int, default 10
-        Number of outliers.
+    n_samples : int, default 500
+        Number of samples.
 
     random_state : int, RandomState instance, default None
         Seed of the pseudo random number generator.
@@ -58,6 +58,8 @@ def make_blobs(
     """
 
     rnd              = check_random_state(random_state)
+    n_outliers       = int(contamination * n_samples)
+    n_inliers        = n_samples - n_outliers
 
     X_inliers, _     = sklearn_make_blobs(
         centers      = centers,
@@ -76,12 +78,12 @@ def make_blobs(
     )
 
     X                = np.concatenate([X_inliers, X_outliers])
-    y                = np.empty(n_inliers + n_outliers, dtype=np.int64)
+    y                = np.empty(n_samples, dtype=np.int64)
     y[:n_inliers]    = 1
     y[n_inliers:]    = -1
 
     if shuffle:
-        indices      = np.arange(n_inliers + n_outliers)
+        indices      = np.arange(n_samples)
 
         rnd.shuffle(indices)
 
