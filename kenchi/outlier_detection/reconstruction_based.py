@@ -132,7 +132,7 @@ class PCA(BaseOutlierDetector):
         return self
 
     def _anomaly_score(self, X):
-        return np.sqrt(np.sum(self.featurewise_anomaly_score(X), axis=1))
+        return np.sum((X - self._reconstruct(X)) ** 2, axis=1)
 
     def _reconstruct(self, X):
         """Apply dimensionality reduction to the given data, and transform the
@@ -140,26 +140,6 @@ class PCA(BaseOutlierDetector):
         """
 
         return self._pca.inverse_transform(self._pca.transform(X))
-
-    def featurewise_anomaly_score(self, X):
-        """Compute the feature-wise anomaly scores for each sample.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Data.
-
-        Returns
-        -------
-        anomaly_score : array-like of shape (n_samples, n_features)
-            Feature-wise anomaly scores for each sample.
-        """
-
-        check_is_fitted(self, '_pca')
-
-        X = check_array(X, estimator=self)
-
-        return (X - self._reconstruct(X)) ** 2
 
     def score(self, X, y=None):
         """Compute the mean log-likelihood of the given data.
