@@ -1,8 +1,77 @@
 import numpy as np
-from sklearn.datasets import make_blobs as sklearn_make_blobs
-from sklearn.utils import check_random_state
+from sklearn.datasets import (
+    load_breast_cancer as sklearn_load_breast_cancer,
+    make_blobs as sklearn_make_blobs
+)
+from sklearn.utils import check_random_state, resample
 
-__all__ = ['make_blobs']
+__all__ = ['load_breast_cancer', 'make_blobs']
+
+
+def load_breast_cancer(
+    n_outliers=10, random_state=None, replace=False, shuffle=True
+):
+    """Load and return the breast cancer wisconsin dataset.
+
+    n_outliers : int, default 20
+        Number of outliers.
+
+    random_state : int, RandomState instance, default None
+        Seed of the pseudo random number generator.
+
+    replace : bool, default False
+        If False, this will implement (sliced) random permutations.
+
+    shuffle : bool, default True
+        If True, shuffle samples.
+
+    Returns
+    -------
+    X : ndarray of shape (357 + n_outliers, n_features)
+        Generated data.
+
+    y : ndarray of shape (357 + n_outliers,)
+        Return -1 (malignant) for outliers and +1 (benign) for inliers.
+
+    References
+    ----------
+    H.-P. Kriegel, M. Schubert and A. Zimek,
+    "Angle-based outlier detection in high-dimensional data,"
+    In Proceedings of SIGKDD'08, pp. 444-452, 2008.
+    """
+
+    rnd                    = check_random_state(random_state)
+
+    X, y                   = sklearn_load_breast_cancer(return_X_y=True)
+
+    is_inlier              = y == 1
+    X_inliers              = X[is_inlier]
+    y_inliers              = y[is_inlier]
+
+    X_outliers             = X[~is_inlier]
+    y_outliers             = y[~is_inlier]
+    y_outliers[:]          = -1
+    X_outliers, y_outliers = resample(
+        X_outliers,
+        y_outliers,
+        n_samples          = n_outliers,
+        random_state       = rnd,
+        replace            = replace
+    )
+
+    X                      = np.concatenate([X_inliers, X_outliers])
+    y                      = np.concatenate([y_inliers, y_outliers])
+    n_samples, _           = X.shape
+
+    if shuffle:
+        indices            = np.arange(n_samples)
+
+        rnd.shuffle(indices)
+
+        X                  = X[indices]
+        y                  = y[indices]
+
+    return X, y
 
 
 def make_blobs(
@@ -35,16 +104,16 @@ def make_blobs(
     random_state : int, RandomState instance, default None
         Seed of the pseudo random number generator.
 
-    shuffle : boolean, default True
+    shuffle : bool, default True
         If True, shuffle samples.
 
     Returns
     -------
-    X : ndarray of shape (n_inliers + n_outliers, n_features)
+    X : ndarray of shape (n_samples, n_features)
         Generated data.
 
-    y : ndarray of shape (n_inliers + n_outliers,)
-        Return 1 for inliers and -1 for outliers.
+    y : ndarray of shape (n_samples,)
+        Return -1 for outliers and +1 for inliers.
 
     References
     ----------
