@@ -36,10 +36,6 @@ class PCATest(unittest.TestCase):
         with self.assertRaises(NotFittedError):
             self.sut.anomaly_score(self.X)
 
-    def test_featurewise_anomaly_score_notfitted(self):
-        with self.assertRaises(NotFittedError):
-            self.sut.featurewise_anomaly_score(self.X)
-
     def test_predict_notfitted(self):
         with self.assertRaises(NotFittedError):
             self.sut.predict(self.X)
