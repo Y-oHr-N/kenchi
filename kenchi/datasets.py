@@ -117,16 +117,11 @@ def make_blobs(
     H.-P. Kriegel, M. Schubert and A. Zimek,
     "Angle-based outlier detection in high-dimensional data,"
     In Proceedings of SIGKDD'08, pp. 444-452, 2008.
-
-    M. Sugiyama, and K. Borgwardt,
-    "Rapid distance-based outlier detection via sampling,"
-    Advances in NIPS'13, pp. 467-475, 2013.
     """
 
     rnd              = check_random_state(random_state)
-    n_outliers       = int(contamination * n_samples)
-    n_inliers        = n_samples - n_outliers
 
+    n_inliers        = int(np.round((1. - contamination) * n_samples))
     X_inliers, _     = sklearn_make_blobs(
         centers      = centers,
         center_box   = center_box,
@@ -137,15 +132,15 @@ def make_blobs(
         shuffle      = False
     )
 
+    n_outliers       = n_samples - n_inliers
     X_outliers       = rnd.uniform(
-        low          = np.min(X_inliers),
-        high         = np.max(X_inliers),
+        low          = np.min(X_inliers, axis=0),
+        high         = np.max(X_inliers, axis=0),
         size         = (n_outliers, n_features)
     )
 
     X                = np.concatenate([X_inliers, X_outliers])
-    y                = np.empty(n_samples, dtype=np.int64)
-    y[:n_inliers]    = 1
+    y                = np.ones(n_samples, dtype=np.int64)
     y[n_inliers:]    = -1
 
     if shuffle:
