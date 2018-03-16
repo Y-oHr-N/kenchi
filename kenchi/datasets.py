@@ -8,19 +8,14 @@ from sklearn.utils import check_random_state, resample
 __all__ = ['load_breast_cancer', 'make_blobs']
 
 
-def load_breast_cancer(
-    n_outliers=10, random_state=None, replace=False, shuffle=True
-):
+def load_breast_cancer(contamination=0.0272, random_state=None, shuffle=True):
     """Load and return the breast cancer wisconsin dataset.
 
-    n_outliers : int, default 20
-        Number of outliers.
+    contamination : float, default 0.0272
+        Proportion of outliers in the data set.
 
     random_state : int, RandomState instance, default None
         Seed of the pseudo random number generator.
-
-    replace : bool, default False
-        If False, this will implement (sliced) random permutations.
 
     shuffle : bool, default True
         If True, shuffle samples.
@@ -35,36 +30,38 @@ def load_breast_cancer(
 
     References
     ----------
-    H.-P. Kriegel, M. Schubert and A. Zimek,
-    "Angle-based outlier detection in high-dimensional data,"
-    In Proceedings of SIGKDD'08, pp. 444-452, 2008.
+    H.-P. Kriegel, P. Kroger, E. Schubert and A. Zimek,
+    "Interpreting and unifying outlier scores,"
+    In Proceedings of SDM'11, pp. 13-24, 2011.
     """
 
     rnd                    = check_random_state(random_state)
-
     X, y                   = sklearn_load_breast_cancer(return_X_y=True)
 
     is_inlier              = y == 1
+    n_inliers              = np.sum(is_inlier)
     X_inliers              = X[is_inlier]
     y_inliers              = y[is_inlier]
 
+    n_outliers             = int(
+        np.round(contamination / (1. - contamination) * n_inliers)
+    )
     X_outliers             = X[~is_inlier]
     y_outliers             = y[~is_inlier]
-    y_outliers[:]          = -1
     X_outliers, y_outliers = resample(
         X_outliers,
         y_outliers,
         n_samples          = n_outliers,
         random_state       = rnd,
-        replace            = replace
+        replace            = False
     )
+    y_outliers[:]          = -1
 
     X                      = np.concatenate([X_inliers, X_outliers])
     y                      = np.concatenate([y_inliers, y_outliers])
-    n_samples, _           = X.shape
 
     if shuffle:
-        indices            = np.arange(n_samples)
+        indices            = np.arange(n_inliers + n_outliers)
 
         rnd.shuffle(indices)
 
