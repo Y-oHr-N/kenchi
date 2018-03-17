@@ -1,14 +1,11 @@
 import numpy as np
-from sklearn.datasets import (
-    load_breast_cancer as sklearn_load_breast_cancer,
-    make_blobs as sklearn_make_blobs
-)
-from sklearn.utils import check_random_state, resample
+from sklearn.datasets import load_breast_cancer, make_blobs as _make_blobs
+from sklearn.utils import check_random_state, shuffle as _shuffle
 
-__all__ = ['load_breast_cancer', 'make_blobs']
+__all__ = ['load_wdbc', 'make_blobs']
 
 
-def load_breast_cancer(contamination=0.0272, random_state=None, shuffle=True):
+def load_wdbc(contamination=0.0272, random_state=None, shuffle=True):
     """Load and return the breast cancer wisconsin dataset.
 
     contamination : float, default 0.0272
@@ -22,10 +19,10 @@ def load_breast_cancer(contamination=0.0272, random_state=None, shuffle=True):
 
     Returns
     -------
-    X : ndarray of shape (357 + n_outliers, n_features)
-        Generated data.
+    X : ndarray of shape (n_samples, n_features)
+        Data.
 
-    y : ndarray of shape (357 + n_outliers,)
+    y : ndarray of shape (n_samples,)
         Return -1 (malignant) for outliers and +1 (benign) for inliers.
 
     References
@@ -36,9 +33,9 @@ def load_breast_cancer(contamination=0.0272, random_state=None, shuffle=True):
     """
 
     rnd                    = check_random_state(random_state)
-    X, y                   = sklearn_load_breast_cancer(return_X_y=True)
+    X, y                   = load_breast_cancer(return_X_y=True)
 
-    is_inlier              = y == 1
+    is_inlier              = y != 0
     n_inliers              = np.sum(is_inlier)
     X_inliers              = X[is_inlier]
     y_inliers              = y[is_inlier]
@@ -48,25 +45,16 @@ def load_breast_cancer(contamination=0.0272, random_state=None, shuffle=True):
     )
     X_outliers             = X[~is_inlier]
     y_outliers             = y[~is_inlier]
-    X_outliers, y_outliers = resample(
-        X_outliers,
-        y_outliers,
-        n_samples          = n_outliers,
-        random_state       = rnd,
-        replace            = False
+    X_outliers, y_outliers = _shuffle(
+        X_outliers, y_outliers, n_samples=n_outliers, random_state=rnd
     )
     y_outliers[:]          = -1
 
-    X                      = np.concatenate([X_inliers, X_outliers])
-    y                      = np.concatenate([y_inliers, y_outliers])
+    X                      = np.concatenate([X_outliers, X_inliers])
+    y                      = np.concatenate([y_outliers, y_inliers])
 
     if shuffle:
-        indices            = np.arange(n_inliers + n_outliers)
-
-        rnd.shuffle(indices)
-
-        X                  = X[indices]
-        y                  = y[indices]
+        X, y               = _shuffle(X, y, random_state=rnd)
 
     return X, y
 
@@ -122,7 +110,7 @@ def make_blobs(
     rnd              = check_random_state(random_state)
 
     n_inliers        = int(np.round((1. - contamination) * n_samples))
-    X_inliers, _     = sklearn_make_blobs(
+    X_inliers, _     = _make_blobs(
         centers      = centers,
         center_box   = center_box,
         cluster_std  = cluster_std,
@@ -139,16 +127,11 @@ def make_blobs(
         size         = (n_outliers, n_features)
     )
 
-    X                = np.concatenate([X_inliers, X_outliers])
-    y                = np.ones(n_samples, dtype=np.int64)
-    y[n_inliers:]    = -1
+    X                = np.concatenate([X_outliers, X_inliers])
+    y                = np.ones(n_samples, dtype=np.int)
+    y[:n_outliers]   = -1
 
     if shuffle:
-        indices      = np.arange(n_samples)
-
-        rnd.shuffle(indices)
-
-        X            = X[indices]
-        y            = y[indices]
+        X, y         = _shuffle(X, y, random_state=rnd)
 
     return X, y
