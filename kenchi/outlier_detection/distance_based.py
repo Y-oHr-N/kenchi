@@ -29,7 +29,7 @@ class KNN(BaseOutlierDetector):
         Number of jobs to run in parallel. If -1, then the number of jobs is
         set to the number of CPU cores.
 
-    n_neighbors : int, default 5
+    n_neighbors : int, default 20
         Number of neighbors.
 
     p : int, default 2
@@ -76,7 +76,7 @@ class KNN(BaseOutlierDetector):
 
     def __init__(
         self, algorithm='auto', contamination=0.1, leaf_size=30,
-        metric='minkowski', n_jobs=1, n_neighbors=5, p=2,
+        metric='minkowski', n_jobs=1, n_neighbors=20, p=2,
         verbose=False, weight=False, metric_params=None
     ):
         super().__init__(contamination=contamination, verbose=verbose)

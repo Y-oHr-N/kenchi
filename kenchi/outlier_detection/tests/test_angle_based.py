@@ -17,7 +17,7 @@ import matplotlib.pyplot as plt
 class FastABODTest(unittest.TestCase):
     def setUp(self):
         self.X, self.y = make_blobs(random_state=1)
-        self.sut       = FastABOD()
+        self.sut       = FastABOD(n_neighbors=5)
         _, self.ax     = plt.subplots()
 
     def tearDown(self):
