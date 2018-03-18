@@ -72,7 +72,7 @@ class KNN(BaseOutlierDetector):
 
     @property
     def X_(self):
-        return self._knn._fit_X
+        return self._estimator._fit_X
 
     def __init__(
         self, algorithm='auto', contamination=0.1, leaf_size=30,
@@ -91,7 +91,7 @@ class KNN(BaseOutlierDetector):
         self.metric_params = metric_params
 
     def _fit(self, X):
-        self._knn         = NearestNeighbors(
+        self._estimator   = NearestNeighbors(
             algorithm     = self.algorithm,
             leaf_size     = self.leaf_size,
             metric        = self.metric,
@@ -105,9 +105,9 @@ class KNN(BaseOutlierDetector):
 
     def _anomaly_score(self, X):
         if np.array_equal(X, self.X_):
-            dist, _ = self._knn.kneighbors()
+            dist, _ = self._estimator.kneighbors()
         else:
-            dist, _ = self._knn.kneighbors(X)
+            dist, _ = self._estimator.kneighbors(X)
 
         if self.weight:
             return np.sum(dist, axis=1)

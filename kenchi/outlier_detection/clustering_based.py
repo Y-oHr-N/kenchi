@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn.cluster import MiniBatchKMeans as SKLearnMiniBatchKMeans
+from sklearn.cluster import MiniBatchKMeans as _MiniBatchKMeans
 from sklearn.utils.validation import check_is_fitted
 
 from .base import BaseOutlierDetector
@@ -75,15 +75,15 @@ class MiniBatchKMeans(BaseOutlierDetector):
 
     @property
     def cluster_centers_(self):
-        return self._kmeans.cluster_centers_
+        return self._estimator.cluster_centers_
 
     @property
     def inertia_(self):
-        return self._kmeans.inertia_
+        return self._estimator.inertia_
 
     @property
     def labels_(self):
-        return self._kmeans.labels_
+        return self._estimator.labels_
 
     def __init__(
         self, batch_size=100, contamination=0.1, init='k-means++',
@@ -105,7 +105,7 @@ class MiniBatchKMeans(BaseOutlierDetector):
         self.tol                = tol
 
     def _fit(self, X):
-        self._kmeans           = SKLearnMiniBatchKMeans(
+        self._estimator        = _MiniBatchKMeans(
             batch_size         = self.batch_size,
             init               = self.init,
             init_size          = self.init_size,
@@ -121,7 +121,7 @@ class MiniBatchKMeans(BaseOutlierDetector):
         return self
 
     def _anomaly_score(self, X):
-        return np.min(self._kmeans.transform(X), axis=1)
+        return np.min(self._estimator.transform(X), axis=1)
 
     def score(self, X, y=None):
         """Compute the opposite value of the given data on the K-means
@@ -140,6 +140,6 @@ class MiniBatchKMeans(BaseOutlierDetector):
             Opposite value of the given data on the K-means objective.
         """
 
-        check_is_fitted(self, '_kmeans')
+        check_is_fitted(self, '_estimator')
 
-        return self._kmeans.score(X)
+        return self._estimator.score(X)

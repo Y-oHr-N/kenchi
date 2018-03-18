@@ -86,7 +86,7 @@ class FastABOD(BaseOutlierDetector):
 
     @property
     def X_(self):
-        return self._knn._fit_X
+        return self._estimator._fit_X
 
     def __init__(
         self, algorithm='auto', contamination=0.1, leaf_size=30,
@@ -104,7 +104,7 @@ class FastABOD(BaseOutlierDetector):
         self.metric_params = metric_params
 
     def _fit(self, X):
-        self._knn         = NearestNeighbors(
+        self._estimator   = NearestNeighbors(
             algorithm     = self.algorithm,
             leaf_size     = self.leaf_size,
             metric        = self.metric,
@@ -129,9 +129,9 @@ class FastABOD(BaseOutlierDetector):
         """Compute the Angle-Based Outlier Factor (ABOF) for each sample."""
 
         if np.array_equal(X, self.X_):
-            neigh_ind = self._knn.kneighbors(return_distance=False)
+            neigh_ind = self._estimator.kneighbors(return_distance=False)
         else:
-            neigh_ind = self._knn.kneighbors(X, return_distance=False)
+            neigh_ind = self._estimator.kneighbors(X, return_distance=False)
 
         n_samples, _  = X.shape
         result        = Parallel(n_jobs=self.n_jobs)(

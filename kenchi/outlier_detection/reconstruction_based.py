@@ -1,5 +1,5 @@
 import numpy as np
-from sklearn.decomposition import PCA as SKLearnPCA
+from sklearn.decomposition import PCA as _PCA
 from sklearn.utils.validation import check_is_fitted
 
 from .base import BaseOutlierDetector
@@ -78,31 +78,31 @@ class PCA(BaseOutlierDetector):
 
     @property
     def components_(self):
-        return self._pca.components_
+        return self._estimator.components_
 
     @property
     def explained_variance_(self):
-        return self._pca.explained_variance_
+        return self._estimator.explained_variance_
 
     @property
     def explained_variance_ratio_(self):
-        return self._pca.explained_variance_ratio_
+        return self._estimator.explained_variance_ratio_
 
     @property
     def mean_(self):
-        return self._pca.mean_
+        return self._estimator.mean_
 
     @property
     def noise_variance_(self):
-        return self._pca.noise_variance_
+        return self._estimator.noise_variance_
 
     @property
     def n_components_(self):
-        return self._pca.n_components_
+        return self._estimator.n_components_
 
     @property
     def singular_values_(self):
-        return self._pca.singular_values_
+        return self._estimator.singular_values_
 
     def __init__(
         self, contamination=0.1, iterated_power='auto', n_components=None,
@@ -119,7 +119,7 @@ class PCA(BaseOutlierDetector):
         self.whiten         = whiten
 
     def _fit(self, X):
-        self._pca          = SKLearnPCA(
+        self._estimator    = _PCA(
             iterated_power = self.iterated_power,
             n_components   = self.n_components,
             random_state   = self.random_state,
@@ -138,7 +138,7 @@ class PCA(BaseOutlierDetector):
         data back to its original space.
         """
 
-        return self._pca.inverse_transform(self._pca.transform(X))
+        return self._estimator.inverse_transform(self._estimator.transform(X))
 
     def score(self, X, y=None):
         """Compute the mean log-likelihood of the given data.
@@ -156,6 +156,6 @@ class PCA(BaseOutlierDetector):
             Mean log-likelihood of the given data.
         """
 
-        check_is_fitted(self, '_pca')
+        check_is_fitted(self, '_estimator')
 
-        return self._pca.score(X)
+        return self._estimator.score(X)
