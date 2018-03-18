@@ -158,6 +158,10 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
         -------
         anomaly_score : array-like of shape (n_samples,)
             Anomaly score for each sample.
+
+        Raises
+        ------
+        NotFittedError
         """
 
         check_is_fitted(self, '_rv')
@@ -185,6 +189,10 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
         y_score : array-like of shape (n_samples,)
             Shifted opposite of the anomaly score for each sample. Negative
             scores represent outliers and positive scores represent inliers.
+
+        Raises
+        ------
+        NotFittedError
         """
 
         anomaly_score = self.anomaly_score(X)
@@ -209,6 +217,10 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
         -------
         y_pred : array-like of shape (n_samples,)
             Return -1 for outliers and +1 for inliers.
+
+        Raises
+        ------
+        NotFittedError
         """
 
         return np.where(
@@ -266,6 +278,10 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
         -------
         ax : matplotlib Axes
             Axes on which the plot was drawn.
+
+        Raises
+        ------
+        NotFittedError
         """
 
         kwargs['anomaly_score'] = self.anomaly_score(X, normalize=normalize)
@@ -320,6 +336,10 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
         -------
         ax : matplotlib Axes
             Axes on which the plot was drawn.
+
+        Raises
+        ------
+        NotFittedError
         """
 
         kwargs['y_true']  = y

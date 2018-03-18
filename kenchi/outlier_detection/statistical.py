@@ -187,6 +187,10 @@ class GMM(BaseOutlierDetector):
         -------
         score : float
             Mean log-likelihood of the given data.
+
+        Raises
+        ------
+        NotFittedError
         """
 
         check_is_fitted(self, '_estimator')
@@ -245,6 +249,9 @@ class KDE(BaseOutlierDetector):
 
     threshold_ : float
         Threshold.
+
+    X_ : array-like of shape (n_samples, n_features)
+        Training data.
     """
 
     @property
@@ -300,6 +307,10 @@ class KDE(BaseOutlierDetector):
         -------
         score : float
             Mean log-likelihood of the given data.
+
+        Raises
+        ------
+        NotFittedError
         """
 
         check_is_fitted(self, '_estimator')
@@ -477,6 +488,10 @@ class SparseStructureLearning(BaseOutlierDetector):
         -------
         anomaly_score : array-like of shape (n_samples, n_features)
             Feature-wise anomaly scores for each sample.
+
+        Raises
+        ------
+        NotFittedError
         """
 
         check_is_fitted(self, '_estimator')
@@ -503,6 +518,10 @@ class SparseStructureLearning(BaseOutlierDetector):
         -------
         score : float
             Mean log-likelihood of the given data.
+
+        Raises
+        ------
+        NotFittedError
         """
 
         check_is_fitted(self, '_estimator')
@@ -536,6 +555,10 @@ class SparseStructureLearning(BaseOutlierDetector):
         -------
         ax : matplotlib Axes
             Axes on which the plot was drawn.
+
+        Raises
+        ------
+        NotFittedError
         """
 
         n_features  = self.location_.size
@@ -580,6 +603,10 @@ class SparseStructureLearning(BaseOutlierDetector):
         -------
         ax : matplotlib Axes
             Axes on which the plot was drawn.
+
+        Raises
+        ------
+        NotFittedError
         """
 
         kwargs['partial_corrcoef'] = self.partial_corrcoef_

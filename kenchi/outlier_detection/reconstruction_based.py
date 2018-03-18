@@ -154,6 +154,10 @@ class PCA(BaseOutlierDetector):
         -------
         score : float
             Mean log-likelihood of the given data.
+
+        Raises
+        ------
+        NotFittedError
         """
 
         check_is_fitted(self, '_estimator')

@@ -138,6 +138,10 @@ class MiniBatchKMeans(BaseOutlierDetector):
         -------
         score : float
             Opposite value of the given data on the K-means objective.
+
+        Raises
+        ------
+        NotFittedError
         """
 
         check_is_fitted(self, '_estimator')
