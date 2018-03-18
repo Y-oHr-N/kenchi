@@ -56,15 +56,23 @@ Usage
 .. code:: python
 
     import matplotlib.pyplot as plt
-    from kenchi.datasets import load_breast_cancer
+    from kenchi.datasets import load_wdbc
     from kenchi.outlier_detection import *
 
-    f, ax = plt.subplots()
-
     # Load the breast cancer wisconsin dataset
-    X, y  = load_breast_cancer(random_state=0)
+    X, y      = load_wdbc(random_state=0)
 
-    for det in [FastABOD(), KNN(), MiniBatchKMeans(), PCA(), KDE()]:
+    f, ax     = plt.subplots()
+    detectors = [
+        FastABOD(),
+        MiniBatchKMeans(random_state=0),
+        LOF(),
+        KNN(),
+        PCA(),
+        KDE()
+    ]
+
+    for det in detectors:
         # Fit the model, and plot the ROC curve
         det.fit(X).plot_roc_curve(X, y, ax=ax)
 
