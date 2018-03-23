@@ -83,6 +83,20 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
                 f'but was {self.contamination}'
             )
 
+    def _check_array(self, X, n_features=None):
+        """Check validity of the array and raise ValueError if not valid."""
+
+        X              = check_array(X, estimator=self)
+        _, _n_features = X.shape
+
+        if n_features is not None and _n_features != n_features:
+            raise ValueError(
+                f'X is expected to have {n_features} features '
+                f'but had {_n_features} features'
+            )
+
+        return X
+
     @abstractmethod
     def _fit(self, X):
         pass
@@ -128,7 +142,8 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
 
         self._check_params()
 
-        X                   = check_array(X, estimator=self)
+        X                   = self._check_array(X)
+        _, self._n_features = X.shape
 
         start_time          = time.time()
         self._fit(X)
@@ -161,12 +176,12 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
 
         Raises
         ------
-        NotFittedError
+        ValueError
         """
 
-        check_is_fitted(self, '_rv')
+        check_is_fitted(self, '_n_features')
 
-        X = check_array(X, estimator=self)
+        X = self._check_array(X, n_features=self._n_features)
 
         if normalize:
             return self._normalized_anomaly_score(X)
@@ -192,7 +207,7 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
 
         Raises
         ------
-        NotFittedError
+        ValueError
         """
 
         anomaly_score = self.anomaly_score(X)
@@ -220,7 +235,7 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
 
         Raises
         ------
-        NotFittedError
+        ValueError
         """
 
         return np.where(
@@ -281,7 +296,7 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
 
         Raises
         ------
-        NotFittedError
+        ValueError
         """
 
         kwargs['anomaly_score'] = self.anomaly_score(X, normalize=normalize)
@@ -339,7 +354,7 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
 
         Raises
         ------
-        NotFittedError
+        ValueError
         """
 
         kwargs['y_true']  = y
