@@ -104,7 +104,7 @@ class KNN(BaseOutlierDetector):
         return self
 
     def _anomaly_score(self, X):
-        if np.array_equal(X, self.X_):
+        if X is self.X_:
             dist, _ = self._estimator.kneighbors()
         else:
             dist, _ = self._estimator.kneighbors(X)

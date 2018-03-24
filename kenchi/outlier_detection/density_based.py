@@ -104,7 +104,7 @@ class LOF(BaseOutlierDetector):
     def _lof(self, X):
         """Compute the Local Outlier Factor (LOF) for each sample."""
 
-        if np.array_equal(X, self.X_):
+        if X is self.X_:
             return -self._estimator.negative_outlier_factor_
         else:
             return -self._estimator._decision_function(X)

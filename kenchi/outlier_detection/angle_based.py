@@ -128,7 +128,7 @@ class FastABOD(BaseOutlierDetector):
     def _abof(self, X):
         """Compute the Angle-Based Outlier Factor (ABOF) for each sample."""
 
-        if np.array_equal(X, self.X_):
+        if X is self.X_:
             neigh_ind = self._estimator.kneighbors(return_distance=False)
         else:
             neigh_ind = self._estimator.kneighbors(X, return_distance=False)

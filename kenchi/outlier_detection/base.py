@@ -10,7 +10,7 @@ from sklearn.utils.validation import check_is_fitted
 
 from ..visualization import plot_anomaly_score, plot_roc_curve
 
-__all__ = ['is_outlier_detector', 'BaseOutlierDetector', 'OutlierMixin']
+__all__ = ['is_outlier_detector', 'BaseOutlierDetector']
 
 
 def is_outlier_detector(estimator):
@@ -30,32 +30,7 @@ def is_outlier_detector(estimator):
     return getattr(estimator, '_estimator_type', None) == 'outlier_detector'
 
 
-class OutlierMixin:
-    """Mixin class for all outlier detectors."""
-
-    _estimator_type = 'outlier_detector'
-
-    def fit_predict(self, X, y=None):
-        """Fit the model according to the given training data and predict if a
-        particular sample is an outlier or not.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Training Data.
-
-        y : ignored
-
-        Returns
-        -------
-        y_pred : array-like of shape (n_samples,)
-            Return -1 for outliers and +1 for inliers.
-        """
-
-        return self.fit(X).predict(X)
-
-
-class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
+class BaseOutlierDetector(BaseEstimator, ABC):
     """Base class for all outlier detectors in kenchi.
 
     References
@@ -64,6 +39,8 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
     "Interpreting and unifying outlier scores,"
     In Proceedings of SDM'11, pp. 13-24, 2011.
     """
+
+    _estimator_type = 'outlier_detector'
 
     @property
     def normalized_threshold_(self):
@@ -158,13 +135,13 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
 
         return self
 
-    def anomaly_score(self, X, normalize=False):
+    def anomaly_score(self, X=None, normalize=False):
         """Compute the anomaly score for each sample.
 
         Parameters
         ----------
-        X : array-like of shape (n_samples, n_features)
-            Data.
+        X : array-like of shape (n_samples, n_features), default None
+            Data. If None, compute the anomaly score for each training sample.
 
         normalize : bool, default False
             If True, return the normalized anomaly score.
@@ -181,6 +158,9 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
 
         check_is_fitted(self, '_n_features')
 
+        if X is None:
+            return self.anomaly_score_
+
         X = self._check_array(X, n_features=self._n_features)
 
         if normalize:
@@ -188,13 +168,14 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
         else:
             return self._anomaly_score(X)
 
-    def decision_function(self, X, threshold=None):
+    def decision_function(self, X=None, threshold=None):
         """Compute the decision function of the given samples.
 
         Parameters
         ----------
-        X : array-like of shape (n_samples, n_features)
-            Data.
+        X : array-like of shape (n_samples, n_features), default None
+            Data. If None, compute the decision function of the given training
+            samples.
 
         threshold : float, default None
             User-provided threshold.
@@ -217,13 +198,14 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
 
         return threshold - anomaly_score
 
-    def predict(self, X, threshold=None):
+    def predict(self, X=None, threshold=None):
         """Predict if a particular sample is an outlier or not.
 
         Parameters
         ----------
-        X : array-like of shape (n_samples, n_features)
-            Data.
+        X : array-like of shape (n_samples, n_features), default None
+            Data. If None, predict if a particular training sample is an
+            outlier or not.
 
         threshold : float, default None
             User-provided threshold.
@@ -242,13 +224,32 @@ class BaseOutlierDetector(BaseEstimator, OutlierMixin, ABC):
             self.decision_function(X, threshold=threshold) >= 0., 1, -1
         )
 
-    def plot_anomaly_score(self, X, normalize=False, **kwargs):
-        """Plot the anomaly score for each sample.
+    def fit_predict(self, X, y=None):
+        """Fit the model according to the given training data and predict if a
+        particular training sample is an outlier or not.
 
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features)
-            Data.
+            Training Data.
+
+        y : ignored
+
+        Returns
+        -------
+        y_pred : array-like of shape (n_samples,)
+            Return -1 for outliers and +1 for inliers.
+        """
+
+        return self.fit(X).predict()
+
+    def plot_anomaly_score(self, X=None, normalize=False, **kwargs):
+        """Plot the anomaly score for each sample.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features), default None
+            Data. If None, plot the anomaly score for each training samples.
 
         normalize : bool, default False
             If True, return the normalized anomaly score.
