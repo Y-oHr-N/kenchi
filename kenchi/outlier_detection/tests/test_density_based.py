@@ -14,7 +14,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 
-class KNNTest(unittest.TestCase):
+class LOFTest(unittest.TestCase):
     def setUp(self):
         self.X, self.y = make_blobs(random_state=1)
         self.sut       = LOF(n_neighbors=5)
