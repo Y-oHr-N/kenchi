@@ -49,7 +49,7 @@ class MiniBatchKMeansTest(unittest.TestCase):
 
     def test_plot_anomaly_score(self):
         self.assertIsInstance(
-            self.sut.fit(self.X).plot_anomaly_score(self.X, ax=self.ax),
+            self.sut.fit(self.X).plot_anomaly_score(ax=self.ax),
             matplotlib.axes.Axes
         )
 

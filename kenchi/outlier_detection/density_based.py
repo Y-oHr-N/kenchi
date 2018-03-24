@@ -24,6 +24,12 @@ class LOF(BaseOutlierDetector):
     metric : str or callable, default 'minkowski'
         Distance metric to use.
 
+    novelty : bool, default False
+        By default, LOF is only meant to be used for outlier detection. Set
+        novelty to True if you want to use LOF for novelty detection. In this
+        case be aware that that you should only use predict, decision_function
+        and anomaly_score on new unseen data and not on the training data.
+
     n_jobs : int, default 1
         Number of jobs to run in parallel. If -1, then the number of jobs is
         set to the number of CPU cores.
@@ -67,14 +73,15 @@ class LOF(BaseOutlierDetector):
 
     def __init__(
         self, algorithm='auto', contamination=0.1, leaf_size=30,
-        metric='minkowski', n_jobs=1, n_neighbors=20, p=2,
-        verbose=False, metric_params=None
+        metric='minkowski', novelty=False, n_jobs=1, n_neighbors=20,
+        p=2, verbose=False, metric_params=None
     ):
         super().__init__(contamination=contamination, verbose=verbose)
 
         self.algorithm     = algorithm
         self.leaf_size     = leaf_size
         self.metric        = metric
+        self.novelty       = novelty
         self.n_jobs        = n_jobs
         self.n_neighbors   = n_neighbors
         self.p             = p

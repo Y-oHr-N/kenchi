@@ -25,6 +25,12 @@ class KNN(BaseOutlierDetector):
     metric : str or callable, default 'minkowski'
         Distance metric to use.
 
+    novelty : bool, default False
+        By default, KNN is only meant to be used for outlier detection. Set
+        novelty to True if you want to use KNN for novelty detection. In this
+        case be aware that that you should only use predict, decision_function
+        and anomaly_score on new unseen data and not on the training data.
+
     n_jobs : int, default 1
         Number of jobs to run in parallel. If -1, then the number of jobs is
         set to the number of CPU cores.
@@ -76,14 +82,15 @@ class KNN(BaseOutlierDetector):
 
     def __init__(
         self, algorithm='auto', contamination=0.1, leaf_size=30,
-        metric='minkowski', n_jobs=1, n_neighbors=20, p=2,
-        verbose=False, weight=False, metric_params=None
+        metric='minkowski', novelty=False, n_jobs=1, n_neighbors=20,
+        p=2, verbose=False, weight=False, metric_params=None
     ):
         super().__init__(contamination=contamination, verbose=verbose)
 
         self.algorithm     = algorithm
         self.leaf_size     = leaf_size
         self.metric        = metric
+        self.novelty       = novelty
         self.n_jobs        = n_jobs
         self.n_neighbors   = n_neighbors
         self.p             = p
@@ -125,6 +132,13 @@ class OneTimeSampling(BaseOutlierDetector):
 
     metric : str, default 'euclidean'
         Distance metric to use.
+
+    novelty : bool, default False
+        By default, OneTimeSampling is only meant to be used for outlier
+        detection. Set novelty to True if you want to use OneTimeSampling for
+        novelty detection. In this case be aware that that you should only use
+        predict, decision_function and anomaly_score on new unseen data and not
+        on the training data.
 
     n_subsamples : int, default 20
         Number of random samples to be used.
@@ -170,12 +184,13 @@ class OneTimeSampling(BaseOutlierDetector):
             return self.metric_params
 
     def __init__(
-        self, contamination=0.1, metric='euclidean', n_subsamples=20,
-        random_state=None, verbose=False, metric_params=None
+        self, contamination=0.1, metric='euclidean', novelty=False,
+        n_subsamples=20, random_state=None, verbose=False, metric_params=None
     ):
         super().__init__(contamination=contamination, verbose=verbose)
 
         self.metric        = metric
+        self.novelty       = novelty
         self.n_subsamples  = n_subsamples
         self.random_state  = random_state
         self.metric_params = metric_params

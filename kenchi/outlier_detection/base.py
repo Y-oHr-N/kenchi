@@ -156,17 +156,23 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         ValueError
         """
 
-        check_is_fitted(self, '_n_features')
+        check_is_fitted(self, 'anomaly_score_')
 
         if X is None:
             return self.anomaly_score_
 
-        X = self._check_array(X, n_features=self._n_features)
+        if getattr(self, 'novelty', True):
+            X = self._check_array(X, n_features=self._n_features)
 
-        if normalize:
-            return self._normalized_anomaly_score(X)
-        else:
-            return self._anomaly_score(X)
+            if normalize:
+                return self._normalized_anomaly_score(X)
+            else:
+                return self._anomaly_score(X)
+
+        raise ValueError(
+            'anomaly_score is not available when novelty=False, use '
+            'novelty=True if you want to predict on new unseen data'
+        )
 
     def decision_function(self, X=None, threshold=None):
         """Compute the decision function of the given samples.
@@ -239,7 +245,17 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         -------
         y_pred : array-like of shape (n_samples,)
             Return -1 for outliers and +1 for inliers.
+
+        Raises
+        ------
+        ValueError
         """
+
+        if getattr(self, 'novelty', False):
+            raise ValueError(
+                'fit_predict is not available when novelty=True, use '
+                'novelty=False if you want to predict on the training data'
+            )
 
         return self.fit(X).predict()
 

@@ -49,7 +49,7 @@ class GMMTest(unittest.TestCase):
 
     def test_plot_anomaly_score(self):
         self.assertIsInstance(
-            self.sut.fit(self.X).plot_anomaly_score(self.X, ax=self.ax),
+            self.sut.fit(self.X).plot_anomaly_score(ax=self.ax),
             matplotlib.axes.Axes
         )
 
@@ -95,7 +95,7 @@ class KDETest(unittest.TestCase):
 
     def test_plot_anomaly_score(self):
         self.assertIsInstance(
-            self.sut.fit(self.X).plot_anomaly_score(self.X, ax=self.ax),
+            self.sut.fit(self.X).plot_anomaly_score(ax=self.ax),
             matplotlib.axes.Axes
         )
 
@@ -145,7 +145,7 @@ class SparseStructureLearningTest(unittest.TestCase):
 
     def test_plot_anomaly_score(self):
         self.assertIsInstance(
-            self.sut.fit(self.X).plot_anomaly_score(self.X, ax=self.ax),
+            self.sut.fit(self.X).plot_anomaly_score(ax=self.ax),
             matplotlib.axes.Axes
         )
 
