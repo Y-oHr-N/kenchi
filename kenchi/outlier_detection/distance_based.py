@@ -12,6 +12,10 @@ class KNN(BaseOutlierDetector):
 
     Parameters
     ----------
+    aggregate : bool, default False
+        If True, return the sum of the distances from k nearest neighbors as
+        the anomaly score.
+
     algorithm : str, default 'auto'
         Tree algorithm to use. Valid algorithms are
         ['kd_tree'|'ball_tree'|'auto'].
@@ -43,10 +47,6 @@ class KNN(BaseOutlierDetector):
 
     verbose : bool, default False
         Enable verbose output.
-
-    weight : bool, default False
-        If True, anomaly score is the sum of the distances from k nearest
-        neighbors.
 
     metric_params : dict, default None
         Additioal parameters passed to the requested metric.
@@ -81,12 +81,13 @@ class KNN(BaseOutlierDetector):
         return self._estimator._fit_X
 
     def __init__(
-        self, algorithm='auto', contamination=0.1, leaf_size=30,
-        metric='minkowski', novelty=False, n_jobs=1, n_neighbors=20,
-        p=2, verbose=False, weight=False, metric_params=None
+        self, aggregate=False, algorithm='auto', contamination=0.1,
+        leaf_size=30, metric='minkowski', novelty=False, n_jobs=1,
+        n_neighbors=20, p=2, verbose=False, metric_params=None
     ):
         super().__init__(contamination=contamination, verbose=verbose)
 
+        self.aggregate     = aggregate
         self.algorithm     = algorithm
         self.leaf_size     = leaf_size
         self.metric        = metric
@@ -94,7 +95,6 @@ class KNN(BaseOutlierDetector):
         self.n_jobs        = n_jobs
         self.n_neighbors   = n_neighbors
         self.p             = p
-        self.weight        = weight
         self.metric_params = metric_params
 
     def _fit(self, X):
@@ -116,7 +116,7 @@ class KNN(BaseOutlierDetector):
         else:
             dist, _ = self._estimator.kneighbors(X)
 
-        if self.weight:
+        if self.aggregate:
             return np.sum(dist, axis=1)
         else:
             return np.max(dist, axis=1)
