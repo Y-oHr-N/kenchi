@@ -141,9 +141,11 @@ class MiniBatchKMeans(BaseOutlierDetector):
 
         Raises
         ------
-        NotFittedError
+        ValueError
         """
 
         check_is_fitted(self, '_estimator')
+
+        X = self._check_array(X, n_features=self._n_features, estimator=self)
 
         return self._estimator.score(X)

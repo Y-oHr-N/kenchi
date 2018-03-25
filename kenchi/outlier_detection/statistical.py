@@ -3,7 +3,6 @@ from sklearn.cluster import affinity_propagation
 from sklearn.covariance import GraphLasso
 from sklearn.mixture import GaussianMixture
 from sklearn.neighbors import KernelDensity
-from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
 from .base import BaseOutlierDetector
@@ -190,10 +189,12 @@ class GMM(BaseOutlierDetector):
 
         Raises
         ------
-        NotFittedError
+        ValueError
         """
 
         check_is_fitted(self, '_estimator')
+
+        X = self._check_array(X, n_features=self._n_features, estimator=self)
 
         return self._estimator.score(X)
 
@@ -310,10 +311,12 @@ class KDE(BaseOutlierDetector):
 
         Raises
         ------
-        NotFittedError
+        ValueError
         """
 
         check_is_fitted(self, '_estimator')
+
+        X = self._check_array(X, n_features=self._n_features, estimator=self)
 
         return np.mean(self._estimator.score_samples(X))
 
@@ -521,10 +524,12 @@ class SparseStructureLearning(BaseOutlierDetector):
 
         Raises
         ------
-        NotFittedError
+        ValueError
         """
 
         check_is_fitted(self, '_estimator')
+
+        X = self._check_array(X, n_features=self._n_features, estimator=self)
 
         return self._estimator.score(X)
 
