@@ -1,3 +1,4 @@
 recursive-include docs *
+recursive-include kenchi/datasets *.csv *.csv.gz
 include README.rst
 include requirements.txt
