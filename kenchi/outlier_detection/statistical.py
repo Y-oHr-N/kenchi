@@ -494,12 +494,12 @@ class SparseStructureLearning(BaseOutlierDetector):
 
         Raises
         ------
-        NotFittedError
+        ValueError
         """
 
         check_is_fitted(self, '_estimator')
 
-        X = check_array(X, estimator=self)
+        X = self._check_array(X, n_features=self._n_features, estimator=self)
 
         return 0.5 * np.log(
             2. * np.pi / np.diag(self.precision_)
@@ -563,14 +563,15 @@ class SparseStructureLearning(BaseOutlierDetector):
 
         Raises
         ------
-        NotFittedError
+        ValueError
         """
 
-        n_features  = self.location_.size
+        check_is_fitted(self, '_estimator')
+
         title       = (
             f'GGM ('
             f'n_clusters={np.max(self.labels_) + 1}, '
-            f'n_features={n_features}, '
+            f'n_features={self._n_features}, '
             f'n_isolates={self.isolates_.size}'
             f')'
         )
@@ -611,8 +612,10 @@ class SparseStructureLearning(BaseOutlierDetector):
 
         Raises
         ------
-        NotFittedError
+        ValueError
         """
+
+        check_is_fitted(self, '_estimator')
 
         kwargs['partial_corrcoef'] = self.partial_corrcoef_
 
