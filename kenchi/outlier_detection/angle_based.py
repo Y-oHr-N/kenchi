@@ -74,9 +74,6 @@ class FastABOD(BaseOutlierDetector):
     threshold_ : float
         Threshold.
 
-    abof_max_ : float
-        Maximum possible ABOF. Used to compute the regularized anomaly score.
-
     X_ : array-like of shape (n_samples, n_features)
         Training data.
 
@@ -121,7 +118,7 @@ class FastABOD(BaseOutlierDetector):
             p             = self.p,
             metric_params = self.metric_params
         ).fit(X)
-        self.abof_max_    = np.max(self._abof(X))
+        self._abof_max    = np.max(self._anomaly_score(X, regularize=False))
 
         return self
 
@@ -129,7 +126,7 @@ class FastABOD(BaseOutlierDetector):
         abof = self._abof(X)
 
         if regularize:
-            return -np.log(abof / self.abof_max_)
+            return -np.log(abof / self._abof_max)
         else:
             return abof
 
