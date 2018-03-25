@@ -203,15 +203,21 @@ class OneTimeSampling(BaseOutlierDetector):
                 f'n_subsamples must be positive but was {self.n_subsamples}'
             )
 
-    def _fit(self, X):
-        n_samples, _    = X.shape
-        rnd             = check_random_state(self.random_state)
+    def _check_array(self, X, **kwargs):
+        X            = super()._check_array(X, **kwargs)
+        n_samples, _ = X.shape
 
         if self.n_subsamples >= n_samples:
             raise ValueError(
                 f'n_subsamples must be smaller than {n_samples} '
                 f'but was {self.n_subsamples}'
             )
+
+        return X
+
+    def _fit(self, X):
+        n_samples, _    = X.shape
+        rnd             = check_random_state(self.random_state)
 
         sampled         = rnd.choice(
             n_samples, size=self.n_subsamples, replace=False

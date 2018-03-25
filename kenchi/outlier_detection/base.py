@@ -60,10 +60,10 @@ class BaseOutlierDetector(BaseEstimator, ABC):
                 f'but was {self.contamination}'
             )
 
-    def _check_array(self, X, n_features=None):
+    def _check_array(self, X, n_features=None, **kwargs):
         """Check validity of the array and raise ValueError if not valid."""
 
-        X              = check_array(X, estimator=self)
+        X              = check_array(X, **kwargs)
         _, _n_features = X.shape
 
         if n_features is not None and _n_features != n_features:
@@ -73,19 +73,6 @@ class BaseOutlierDetector(BaseEstimator, ABC):
             )
 
         return X
-
-    @abstractmethod
-    def _fit(self, X):
-        pass
-
-    @abstractmethod
-    def _anomaly_score(self, X):
-        pass
-
-    def _normalized_anomaly_score(self, X):
-        """Compute the normalized anomaly score for each sample."""
-
-        return np.maximum(0., 2. * self._rv.cdf(self._anomaly_score(X)) - 1.)
 
     def _get_threshold(self):
         """Get the threshold according to the derived anomaly scores."""
@@ -100,6 +87,48 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         loc, scale = norm.fit(self.anomaly_score_)
 
         return norm(loc=loc, scale=scale)
+
+    @abstractmethod
+    def _fit(self, X):
+        pass
+
+    @abstractmethod
+    def _anomaly_score(self, X):
+        pass
+
+    def _normalized_anomaly_score(self, X):
+        """Compute the normalized anomaly score for each sample."""
+
+        return np.maximum(0., 2. * self._rv.cdf(self._anomaly_score(X)) - 1.)
+
+    def fit_predict(self, X, y=None):
+        """Fit the model according to the given training data and predict if a
+        particular training sample is an outlier or not.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Training Data.
+
+        y : ignored
+
+        Returns
+        -------
+        y_pred : array-like of shape (n_samples,)
+            Return -1 for outliers and +1 for inliers.
+
+        Raises
+        ------
+        ValueError
+        """
+
+        if getattr(self, 'novelty', False):
+            raise ValueError(
+                'fit_predict is not available when novelty=True, use '
+                'novelty=False if you want to predict on the training data'
+            )
+
+        return self.fit(X).predict()
 
     def fit(self, X, y=None):
         """Fit the model according to the given training data.
@@ -119,7 +148,7 @@ class BaseOutlierDetector(BaseEstimator, ABC):
 
         self._check_params()
 
-        X                   = self._check_array(X)
+        X                   = self._check_array(X, estimator=self)
         _, self._n_features = X.shape
 
         start_time          = time.time()
@@ -135,43 +164,30 @@ class BaseOutlierDetector(BaseEstimator, ABC):
 
         return self
 
-    def anomaly_score(self, X=None, normalize=False):
-        """Compute the anomaly score for each sample.
+    def predict(self, X=None, threshold=None):
+        """Predict if a particular sample is an outlier or not.
 
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features), default None
-            Data. If None, compute the anomaly score for each training sample.
+            Data. If None, predict if a particular training sample is an
+            outlier or not.
 
-        normalize : bool, default False
-            If True, return the normalized anomaly score.
+        threshold : float, default None
+            User-provided threshold.
 
         Returns
         -------
-        anomaly_score : array-like of shape (n_samples,)
-            Anomaly score for each sample.
+        y_pred : array-like of shape (n_samples,)
+            Return -1 for outliers and +1 for inliers.
 
         Raises
         ------
         ValueError
         """
 
-        check_is_fitted(self, 'anomaly_score_')
-
-        if X is None:
-            return self.anomaly_score_
-
-        if getattr(self, 'novelty', True):
-            X = self._check_array(X, n_features=self._n_features)
-
-            if normalize:
-                return self._normalized_anomaly_score(X)
-            else:
-                return self._anomaly_score(X)
-
-        raise ValueError(
-            'anomaly_score is not available when novelty=False, use '
-            'novelty=True if you want to predict on new unseen data'
+        return np.where(
+            self.decision_function(X, threshold=threshold) >= 0., 1, -1
         )
 
     def decision_function(self, X=None, threshold=None):
@@ -204,60 +220,46 @@ class BaseOutlierDetector(BaseEstimator, ABC):
 
         return threshold - anomaly_score
 
-    def predict(self, X=None, threshold=None):
-        """Predict if a particular sample is an outlier or not.
+    def anomaly_score(self, X=None, normalize=False):
+        """Compute the anomaly score for each sample.
 
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features), default None
-            Data. If None, predict if a particular training sample is an
-            outlier or not.
+            Data. If None, compute the anomaly score for each training sample.
 
-        threshold : float, default None
-            User-provided threshold.
+        normalize : bool, default False
+            If True, return the normalized anomaly score.
 
         Returns
         -------
-        y_pred : array-like of shape (n_samples,)
-            Return -1 for outliers and +1 for inliers.
+        anomaly_score : array-like of shape (n_samples,)
+            Anomaly score for each sample.
 
         Raises
         ------
         ValueError
         """
 
-        return np.where(
-            self.decision_function(X, threshold=threshold) >= 0., 1, -1
-        )
+        check_is_fitted(self, 'anomaly_score_')
 
-    def fit_predict(self, X, y=None):
-        """Fit the model according to the given training data and predict if a
-        particular training sample is an outlier or not.
+        if X is None:
+            return self.anomaly_score_
 
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Training Data.
-
-        y : ignored
-
-        Returns
-        -------
-        y_pred : array-like of shape (n_samples,)
-            Return -1 for outliers and +1 for inliers.
-
-        Raises
-        ------
-        ValueError
-        """
-
-        if getattr(self, 'novelty', False):
-            raise ValueError(
-                'fit_predict is not available when novelty=True, use '
-                'novelty=False if you want to predict on the training data'
+        if getattr(self, 'novelty', True):
+            X = self._check_array(
+                X, n_features=self._n_features, estimator=self
             )
 
-        return self.fit(X).predict()
+            if normalize:
+                return self._normalized_anomaly_score(X)
+            else:
+                return self._anomaly_score(X)
+
+        raise ValueError(
+            'anomaly_score is not available when novelty=False, use '
+            'novelty=True if you want to predict on new unseen data'
+        )
 
     def plot_anomaly_score(self, X=None, normalize=False, **kwargs):
         """Plot the anomaly score for each sample.
