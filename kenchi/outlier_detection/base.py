@@ -42,10 +42,6 @@ class BaseOutlierDetector(BaseEstimator, ABC):
 
     _estimator_type = 'outlier_detector'
 
-    @property
-    def normalized_threshold_(self):
-        return np.maximum(0., 2. * self._rv.cdf(self.threshold_) - 1.)
-
     @abstractmethod
     def __init__(self, contamination=0.1, verbose=False):
         self.contamination = contamination
@@ -95,11 +91,6 @@ class BaseOutlierDetector(BaseEstimator, ABC):
     @abstractmethod
     def _anomaly_score(self, X):
         pass
-
-    def _normalized_anomaly_score(self, X):
-        """Compute the normalized anomaly score for each sample."""
-
-        return np.maximum(0., 2. * self._rv.cdf(self._anomaly_score(X)) - 1.)
 
     def fit_predict(self, X, y=None):
         """Fit the model according to the given training data and predict if a
@@ -244,17 +235,23 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         check_is_fitted(self, 'anomaly_score_')
 
         if X is None:
-            return self.anomaly_score_
-
-        if getattr(self, 'novelty', True):
-            X = self._check_array(
-                X, n_features=self._n_features, estimator=self
-            )
+            anomaly_score = self.anomaly_score_
 
             if normalize:
-                return self._normalized_anomaly_score(X)
+                return np.maximum(0., 2. * self._rv.cdf(anomaly_score) - 1.)
             else:
-                return self._anomaly_score(X)
+                return anomaly_score
+
+        if getattr(self, 'novelty', True):
+            X             = self._check_array(
+                X, n_features=self._n_features, estimator=self
+            )
+            anomaly_score = self._anomaly_score(X)
+
+            if normalize:
+                return np.maximum(0., 2. * self._rv.cdf(anomaly_score) - 1.)
+            else:
+                return anomaly_score
 
         raise ValueError(
             'anomaly_score is not available when novelty=False, use '
@@ -323,7 +320,9 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         kwargs.setdefault('label', self.__class__.__name__)
 
         if normalize:
-            kwargs['threshold'] = self.normalized_threshold_
+            kwargs['threshold'] = np.maximum(
+                0., 2. * self._rv.cdf(self.threshold_) - 1.
+            )
 
             kwargs.setdefault('ylim', (0., 1.05))
 
