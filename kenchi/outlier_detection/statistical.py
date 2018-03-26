@@ -321,59 +321,93 @@ class KDE(BaseOutlierDetector):
         return np.mean(self._estimator.score_samples(X))
 
 
-class HBOS(BaseDetector):
-    """Histogram-based outlier detector."""
+class HBOS(BaseOutlierDetector):
+    """Histogram-based outlier detector.
 
-    def __init__(self, contamination=0.01, verbose=False, n_bins='sqrt'):
+    Parameters
+    ----------
+    bins : int, str or array-like, default 'sqrt'
+        Number of hist bins.
+
+    contamination : float, default 0.1
+        Proportion of outliers in the data set. Used to define the threshold.
+
+    verbose : bool, default False
+        Enable verbose output.
+
+    Attributes
+    ----------
+    anomaly_score_ : array-like of shape (n_samples,)
+        Anomaly score for each training data.
+
+    bin_edges_ : array-like of shape (n_features, bins + 1)
+        Bin edges.
+
+    bin_widths_ : array-like of shape (n_features,)
+        Bin widths.
+
+    fit_time_ : float
+        Time spent for fitting in seconds.
+
+    hist_ : array-like of shape (n_features, bins)
+        Values of the histogram.
+
+    threshold_ : float
+        Threshold.
+
+    X_ : array-like of shape (n_samples, n_features)
+        Training data.
+
+    References
+    ----------
+    M. Goldstein and A. Dengel,
+    "Histogram-based outlier score (HBOS): A fast unsupervised anomaly
+    detection algorithm,"
+    KI'12: Poster and Demo Track, pp. 59-63, 2012.
+    """
+
+    def __init__(self, bins='sqrt', contamination=0.1, verbose=False):
         super().__init__(contamination=contamination, verbose=verbose)
 
-        self.n_bins = n_bins
+        self.bins = bins
 
-    def check_params(self, X, y=None):
-        super().check_params(X)
+    def _fit(self, X):
+        self.X_                 = X
+        n_samples, n_features   = X.shape
 
-    def fit(self, X, y=None):
-        self.check_params(X)
-
-        self.X_               = check_array(X, estimator=self)
-        n_samples, n_features = self.X_.shape
-
-        if self.n_bins == 'sqrt':
-            n_bins = int(np.sqrt(n_samples))
+        if self.bins == 'sqrt':
+            bins                = int(np.sqrt(n_samples))
         else:
-            n_bins = self.n_bins
+            bins                = self.bins
 
-        self.hist_ = np.empty((n_features, n_bins))
-        self.bins_ = np.empty((n_features, n_bins + 1))
+        self.hist_              = np.empty((n_features, bins))
+        self.bin_edges_         = np.empty((n_features, bins + 1))
+        self.bin_widths_        = np.empty(n_features)
 
         for j in range(n_features):
-            self.hist_[j], self.bins_[j] = np.histogram(
-                self.X_[:, j], bins=n_bins, density=True
+            self.hist_[j], self.bin_edges_[j] = np.histogram(
+                X[:, j], bins=bins, density=True
             )
-
-        self.threshold_ = self._get_threshold()
+            self.bin_widths_[j] = (
+                self.bin_edges_[j, 1] - self.bin_edges_[j, 0]
+            )
 
         return self
 
-    def anomaly_score(self, X=None):
-        return np.sum(self.featurewise_anomaly_score(X), axis=1)
-
-    def featurewise_anomaly_score(self, X=None):
-        check_is_fitted(self, ['hist_', 'bins_'])
-
-        if X is None:
-            X = self.X_
-        else:
+    def _anomaly_score(self, X):
+        if X is not self.X_:
             raise NotImplementedError()
 
         n_samples, n_features = X.shape
-        anomaly_score         = np.empty((n_samples, n_features))
+        anomaly_score         = np.zeros(n_samples)
 
         for j in range(n_features):
-            ind                 = np.digitize(
-                X[:, j], self.bins_[j], right=True
+            ind               = np.digitize(
+                X[:, j], self.bin_edges_[j], right=True
             )
-            anomaly_score[:, j] = -np.log(self.hist_[j, ind - 1])
+            anomaly_score    -= np.log(
+                self.hist_[j, ind - 1] * self.bin_widths_[j]
+            )
 
         return anomaly_score
 
