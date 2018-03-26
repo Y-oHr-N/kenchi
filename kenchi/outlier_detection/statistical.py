@@ -1,25 +1,22 @@
 import numpy as np
-from scipy.stats import chi2
 from sklearn.cluster import affinity_propagation
 from sklearn.covariance import GraphLasso
 from sklearn.mixture import GaussianMixture
 from sklearn.neighbors import KernelDensity
-from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
-from ..base import BaseDetector
-from ..utils import timeit
+from .base import BaseOutlierDetector
 from ..visualization import plot_graphical_model, plot_partial_corrcoef
 
 __all__ = ['GMM', 'KDE', 'HBOS', 'SparseStructureLearning']
 
 
-class GMM(BaseDetector):
+class GMM(BaseOutlierDetector):
     """Outlier detector using Gaussian Mixture Models (GMMs).
 
     Parameters
     ----------
-    contamination : float, default 0.01
+    contamination : float, default 0.1
         Proportion of outliers in the data set. Used to define the threshold.
 
     covariance_type : str, default 'full'
@@ -66,14 +63,20 @@ class GMM(BaseDetector):
 
     Attributes
     ----------
+    anomaly_score_ : array-like of shape (n_samples,)
+        Anomaly score for each training data.
+
+    fit_time_ : float
+        Time spent for fitting in seconds.
+
+    threshold_ : float
+        Threshold.
+
     converged_ : bool
         True when convergence was reached in `fit`, False otherwise.
 
     covariances_ : array-like
         Covariance of each mixture component.
-
-    fit_time_ : float
-        Time spent for fitting in seconds.
 
     lower_bound_ : float
         Log-likelihood of the best fit of EM.
@@ -91,57 +94,47 @@ class GMM(BaseDetector):
         Cholesky decomposition of the precision matrices of each mixture
         component.
 
-    threshold_ : float
-        Threshold.
-
     weights_ : array-like of shape (n_components,)
         Weight of each mixture components.
-
-    X_ : array-like of shape (n_samples, n_features)
-        Training data.
     """
 
     @property
     def converged_(self):
-        return self._gmm.converged_
+        return self._estimator.converged_
 
     @property
     def covariances_(self):
-        return self._gmm.covariances_
+        return self._estimator.covariances_
 
     @property
     def lower_bound_(self):
-        return self._gmm.lower_bound_
+        return self._estimator.lower_bound_
 
     @property
     def means_(self):
-        return self._gmm.means_
+        return self._estimator.means_
 
     @property
     def n_iter_(self):
-        return self._gmm.n_iter_
+        return self._estimator.n_iter_
 
     @property
     def precisions_(self):
-        return self._gmm.precisions_
+        return self._estimator.precisions_
 
     @property
     def precisions_cholesky_(self):
-        return self._gmm.precisions_cholesky_
+        return self._estimator.precisions_cholesky_
 
     @property
     def weights_(self):
-        return self._gmm.weights_
+        return self._estimator.weights_
 
     def __init__(
-        self,                   contamination=0.01,
-        covariance_type='full', init_params='kmeans',
-        max_iter=100,           means_init=None,
-        n_components=1,         n_init=1,
-        precisions_init=None,   random_state=None,
-        reg_covar=1e-06,        tol=1e-03,
-        verbose=False,          warm_start=False,
-        weights_init=None
+        self, contamination=0.1, covariance_type='full', init_params='kmeans',
+        max_iter=100, means_init=None, n_components=1, n_init=1,
+        precisions_init=None, random_state=None, reg_covar=1e-06, tol=1e-03,
+        verbose=False, warm_start=False, weights_init=None
     ):
         super().__init__(contamination=contamination, verbose=verbose)
 
@@ -158,15 +151,8 @@ class GMM(BaseDetector):
         self.warm_start      = warm_start
         self.weights_init    = weights_init
 
-    def check_params(self, X, y=None):
-        super().check_params(X)
-
-    @timeit
-    def fit(self, X, y=None):
-        self.check_params(X)
-
-        self.X_             = check_array(X, estimator=self)
-        self._gmm           = GaussianMixture(
+    def _fit(self, X):
+        self._estimator     = GaussianMixture(
             covariance_type = self.covariance_type,
             init_params     = self.init_params,
             max_iter        = self.max_iter,
@@ -180,19 +166,11 @@ class GMM(BaseDetector):
             warm_start      = self.warm_start,
             weights_init    = self.weights_init
         ).fit(X)
-        self.threshold_     = self._get_threshold()
 
         return self
 
-    def anomaly_score(self, X=None):
-        check_is_fitted(self, '_gmm')
-
-        if X is None:
-            X = self.X_
-        else:
-            X = check_array(X, estimator=self)
-
-        return -self._gmm.score_samples(X)
+    def _anomaly_score(self, X):
+        return -self._estimator.score_samples(X)
 
     def score(self, X, y=None):
         """Compute the mean log-likelihood of the given data.
@@ -208,14 +186,20 @@ class GMM(BaseDetector):
         -------
         score : float
             Mean log-likelihood of the given data.
+
+        Raises
+        ------
+        ValueError
         """
 
-        check_is_fitted(self, '_gmm')
+        check_is_fitted(self, '_estimator')
 
-        return self._gmm.score(X)
+        X = self._check_array(X, n_features=self._n_features, estimator=self)
+
+        return self._estimator.score(X)
 
 
-class KDE(BaseDetector):
+class KDE(BaseOutlierDetector):
     """Outlier detector using Kernel Density Estimation (KDE).
 
     Parameters
@@ -234,7 +218,7 @@ class KDE(BaseDetector):
         If true, use a breadth-first approach to the problem. Otherwise use a
         depth-first approach.
 
-    contamination : float, default 0.01
+    contamination : float, default 0.1
         Proportion of outliers in the data set. Used to define the threshold.
 
     kernel : str, default 'gaussian'
@@ -258,6 +242,9 @@ class KDE(BaseDetector):
 
     Attributes
     ----------
+    anomaly_score_ : array-like of shape (n_samples,)
+        Anomaly score for each training data.
+
     fit_time_ : float
         Time spent for fitting in seconds.
 
@@ -270,15 +257,12 @@ class KDE(BaseDetector):
 
     @property
     def X_(self):
-        return self._kde.tree_.data
+        return self._estimator.tree_.data
 
     def __init__(
-        self,               algorithm='auto',
-        atol=0.,            bandwidth=1.,
-        breadth_first=True, contamination=0.01,
-        kernel='gaussian',  leaf_size=40,
-        metric='euclidean', rtol=0.,
-        verbose=False,      metric_params=None
+        self, algorithm='auto', atol=0., bandwidth=1.,
+        breadth_first=True, contamination=0.1, kernel='gaussian', leaf_size=40,
+        metric='euclidean', rtol=0., verbose=False, metric_params=None
     ):
         super().__init__(contamination=contamination, verbose=verbose)
 
@@ -292,14 +276,8 @@ class KDE(BaseDetector):
         self.rtol          = rtol
         self.metric_params = metric_params
 
-    def check_params(self, X, y=None):
-        super().check_params(X)
-
-    @timeit
-    def fit(self, X, y=None):
-        self.check_params(X)
-
-        self._kde         = KernelDensity(
+    def _fit(self, X):
+        self._estimator   = KernelDensity(
             algorithm     = self.algorithm,
             atol          = self.atol,
             bandwidth     = self.bandwidth,
@@ -310,19 +288,11 @@ class KDE(BaseDetector):
             rtol          = self.rtol,
             metric_params = self.metric_params
         ).fit(X)
-        self.threshold_   = self._get_threshold()
 
         return self
 
-    def anomaly_score(self, X=None):
-        check_is_fitted(self, '_kde')
-
-        if X is None:
-            X = self.X_
-        else:
-            X = check_array(X, estimator=self)
-
-        return -self._kde.score_samples(X)
+    def _anomaly_score(self, X):
+        return -self._estimator.score_samples(X)
 
     def score(self, X, y=None):
         """Compute the mean log-likelihood of the given data.
@@ -338,11 +308,17 @@ class KDE(BaseDetector):
         -------
         score : float
             Mean log-likelihood of the given data.
+
+        Raises
+        ------
+        ValueError
         """
 
-        check_is_fitted(self, '_kde')
+        check_is_fitted(self, '_estimator')
 
-        return np.mean(self._kde.score_samples(X))
+        X = self._check_array(X, n_features=self._n_features, estimator=self)
+
+        return np.mean(self._estimator.score_samples(X))
 
 
 class HBOS(BaseDetector):
@@ -402,7 +378,7 @@ class HBOS(BaseDetector):
         return anomaly_score
 
 
-class SparseStructureLearning(BaseDetector):
+class SparseStructureLearning(BaseOutlierDetector):
     """Outlier detector using sparse structure learning.
 
     Parameters
@@ -413,7 +389,7 @@ class SparseStructureLearning(BaseDetector):
     assume_centered : bool, default False
         If True, data are not centered before computation.
 
-    contamination : float, default 0.01
+    contamination : float, default 0.1
         Proportion of outliers in the data set. Used to define the threshold.
 
     enet_tol : float, default 1e-04
@@ -439,14 +415,23 @@ class SparseStructureLearning(BaseDetector):
 
     Attributes
     ----------
-    covariance_ : array-like of shape (n_features, n_features)
-        Estimated covariance matrix.
+    anomaly_score_ : array-like of shape (n_samples,)
+        Anomaly score for each training data.
 
     fit_time_ : float
         Time spent for fitting in seconds.
 
+    threshold_ : float
+        Threshold.
+
+    covariance_ : array-like of shape (n_features, n_features)
+        Estimated covariance matrix.
+
     graphical_model_ : networkx Graph
         GGM.
+
+    isolates_ : array-like of shape (n_isolates,)
+        Indices of isolates.
 
     labels_ : array-like of shape (n_features,)
         Label of each feature.
@@ -463,12 +448,6 @@ class SparseStructureLearning(BaseDetector):
     precision_ : array-like of shape (n_features, n_features)
         Estimated pseudo inverse matrix.
 
-    threshold_ : float
-        Threshold.
-
-    X_ : array-like of shape (n_samples, n_features)
-        Training data.
-
     References
     ----------
     T. Ide, C. Lozano, N. Abe and Y. Liu,
@@ -478,13 +457,19 @@ class SparseStructureLearning(BaseDetector):
 
     @property
     def covariance_(self):
-        return self._glasso.covariance_
+        return self._estimator.covariance_
 
     @property
     def graphical_model_(self):
         import networkx as nx
 
         return nx.from_numpy_matrix(np.tril(self.partial_corrcoef_, k=-1))
+
+    @property
+    def isolates_(self):
+        import networkx as nx
+
+        return np.array(list(nx.isolates(self.graphical_model_)))
 
     @property
     def labels_(self):
@@ -502,11 +487,11 @@ class SparseStructureLearning(BaseDetector):
 
     @property
     def location_(self):
-        return self._glasso.location_
+        return self._estimator.location_
 
     @property
     def n_iter_(self):
-        return self._glasso.n_iter_
+        return self._estimator.n_iter_
 
     @property
     def partial_corrcoef_(self):
@@ -519,14 +504,12 @@ class SparseStructureLearning(BaseDetector):
 
     @property
     def precision_(self):
-        return self._glasso.precision_
+        return self._estimator.precision_
 
     def __init__(
-        self,                  alpha=0.01,
-        assume_centered=False, contamination=0.01,
-        enet_tol=1e-04,        max_iter=100,
-        mode='cd',             tol=1e-04,
-        verbose=False,         apcluster_params=None
+        self, alpha=0.01, assume_centered=False, contamination=0.1,
+        enet_tol=1e-04, max_iter=100, mode='cd', tol=1e-04,
+        verbose=False, apcluster_params=None
     ):
         super().__init__(contamination=contamination, verbose=verbose)
 
@@ -538,15 +521,8 @@ class SparseStructureLearning(BaseDetector):
         self.mode             = mode
         self.tol              = tol
 
-    def check_params(self, X, y=None):
-        super().check_params(X)
-
-    @timeit
-    def fit(self, X, y=None):
-        self.check_params(X)
-
-        self.X_             = check_array(X, estimator=self)
-        self._glasso        = GraphLasso(
+    def _fit(self, X):
+        self._estimator     = GraphLasso(
             alpha           = self.alpha,
             assume_centered = self.assume_centered,
             enet_tol        = self.enet_tol,
@@ -554,42 +530,33 @@ class SparseStructureLearning(BaseDetector):
             mode            = self.mode,
             tol             = self.tol
         ).fit(X)
-        df, loc, scale      = chi2.fit(self.anomaly_score())
-        self.threshold_     = chi2.ppf(1. - self.contamination, df, loc, scale)
 
         return self
 
-    def anomaly_score(self, X=None):
-        check_is_fitted(self, '_glasso')
+    def _anomaly_score(self, X):
+        return self._estimator.mahalanobis(X)
 
-        if X is None:
-            X = self.X_
-        else:
-            X = check_array(X, estimator=self)
-
-        return self._glasso.mahalanobis(X)
-
-    def featurewise_anomaly_score(self, X=None):
+    def featurewise_anomaly_score(self, X):
         """Compute the feature-wise anomaly scores for each sample.
 
         Parameters
         ----------
-        X : array-like of shape (n_samples, n_features), default None
-            Data. If None, the feature-wise anomaly scores for each training
-            sample are returned.
+        X : array-like of shape (n_samples, n_features)
+            Data.
 
         Returns
         -------
         anomaly_score : array-like of shape (n_samples, n_features)
             Feature-wise anomaly scores for each sample.
+
+        Raises
+        ------
+        ValueError
         """
 
-        check_is_fitted(self, '_glasso')
+        check_is_fitted(self, '_estimator')
 
-        if X is None:
-            X = self.X_
-        else:
-            X = check_array(X, estimator=self)
+        X = self._check_array(X, n_features=self._n_features, estimator=self)
 
         return 0.5 * np.log(
             2. * np.pi / np.diag(self.precision_)
@@ -611,11 +578,17 @@ class SparseStructureLearning(BaseDetector):
         -------
         score : float
             Mean log-likelihood of the given data.
+
+        Raises
+        ------
+        ValueError
         """
 
-        check_is_fitted(self, '_glasso')
+        check_is_fitted(self, '_estimator')
 
-        return self._glasso.score(X)
+        X = self._check_array(X, n_features=self._n_features, estimator=self)
+
+        return self._estimator.score(X)
 
     def plot_graphical_model(self, **kwargs):
         """Plot the Gaussian Graphical Model (GGM).
@@ -631,13 +604,10 @@ class SparseStructureLearning(BaseDetector):
         filename : str, default None
             If provided, save the current figure.
 
-        pos : dict, default None
-            Dictionary with nodes as keys and positions as values.
-
         random_state : int, RandomState instance, default None
             Seed of the pseudo random number generator.
 
-        title : string, default 'GGM (n_features=%d, n_clusters=%d)'
+        title : string, default 'GGM (n_clusters, n_features, n_isolates)'
             Axes title. To disable, pass None.
 
         **kwargs : dict
@@ -647,23 +617,27 @@ class SparseStructureLearning(BaseDetector):
         -------
         ax : matplotlib Axes
             Axes on which the plot was drawn.
+
+        Raises
+        ------
+        ValueError
         """
 
-        import networkx as nx
+        check_is_fitted(self, '_estimator')
 
-        if 'node_color' not in kwargs:
-            kwargs['node_color'] = self.labels_
+        title       = (
+            f'GGM ('
+            f'n_clusters={np.max(self.labels_) + 1}, '
+            f'n_features={self._n_features}, '
+            f'n_isolates={self.isolates_.size}'
+            f')'
+        )
+        kwargs['G'] = self.graphical_model_
 
-        if 'title' not in kwargs:
-            kwargs['title']      = (
-                f'GGM ('
-                f'n_clusters={np.max(self.labels_) + 1}, '
-                f'n_features={self.precision_.shape[0]}, '
-                f'n_isolates={len(list(nx.isolates(self.graphical_model_)))}'
-                f')'
-            )
+        kwargs.setdefault('node_color', self.labels_)
+        kwargs.setdefault('title', title)
 
-        return plot_graphical_model(self.graphical_model_, **kwargs)
+        return plot_graphical_model(**kwargs)
 
     def plot_partial_corrcoef(self, **kwargs):
         """Plot the partial correlation coefficient matrix.
@@ -682,9 +656,6 @@ class SparseStructureLearning(BaseDetector):
         filename : str, default None
             If provided, save the current figure.
 
-        linewidth : float, default 0.1
-            Width of the lines that will divide each cell.
-
         title : string, default 'Partial correlation'
             Axes title. To disable, pass None.
 
@@ -695,6 +666,14 @@ class SparseStructureLearning(BaseDetector):
         -------
         ax : matplotlib Axes
             Axes on which the plot was drawn.
+
+        Raises
+        ------
+        ValueError
         """
 
-        return plot_partial_corrcoef(self.partial_corrcoef_, **kwargs)
+        check_is_fitted(self, '_estimator')
+
+        kwargs['partial_corrcoef'] = self.partial_corrcoef_
+
+        return plot_partial_corrcoef(**kwargs)

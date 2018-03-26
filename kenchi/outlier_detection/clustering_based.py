@@ -1,15 +1,13 @@
 import numpy as np
-from sklearn.cluster import MiniBatchKMeans as SKLearnMiniBatchKMeans
-from sklearn.utils import check_array
+from sklearn.cluster import MiniBatchKMeans as _MiniBatchKMeans
 from sklearn.utils.validation import check_is_fitted
 
-from ..base import BaseDetector
-from ..utils import timeit
+from .base import BaseOutlierDetector
 
 __all__ = ['MiniBatchKMeans']
 
 
-class MiniBatchKMeans(BaseDetector):
+class MiniBatchKMeans(BaseOutlierDetector):
     """Outlier detector using K-means clustering.
 
     Parameters
@@ -17,7 +15,7 @@ class MiniBatchKMeans(BaseDetector):
     batch_size : int, optional, default 100
         Size of the mini batches.
 
-    contamination : float, default 0.01
+    contamination : float, default 0.1
         Proportion of outliers in the data set. Used to define the threshold.
 
     init : str or array-like, default 'k-means++'
@@ -56,44 +54,41 @@ class MiniBatchKMeans(BaseDetector):
 
     Attributes
     ----------
-    cluster_centers_ : array-like of shape (n_clusters, n_features)
-        Coordinates of cluster centers.
+    anomaly_score_ : array-like of shape (n_samples,)
+        Anomaly score for each training data.
 
     fit_time_ : float
         Time spent for fitting in seconds.
+
+    threshold_ : float
+        Threshold.
+
+    cluster_centers_ : array-like of shape (n_clusters, n_features)
+        Coordinates of cluster centers.
 
     inertia_ : float
         Value of the inertia criterion associated with the chosen partition.
 
     labels_ : array-like of shape (n_samples,)
         Label of each point.
-
-    threshold_ : float
-        Threshold.
-
-    X_ : array-like of shape (n_samples, n_features)
-        Training data.
     """
 
     @property
     def cluster_centers_(self):
-        return self._kmeans.cluster_centers_
+        return self._estimator.cluster_centers_
 
     @property
     def inertia_(self):
-        return self._kmeans.inertia_
+        return self._estimator.inertia_
 
     @property
     def labels_(self):
-        return self._kmeans.labels_
+        return self._estimator.labels_
 
     def __init__(
-        self,                    batch_size=100,
-        contamination=0.01,      init='k-means++',
-        init_size=None,          max_iter=100,
-        max_no_improvement=10,   n_clusters=8,
-        n_init=3,                random_state=None,
-        reassignment_ratio=0.01, tol=0.0,
+        self, batch_size=100, contamination=0.1, init='k-means++',
+        init_size=None, max_iter=100, max_no_improvement=10, n_clusters=8,
+        n_init=3, random_state=None, reassignment_ratio=0.01, tol=0.0,
         verbose=False
     ):
         super().__init__(contamination=contamination, verbose=verbose)
@@ -109,15 +104,8 @@ class MiniBatchKMeans(BaseDetector):
         self.reassignment_ratio = reassignment_ratio
         self.tol                = tol
 
-    def check_params(self, X, y=None):
-        super().check_params(X)
-
-    @timeit
-    def fit(self, X, y=None):
-        self.check_params(X)
-
-        self.X_                = check_array(X, estimator=self)
-        self._kmeans           = SKLearnMiniBatchKMeans(
+    def _fit(self, X):
+        self._estimator        = _MiniBatchKMeans(
             batch_size         = self.batch_size,
             init               = self.init,
             init_size          = self.init_size,
@@ -129,19 +117,11 @@ class MiniBatchKMeans(BaseDetector):
             reassignment_ratio = self.reassignment_ratio,
             tol                = self.tol
         ).fit(X)
-        self.threshold_        = self._get_threshold()
 
         return self
 
-    def anomaly_score(self, X=None):
-        check_is_fitted(self, '_kmeans')
-
-        if X is None:
-            X = self.X_
-        else:
-            X = check_array(X, estimator=self)
-
-        return np.min(self._kmeans.transform(X), axis=1)
+    def _anomaly_score(self, X):
+        return np.min(self._estimator.transform(X), axis=1)
 
     def score(self, X, y=None):
         """Compute the opposite value of the given data on the K-means
@@ -158,8 +138,14 @@ class MiniBatchKMeans(BaseDetector):
         -------
         score : float
             Opposite value of the given data on the K-means objective.
+
+        Raises
+        ------
+        ValueError
         """
 
-        check_is_fitted(self, '_kmeans')
+        check_is_fitted(self, '_estimator')
 
-        return self._kmeans.score(X)
+        X = self._check_array(X, n_features=self._n_features, estimator=self)
+
+        return self._estimator.score(X)

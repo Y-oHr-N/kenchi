@@ -1,29 +1,13 @@
-import itertools
-
 import numpy as np
-from sklearn.neighbors import NearestNeighbors
-from sklearn.externals.joblib import delayed, Parallel
-from sklearn.utils import gen_even_slices
+from sklearn.neighbors import LocalOutlierFactor
 
 from .base import BaseOutlierDetector
 
-__all__ = ['FastABOD']
+__all__ = ['LOF']
 
 
-def _abof(X, X_train, neigh_ind):
-    with np.errstate(invalid='raise'):
-        return np.var([
-            [
-                (diff_a @ diff_b) / (diff_a @ diff_a) / (diff_b @ diff_b)
-                for diff_a, diff_b in itertools.combinations(
-                    X_neigh - query_point, 2
-                )
-            ] for query_point, X_neigh in zip(X, X_train[neigh_ind])
-        ], axis=1)
-
-
-class FastABOD(BaseOutlierDetector):
-    """Fast Angle-Based Outlier Detector (FastABOD).
+class LOF(BaseOutlierDetector):
+    """Local Outlier Factor.
 
     Parameters
     ----------
@@ -41,11 +25,10 @@ class FastABOD(BaseOutlierDetector):
         Distance metric to use.
 
     novelty : bool, default False
-        By default, FastABOD is only meant to be used for outlier detection.
-        Set novelty to True if you want to use FastABOD for novelty detection.
-        In this case be aware that that you should only use predict,
-        decision_function and anomaly_score on new unseen data and not on the
-        training data.
+        By default, LOF is only meant to be used for outlier detection. Set
+        novelty to True if you want to use LOF for novelty detection. In this
+        case be aware that that you should only use predict, decision_function
+        and anomaly_score on new unseen data and not on the training data.
 
     n_jobs : int, default 1
         Number of jobs to run in parallel. If -1, then the number of jobs is
@@ -79,13 +62,9 @@ class FastABOD(BaseOutlierDetector):
 
     References
     ----------
-    H.-P. Kriegel, M. Schubert and A. Zimek,
-    "Angle-based outlier detection in high-dimensional data,"
-    In Proceedings of SIGKDD'08, pp. 444-452, 2008.
-
-    H.-P. Kriegel, P. Kroger, E. Schubert and A. Zimek,
-    "Interpreting and unifying outlier scores,"
-    In Proceedings of SDM'11, pp. 13-24, 2011.
+    M. M. Breunig, H.-P. Kriegel, R. T. Ng and J. Sander,
+    "LOF: identifying density-based local outliers,"
+    In ACM sigmod record, pp. 93-104, 2000.
     """
 
     @property
@@ -109,7 +88,7 @@ class FastABOD(BaseOutlierDetector):
         self.metric_params = metric_params
 
     def _fit(self, X):
-        self._estimator   = NearestNeighbors(
+        self._estimator   = LocalOutlierFactor(
             algorithm     = self.algorithm,
             leaf_size     = self.leaf_size,
             metric        = self.metric,
@@ -118,31 +97,21 @@ class FastABOD(BaseOutlierDetector):
             p             = self.p,
             metric_params = self.metric_params
         ).fit(X)
-        self._abof_max    = np.max(self._anomaly_score(X, regularize=False))
 
         return self
 
     def _anomaly_score(self, X, regularize=True):
-        abof = self._abof(X)
+        lof = self._lof(X)
 
         if regularize:
-            return -np.log(abof / self._abof_max)
+            return np.maximum(0., lof - 1.)
         else:
-            return abof
+            return lof
 
-    def _abof(self, X):
-        """Compute the Angle-Based Outlier Factor (ABOF) for each sample."""
+    def _lof(self, X):
+        """Compute the Local Outlier Factor (LOF) for each sample."""
 
         if X is self.X_:
-            neigh_ind = self._estimator.kneighbors(return_distance=False)
+            return -self._estimator.negative_outlier_factor_
         else:
-            neigh_ind = self._estimator.kneighbors(X, return_distance=False)
-
-        n_samples, _  = X.shape
-        result        = Parallel(n_jobs=self.n_jobs)(
-            delayed(_abof)(
-                X[s], self.X_, neigh_ind[s]
-            ) for s in gen_even_slices(n_samples, self.n_jobs)
-        )
-
-        return np.concatenate(result)
+            return -self._estimator._decision_function(X)

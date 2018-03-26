@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.stats import gaussian_kde
 from sklearn.metrics import auc, roc_curve
 from sklearn.utils.validation import check_array, check_symmetric, column_or_1d
 
@@ -9,14 +10,10 @@ __all__ = [
     'plot_partial_corrcoef'
 ]
 
-# TODO: Implement plot_featurewise_anomaly_score function
-# TODO: Update plot_anomaly_score function so that a gaussian kernel density
-# estimate can be plotted
-
 
 def plot_anomaly_score(
     anomaly_score, ax=None, bins='auto', figsize=None,
-    filename=None, grid=True, hist=True, threshold=None,
+    filename=None, hist=True, kde=True, threshold=None,
     title=None, xlabel='Samples', xlim=None, ylabel='Anomaly score',
     ylim=None, **kwargs
 ):
@@ -39,11 +36,11 @@ def plot_anomaly_score(
     filename : str, default None
         If provided, save the current figure.
 
-    grid : bool, default True
-        If True, turn the axes grids on.
-
     hist : bool, default True
         If True, plot a histogram of anomaly scores.
+
+    kde : bool, default True
+        If True, plot a gaussian kernel density estimate.
 
     threshold : float, default None
         Threshold.
@@ -79,17 +76,48 @@ def plot_anomaly_score(
     import matplotlib.pyplot as plt
     from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-    anomaly_score = column_or_1d(anomaly_score)
-    n_samples,    = anomaly_score.shape
+    def _get_ax_hist(ax):
+        locator          = ax.get_axes_locator()
+
+        if locator is None:
+            # Create an axes on the right side of ax
+            divider      = make_axes_locatable(ax)
+            ax_hist      = divider.append_axes(
+                'right', '20%', pad=0.1, sharey=ax
+            )
+
+            return ax_hist
+
+        for ax_hist in ax.get_figure().get_axes():
+            locator_hist = ax_hist.get_axes_locator()
+
+            if ax_hist == ax:
+                continue
+
+            if locator_hist is None:
+                continue
+
+            if locator_hist._axes_divider == locator._axes_divider:
+                return ax_hist
+
+    anomaly_score        = column_or_1d(anomaly_score)
+    n_samples,           = anomaly_score.shape
+    xlocs                = np.arange(n_samples)
 
     if ax is None:
-        _, ax     = plt.subplots(figsize=figsize)
+        _, ax            = plt.subplots(figsize=figsize)
+
+    ax.grid(True, linestyle=':')
 
     if xlim is None:
-        xlim      = (0., n_samples - 1.)
+        xlim             = (0., n_samples - 1.)
+
+    ax.set_xlim(xlim)
 
     if ylim is None:
-        ylim      = (0., 1.1 * np.max(anomaly_score))
+        ylim             = (0., 1.05 * np.max(anomaly_score))
+
+    ax.set_ylim(ylim)
 
     if title is not None:
         ax.set_title(title)
@@ -100,38 +128,50 @@ def plot_anomaly_score(
     if ylabel is not None:
         ax.set_ylabel(ylabel)
 
-    if threshold is not None:
-        ax.hlines(threshold, xlim[0], xlim[1])
+    line,                = ax.plot(xlocs, anomaly_score, **kwargs)
+    color                = line.get_color()
 
-    ax.set_xlim(xlim)
-    ax.set_ylim(ylim)
-    ax.grid(grid, linestyle=':')
-    ax.plot(np.arange(n_samples), anomaly_score, **kwargs)
+    if threshold is not None:
+        ax.hlines(threshold, xlim[0], xlim[1], color=color)
+
+    if hist or kde:
+        ax_hist          = _get_ax_hist(ax)
+
+        ax_hist.grid(True, linestyle=':')
+        ax_hist.tick_params(axis='y', labelleft=False)
+        ax_hist.set_ylim(ylim)
 
     if hist:
-        # Create an axes on the right side of ax
-        divider   = make_axes_locatable(ax)
-        ax_hist_y = divider.append_axes(
-            'right', size='20%', pad=0.1, sharey=ax
+        # Draw a histogram
+        ax_hist.hist(
+            anomaly_score,
+            alpha        = 0.4,
+            bins         = bins,
+            color        = color,
+            density      = True,
+            orientation  = 'horizontal'
         )
 
-        ax_hist_y.set_ylim(ylim)
-        ax_hist_y.yaxis.set_tick_params(labelleft=False)
-        ax_hist_y.grid(grid, linestyle=':')
-        ax_hist_y.hist(
-            anomaly_score, bins=bins, density=True, orientation='horizontal'
-        )
+    if kde:
+        kernel           = gaussian_kde(anomaly_score)
+        ylocs            = np.linspace(ylim[0], ylim[1])
+
+        # Draw a gaussian kernel density estimate
+        ax_hist.plot(kernel(ylocs), ylocs, color=color)
+
+    if 'label' in kwargs:
+        ax.legend(loc='upper left')
 
     if filename is not None:
-        ax.figure.savefig(filename)
+        ax.get_figure().savefig(filename)
 
     return ax
 
 
 def plot_roc_curve(
     y_true, y_score, ax=None, figsize=None,
-    filename=None, grid=True, label=None, title=None,
-    xlabel='FPR', ylabel='TPR', **kwargs
+    filename=None, title='ROC curve', xlabel='FPR', ylabel='TPR',
+    **kwargs
 ):
     """Plot the Receiver Operating Characteristic (ROC) curve.
 
@@ -152,13 +192,7 @@ def plot_roc_curve(
     filename : str, default None
         If provided, save the current figure.
 
-    grid : bool, default True
-        If True, turn the axes grids on.
-
-    label : str, default None
-        Legend label.
-
-    title : string, default None
+    title : string, default 'ROC curve'
         Axes title. To disable, pass None.
 
     xlabel : string, default 'FPR'
@@ -182,14 +216,15 @@ def plot_roc_curve(
 
     import matplotlib.pyplot as plt
 
-    fpr, tpr, _ = roc_curve(y_true, y_score, pos_label=-1)
-    roc_auc     = auc(fpr, tpr)
+    fpr, tpr, _          = roc_curve(y_true, y_score)
+    roc_auc              = auc(fpr, tpr)
 
     if ax is None:
-        _, ax   = plt.subplots(figsize=figsize)
+        _, ax            = plt.subplots(figsize=figsize)
 
-    if label is None:
-        label   = f'area={roc_auc:1.3f}'
+    ax.grid(True, linestyle=':')
+    ax.set_xlim(0., 1.)
+    ax.set_ylim(0., 1.05)
 
     if title is not None:
         ax.set_title(title)
@@ -200,27 +235,30 @@ def plot_roc_curve(
     if ylabel is not None:
         ax.set_ylabel(ylabel)
 
-    ax.set_xlim(0., 1.)
-    ax.set_ylim(0., 1.05)
-    ax.grid(grid, linestyle=':')
-    ax.plot(fpr, tpr, label=label, **kwargs)
+    if 'label' in kwargs:
+        kwargs['label'] += f' (area={roc_auc:1.3f})'
+    else:
+        kwargs['label']  = f'area={roc_auc:1.3f}'
+
+    ax.plot(fpr, tpr, **kwargs)
+
     ax.legend(loc='lower right')
 
     if filename is not None:
-        ax.figure.savefig(filename)
+        ax.get_figure().savefig(filename)
 
     return ax
 
 
 def plot_graphical_model(
-    graphical_model, ax=None, figsize=None, filename=None,
-    pos=None, random_state=None, title='GGM', **kwargs
+    G, ax=None, figsize=None, filename=None,
+    random_state=None, title='GGM', **kwargs
 ):
     """Plot the Gaussian Graphical Model (GGM).
 
     Parameters
     ----------
-    graphical_model : networkx Graph
+    G : networkx Graph
         GGM.
 
     ax : matplotlib Axes, default None
@@ -231,9 +269,6 @@ def plot_graphical_model(
 
     filename : str, default None
         If provided, save the current figure.
-
-    pos : dict, default None
-        Dictionary with nodes as keys and positions as values.
 
     random_state : int, RandomState instance, default None
         Seed of the pseudo random number generator.
@@ -257,45 +292,38 @@ def plot_graphical_model(
     import matplotlib.pyplot as plt
     import networkx as nx
 
-    if pos is None:
-        try:
-            pos         = nx.nx_agraph.graphviz_layout(graphical_model)
-        except ImportError:
-            pos         = nx.spling_layout(
-                graphical_model, random_state=random_state
-            )
-
     if ax is None:
-        _, ax           = plt.subplots(figsize=figsize)
+        _, ax = plt.subplots(figsize=figsize)
 
     if title is not None:
         ax.set_title(title)
 
+    node_size = np.array([30. * (d + 1.) for _, d in G.degree])
+    pos       = nx.spring_layout(G, random_state=random_state)
+    width     = np.abs([3. * w for _, _, w in G.edges(data='weight')])
+
     # Add the draw_networkx kwargs here
-    kwargs['cmap']      = 'Spectral'
-    kwargs['node_size'] = np.array([
-        10. * (d + 1.) for _, d in graphical_model.degree
-    ])
-    kwargs['width']     = np.abs([
-        10. * w for _, _, w in graphical_model.edges(data='weight')
-    ])
+    kwargs.setdefault('cmap', 'Spectral')
+    kwargs.setdefault('node_size', node_size)
+    kwargs.setdefault('pos', pos)
+    kwargs.setdefault('width', width)
 
     # Draw the Gaussian grapchical model
-    nx.draw_networkx(graphical_model, pos=pos, ax=ax, **kwargs)
+    nx.draw_networkx(G, ax=ax, **kwargs)
 
     # Turn off tick visibility
-    ax.xaxis.set_tick_params(labelbottom=False, bottom=False)
-    ax.yaxis.set_tick_params(labelleft=False, left=False)
+    ax.tick_params('x', labelbottom=False, bottom=False)
+    ax.tick_params('y', labelleft=False, left=False)
 
     if filename is not None:
-        ax.figure.savefig(filename)
+        ax.get_figure().savefig(filename)
 
     return ax
 
 
 def plot_partial_corrcoef(
     partial_corrcoef, ax=None, cbar=True, figsize=None,
-    filename=None, linewidth=0.1, title='Partial correlation', **kwargs
+    filename=None, title='Partial correlation', **kwargs
 ):
     """Plot the partial correlation coefficient matrix.
 
@@ -316,9 +344,6 @@ def plot_partial_corrcoef(
     filename : str, default None
         If provided, save the current figure.
 
-    linewidth : float, default 0.1
-        Width of the lines that will divide each cell.
-
     title : string, default 'Partial correlation'
         Axes title. To disable, pass None.
 
@@ -338,26 +363,24 @@ def plot_partial_corrcoef(
     import matplotlib.pyplot as plt
     from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-    partial_corrcoef     = check_array(partial_corrcoef)
-    partial_corrcoef     = check_symmetric(
-        partial_corrcoef, raise_exception=True
-    )
+    partial_corrcoef = check_array(partial_corrcoef)
+    partial_corrcoef = check_symmetric(partial_corrcoef, raise_exception=True)
 
     if ax is None:
-        _, ax            = plt.subplots(figsize=figsize)
+        _, ax        = plt.subplots(figsize=figsize)
 
     if title is not None:
         ax.set_title(title)
 
     # Add the pcolormesh kwargs here
-    kwargs['cmap']       = 'RdBu'
-    kwargs['edgecolors'] = 'white'
-    kwargs['vmin']       = -1.
-    kwargs['vmax']       = 1.
+    kwargs.setdefault('cmap', 'RdBu')
+    kwargs.setdefault('edgecolors', 'white')
+    kwargs.setdefault('vmin', -1.)
+    kwargs.setdefault('vmax', 1.)
 
     # Draw the heatmap
-    mesh                 = ax.pcolormesh(
-        np.ma.masked_equal(partial_corrcoef, 0.), linewidth=linewidth, **kwargs
+    mesh             = ax.pcolormesh(
+        np.ma.masked_equal(partial_corrcoef, 0.), **kwargs
     )
 
     ax.set_aspect('equal')
@@ -368,12 +391,12 @@ def plot_partial_corrcoef(
 
     if cbar:
         # Create an axes on the right side of ax
-        divider          = make_axes_locatable(ax)
-        cax              = divider.append_axes('right', size='5%', pad=0.1)
+        divider      = make_axes_locatable(ax)
+        cax          = divider.append_axes('right', '5%', pad=0.1)
 
-        ax.figure.colorbar(mesh, cax=cax)
+        ax.get_figure().colorbar(mesh, cax=cax)
 
     if filename is not None:
-        ax.figure.savefig(filename)
+        ax.get_figure().savefig(filename)
 
     return ax

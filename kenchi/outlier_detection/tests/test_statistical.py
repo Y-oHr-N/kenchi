@@ -16,10 +16,9 @@ import matplotlib.pyplot as plt
 
 class GMMTest(unittest.TestCase):
     def setUp(self):
-        self.X_train, _          = make_blobs(random_state=1)
-        self.X_test, self.y_test = make_blobs(random_state=2)
-        self.sut                 = GMM()
-        _, self.ax               = plt.subplots()
+        self.X, self.y = make_blobs(random_state=1)
+        self.sut       = GMM()
+        _, self.ax     = plt.subplots()
 
     def tearDown(self):
         plt.close()
@@ -28,49 +27,44 @@ class GMMTest(unittest.TestCase):
         self.assertIsNone(check_estimator(self.sut))
 
     def test_fit(self):
-        self.assertIsInstance(self.sut.fit(self.X_train), GMM)
+        self.assertIsInstance(self.sut.fit(self.X), GMM)
 
     def test_fit_predict(self):
-        self.assertIsInstance(self.sut.fit_predict(self.X_train), np.ndarray)
+        self.assertIsInstance(self.sut.fit_predict(self.X), np.ndarray)
 
     def test_anomaly_score_notfitted(self):
         with self.assertRaises(NotFittedError):
-            self.sut.anomaly_score(self.X_train)
+            self.sut.anomaly_score(self.X)
 
     def test_predict_notfitted(self):
         with self.assertRaises(NotFittedError):
-            self.sut.predict(self.X_train)
+            self.sut.predict(self.X)
 
     def test_score(self):
-        self.assertIsInstance(
-            self.sut.fit(self.X_train).score(self.X_test), float
-        )
+        self.assertIsInstance(self.sut.fit(self.X).score(self.X), float)
 
     def test_score_notfitted(self):
         with self.assertRaises(NotFittedError):
-            self.sut.score(self.X_train)
+            self.sut.score(self.X)
 
     def test_plot_anomaly_score(self):
         self.assertIsInstance(
-            self.sut.fit(self.X_train).plot_anomaly_score(ax=self.ax),
+            self.sut.fit(self.X).plot_anomaly_score(ax=self.ax),
             matplotlib.axes.Axes
         )
 
     def test_plot_roc_curve(self):
         self.assertIsInstance(
-            self.sut.fit(
-                self.X_train
-            ).plot_roc_curve(self.X_test, self.y_test, ax=self.ax),
+            self.sut.fit(self.X).plot_roc_curve(self.X, self.y, ax=self.ax),
             matplotlib.axes.Axes
         )
 
 
 class KDETest(unittest.TestCase):
     def setUp(self):
-        self.X_train, _          = make_blobs(random_state=1)
-        self.X_test, self.y_test = make_blobs(random_state=2)
-        self.sut                 = KDE()
-        _, self.ax               = plt.subplots()
+        self.X, self.y = make_blobs(random_state=1)
+        self.sut       = KDE()
+        _, self.ax     = plt.subplots()
 
     def tearDown(self):
         plt.close()
@@ -79,39 +73,35 @@ class KDETest(unittest.TestCase):
         self.assertIsNone(check_estimator(self.sut))
 
     def test_fit(self):
-        self.assertIsInstance(self.sut.fit(self.X_train), KDE)
+        self.assertIsInstance(self.sut.fit(self.X), KDE)
 
     def test_fit_predict(self):
-        self.assertIsInstance(self.sut.fit_predict(self.X_train), np.ndarray)
+        self.assertIsInstance(self.sut.fit_predict(self.X), np.ndarray)
 
     def test_anomaly_score_notfitted(self):
         with self.assertRaises(NotFittedError):
-            self.sut.anomaly_score(self.X_train)
+            self.sut.anomaly_score(self.X)
 
     def test_predict_notfitted(self):
         with self.assertRaises(NotFittedError):
-            self.sut.predict(self.X_train)
+            self.sut.predict(self.X)
 
     def test_score(self):
-        self.assertIsInstance(
-            self.sut.fit(self.X_train).score(self.X_test), float
-        )
+        self.assertIsInstance(self.sut.fit(self.X).score(self.X), float)
 
     def test_score_notfitted(self):
         with self.assertRaises(NotFittedError):
-            self.sut.score(self.X_train)
+            self.sut.score(self.X)
 
     def test_plot_anomaly_score(self):
         self.assertIsInstance(
-            self.sut.fit(self.X_train).plot_anomaly_score(ax=self.ax),
+            self.sut.fit(self.X).plot_anomaly_score(ax=self.ax),
             matplotlib.axes.Axes
         )
 
     def test_plot_roc_curve(self):
         self.assertIsInstance(
-            self.sut.fit(
-                self.X_train
-            ).plot_roc_curve(self.X_test, self.y_test, ax=self.ax),
+            self.sut.fit(self.X).plot_roc_curve(self.X, self.y, ax=self.ax),
             matplotlib.axes.Axes
         )
 
@@ -164,10 +154,9 @@ class HBOSTest(unittest.TestCase):
 
 class SparseStructureLearningTest(unittest.TestCase):
     def setUp(self):
-        self.X_train, _          = make_blobs(centers=1, random_state=1)
-        self.X_test, self.y_test = make_blobs(random_state=2)
-        self.sut                 = SparseStructureLearning(tol=0.02)
-        _, self.ax               = plt.subplots()
+        self.X, self.y = make_blobs(centers=1, random_state=1)
+        self.sut       = SparseStructureLearning(tol=0.02)
+        _, self.ax     = plt.subplots()
 
     def tearDown(self):
         plt.close()
@@ -176,56 +165,50 @@ class SparseStructureLearningTest(unittest.TestCase):
         self.assertIsNone(check_estimator(self.sut))
 
     def test_fit(self):
-        self.assertIsInstance(
-            self.sut.fit(self.X_train), SparseStructureLearning
-        )
+        self.assertIsInstance(self.sut.fit(self.X), SparseStructureLearning)
 
     def test_fit_predict(self):
-        self.assertIsInstance(self.sut.fit_predict(self.X_train), np.ndarray)
+        self.assertIsInstance(self.sut.fit_predict(self.X), np.ndarray)
 
     def test_anomaly_score_notfitted(self):
         with self.assertRaises(NotFittedError):
-            self.sut.anomaly_score(self.X_train)
+            self.sut.anomaly_score(self.X)
 
     def test_featurewise_anomaly_score_notfitted(self):
         with self.assertRaises(NotFittedError):
-            self.sut.featurewise_anomaly_score(self.X_train)
+            self.sut.featurewise_anomaly_score(self.X)
 
     def test_predict_notfitted(self):
         with self.assertRaises(NotFittedError):
-            self.sut.predict(self.X_train)
+            self.sut.predict(self.X)
 
     def test_score(self):
-        self.assertIsInstance(
-            self.sut.fit(self.X_train).score(self.X_test), float
-        )
+        self.assertIsInstance(self.sut.fit(self.X).score(self.X), float)
 
     def test_score_notfitted(self):
         with self.assertRaises(NotFittedError):
-            self.sut.score(self.X_train)
+            self.sut.score(self.X)
 
     def test_plot_anomaly_score(self):
         self.assertIsInstance(
-            self.sut.fit(self.X_train).plot_anomaly_score(ax=self.ax),
+            self.sut.fit(self.X).plot_anomaly_score(ax=self.ax),
             matplotlib.axes.Axes
         )
 
     def test_plot_roc_curve(self):
         self.assertIsInstance(
-            self.sut.fit(
-                self.X_train
-            ).plot_roc_curve(self.X_test, self.y_test, ax=self.ax),
+            self.sut.fit(self.X).plot_roc_curve(self.X, self.y, ax=self.ax),
             matplotlib.axes.Axes
         )
 
     def test_plot_graphical_model(self):
         self.assertIsInstance(
-            self.sut.fit(self.X_train).plot_graphical_model(ax=self.ax),
+            self.sut.fit(self.X).plot_graphical_model(ax=self.ax),
             matplotlib.axes.Axes
         )
 
     def test_plot_partial_corrcoeff(self):
         self.assertIsInstance(
-            self.sut.fit(self.X_train).plot_partial_corrcoef(ax=self.ax),
+            self.sut.fit(self.X).plot_partial_corrcoef(ax=self.ax),
             matplotlib.axes.Axes
         )

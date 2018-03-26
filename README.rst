@@ -32,7 +32,6 @@ Requirements
 -  networkx (>=2.0)
 -  numpy (>=1.14.0)
 -  pandas (>=0.22.0)
--  pygraphviz (>=1.3.1)
 -  scikit-learn (>=0.19.1)
 -  scipy (>=1.0.0)
 
@@ -57,21 +56,29 @@ Usage
 .. code:: python
 
     import matplotlib.pyplot as plt
-    from kenchi.datasets import make_blobs
-    from kenchi.outlier_detection import SparseStructureLearning
+    from kenchi.datasets import load_wdbc
+    from kenchi.outlier_detection import *
 
-    # Generate the training data
-    X, _ = make_blobs(centers=1, random_state=1)
+    # Load the breast cancer wisconsin dataset
+    X, y      = load_wdbc(random_state=0)
 
-    # Fit the model according to the given training data
-    det  = SparseStructureLearning().fit(X)
+    f, ax     = plt.subplots()
+    detectors = [
+        FastABOD(),
+        MiniBatchKMeans(random_state=0),
+        LOF(),
+        KNN(),
+        PCA(),
+        KDE()
+    ]
 
-    # Plot the anomaly score for each training sample
-    det.plot_anomaly_score(linestyle='', marker='.')
+    for det in detectors:
+        # Fit the model, and plot the ROC curve
+        det.fit(X).plot_roc_curve(X, y, ax=ax)
 
     plt.show()
 
-.. image:: https://raw.githubusercontent.com/Y-oHr-N/kenchi/master/docs/images/plot_anomaly_score.png
+.. image:: https://raw.githubusercontent.com/Y-oHr-N/kenchi/master/docs/images/plot_roc_curve.png
 
 License
 -------

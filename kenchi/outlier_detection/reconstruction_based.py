@@ -1,20 +1,18 @@
 import numpy as np
-from sklearn.decomposition import PCA as SKLearnPCA
-from sklearn.utils import check_array
+from sklearn.decomposition import PCA as _PCA
 from sklearn.utils.validation import check_is_fitted
 
-from ..base import BaseDetector
-from ..utils import timeit
+from .base import BaseOutlierDetector
 
 __all__ = ['PCA']
 
 
-class PCA(BaseDetector):
+class PCA(BaseOutlierDetector):
     """Outlier detector using Principal Component Analysis (PCA).
 
     Parameters
     ----------
-    contamination : float, default 0.01
+    contamination : float, default 0.1
         Proportion of outliers in the data set. Used to define the threshold.
 
     iterated_power : int, default 'auto'
@@ -45,6 +43,15 @@ class PCA(BaseDetector):
 
     Attributes
     ----------
+    anomaly_score_ : array-like of shape (n_samples,)
+        Anomaly score for each training data.
+
+    fit_time_ : float
+        Time spent for fitting in seconds.
+
+    threshold_ : float
+        Threshold.
+
     components_ : array-like of shape (n_components, n_features)
         Principal axes in feature space, representing the directions of maximum
         variance in the data.
@@ -54,9 +61,6 @@ class PCA(BaseDetector):
 
     explained_variance_ratio_ : array-like of shape (n_components,)
         Percentage of variance explained by each of the selected components.
-
-    fit_time_ : float
-        Time spent for fitting in seconds.
 
     mean_ : array-like of shape (n_features,)
         Per-feature empirical mean, estimated from the training set.
@@ -70,47 +74,39 @@ class PCA(BaseDetector):
 
     singular_values_ : array-like of shape (n_components,)
         Singular values corresponding to each of the selected components.
-
-    threshold_ : float
-        Threshold.
-
-    X_ : array-like of shape (n_samples, n_features)
-        Training data.
     """
 
     @property
     def components_(self):
-        return self._pca.components_
+        return self._estimator.components_
 
     @property
     def explained_variance_(self):
-        return self._pca.explained_variance_
+        return self._estimator.explained_variance_
 
     @property
     def explained_variance_ratio_(self):
-        return self._pca.explained_variance_ratio_
+        return self._estimator.explained_variance_ratio_
 
     @property
     def mean_(self):
-        return self._pca.mean_
+        return self._estimator.mean_
 
     @property
     def noise_variance_(self):
-        return self._pca.noise_variance_
+        return self._estimator.noise_variance_
 
     @property
     def n_components_(self):
-        return self._pca.n_components_
+        return self._estimator.n_components_
 
     @property
     def singular_values_(self):
-        return self._pca.singular_values_
+        return self._estimator.singular_values_
 
     def __init__(
-        self,                  contamination=0.01,
-        iterated_power='auto', n_components=None,
-        random_state=None,     svd_solver='auto',
-        tol=0.,                verbose=False,
+        self, contamination=0.1, iterated_power='auto', n_components=None,
+        random_state=None, svd_solver='auto', tol=0., verbose=False,
         whiten=False
     ):
         super().__init__(contamination=contamination, verbose=verbose)
@@ -122,15 +118,8 @@ class PCA(BaseDetector):
         self.tol            = tol
         self.whiten         = whiten
 
-    def check_params(self, X, y=None):
-        super().check_params(X)
-
-    @timeit
-    def fit(self, X, y=None):
-        self.check_params(X)
-
-        self.X_            = check_array(X, estimator=self)
-        self._pca          = SKLearnPCA(
+    def _fit(self, X):
+        self._estimator    = _PCA(
             iterated_power = self.iterated_power,
             n_components   = self.n_components,
             random_state   = self.random_state,
@@ -138,54 +127,18 @@ class PCA(BaseDetector):
             tol            = self.tol,
             whiten         = self.whiten
         ).fit(X)
-        self.threshold_    = self._get_threshold()
 
         return self
 
-    def reconstruct(self, X):
+    def _anomaly_score(self, X):
+        return np.sum((X - self._reconstruct(X)) ** 2, axis=1)
+
+    def _reconstruct(self, X):
         """Apply dimensionality reduction to the given data, and transform the
         data back to its original space.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Data.
-
-        Returns
-        -------
-        X_rec : array-like of shape (n_samples, n_features)
         """
 
-        check_is_fitted(self, '_pca')
-
-        return self._pca.inverse_transform(self._pca.transform(X))
-
-    def anomaly_score(self, X=None):
-        return np.sqrt(np.sum(self.featurewise_anomaly_score(X), axis=1))
-
-    def featurewise_anomaly_score(self, X=None):
-        """Compute the feature-wise anomaly scores for each sample.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features), default None
-            Data. If not provided, the feature-wise anomaly scores for each
-            training sample are returned.
-
-        Returns
-        -------
-        anomaly_score : array-like of shape (n_samples, n_features)
-            Feature-wise anomaly scores for each sample.
-        """
-
-        check_is_fitted(self, '_pca')
-
-        if X is None:
-            X = self.X_
-        else:
-            X = check_array(X, estimator=self)
-
-        return (X - self.reconstruct(X)) ** 2
+        return self._estimator.inverse_transform(self._estimator.transform(X))
 
     def score(self, X, y=None):
         """Compute the mean log-likelihood of the given data.
@@ -201,8 +154,14 @@ class PCA(BaseDetector):
         -------
         score : float
             Mean log-likelihood of the given data.
+
+        Raises
+        ------
+        ValueError
         """
 
-        check_is_fitted(self, '_pca')
+        check_is_fitted(self, '_estimator')
 
-        return self._pca.score(X)
+        X = self._check_array(X, n_features=self._n_features, estimator=self)
+
+        return self._estimator.score(X)

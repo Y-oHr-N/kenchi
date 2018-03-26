@@ -1,12 +1,15 @@
-from .angle_based import FastABOD
-from .clustering_based import MiniBatchKMeans
-from .distance_based import KNN, OneTimeSampling
-from .reconstruction_based import PCA
-from .statistical import GMM, KDE, HBOS, SparseStructureLearning
+from .angle_based import * # noqa
+from .clustering_based import * # noqa
+from .density_based import * # noqa
+from .distance_based import * # noqa
+from .reconstruction_based import * # noqa
+from .statistical import * # noqa
 
 # TODO: Implement angle_based.ABOD class
 # TODO: Implement angle_based.LBABOD class
 # TODO: Implement angle_based.FastVOA class
+# TODO: Implement clustering_based.CBLOF class
+# TODO: Implement clustering_based.LDCOF class
 # TODO: Implement density_based.COF class
 # TODO: Implement density_based.LOCI class
 # TODO: Implement density_based.ALOCI class
@@ -19,15 +22,3 @@ from .statistical import GMM, KDE, HBOS, SparseStructureLearning
 # TODO: Implement distance_based.IterativeSampling class
 # TODO: Implement statistical.KLIEP class
 # TODO: Implement statistical.ULSIF class
-
-__all__ = [
-    'FastABOD',
-    'MiniBatchKMeans',
-    'KNN',
-    'OneTimeSampling',
-    'PCA',
-    'GMM',
-    'KDE',
-    'HBOS',
-    'SparseStructureLearning'
-]
