@@ -326,7 +326,7 @@ class HBOS(BaseOutlierDetector):
 
     Parameters
     ----------
-    bins : int, str or array-like, default 'sqrt'
+    bins : int, str or array-like, default 'auto'
         Number of hist bins.
 
     contamination : float, default 0.1
@@ -346,10 +346,10 @@ class HBOS(BaseOutlierDetector):
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
 
-    bin_edges_ : array-like of shape (n_features, bins + 1)
+    bin_edges_ : array-like
         Bin edges.
 
-    bin_widths_ : array-like of shape (n_features,)
+    bin_widths_ : array-like
         Bin widths.
 
     data_min_ : array-like of shape (n_features,)
@@ -379,7 +379,7 @@ class HBOS(BaseOutlierDetector):
     """
 
     def __init__(
-        self, bins='sqrt', contamination=0.1, novelty=False,
+        self, bins='auto', contamination=0.1, novelty=False,
         verbose=False
     ):
         super().__init__(contamination=contamination, verbose=verbose)
@@ -388,35 +388,29 @@ class HBOS(BaseOutlierDetector):
         self.novelty = novelty
 
     def _fit(self, X):
-        n_samples, n_features   = X.shape
-
-        if self.bins == 'sqrt':
-            bins                = int(np.sqrt(n_samples))
-        else:
-            bins                = self.bins
-
         self.data_min_          = np.min(X, axis=0)
         self.data_max_          = np.max(X, axis=0)
-        self.hist_              = np.empty((n_features, bins))
-        self.bin_edges_         = np.empty((n_features, bins + 1))
-        self.bin_widths_        = np.empty(n_features)
+        self.hist_              = np.empty(self._n_features, dtype=object)
+        self.bin_edges_         = np.empty(self._n_features, dtype=object)
+        self.bin_widths_        = np.empty(self._n_features)
 
-        for j in range(n_features):
+        for j in range(self._n_features):
             self.hist_[j], self.bin_edges_[j] = np.histogram(
-                X[:, j], bins=bins, density=True
+                X[:, j], bins=self.bins, density=True
             )
             self.bin_widths_[j] = (
-                self.bin_edges_[j, 1] - self.bin_edges_[j, 0]
+                self.bin_edges_[j][1] - self.bin_edges_[j][0]
             )
 
         return self
 
     def _anomaly_score(self, X):
         n_samples, n_features                = X.shape
-        _, bins                              = self.hist_.shape
         anomaly_score                        = np.zeros(n_samples)
 
         for j in range(n_features):
+            bins                             = self.hist_[j].size
+
             is_in_range                      = (
                 (self.data_min_[j] <= X[:, j]) & (X[:, j] <= self.data_max_[j])
             )
@@ -428,7 +422,7 @@ class HBOS(BaseOutlierDetector):
 
             prob                             = np.zeros(n_samples)
             prob[is_in_range]                = (
-                self.hist_[j, ind[is_in_range]] * self.bin_widths_[j]
+                self.hist_[j][ind[is_in_range]] * self.bin_widths_[j]
             )
 
             with np.errstate(divide='ignore'):
