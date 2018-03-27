@@ -8,7 +8,7 @@ from sklearn.utils.validation import check_is_fitted
 from .base import BaseOutlierDetector
 from ..visualization import plot_graphical_model, plot_partial_corrcoef
 
-__all__ = ['GMM', 'KDE', 'SparseStructureLearning']
+__all__ = ['GMM', 'KDE', 'HBOS', 'SparseStructureLearning']
 
 
 class GMM(BaseOutlierDetector):
@@ -319,6 +319,116 @@ class KDE(BaseOutlierDetector):
         X = self._check_array(X, n_features=self._n_features, estimator=self)
 
         return np.mean(self._estimator.score_samples(X))
+
+
+class HBOS(BaseOutlierDetector):
+    """Histogram-based outlier detector.
+
+    Parameters
+    ----------
+    bins : int, str or array-like, default 'auto'
+        Number of hist bins.
+
+    contamination : float, default 0.1
+        Proportion of outliers in the data set. Used to define the threshold.
+
+    novelty : bool, default False
+        By default, HBOS is only meant to be used for outlier detection. Set
+        novelty to True if you want to use HBOS for novelty detection. In this
+        case be aware that that you should only use predict, decision_function
+        and anomaly_score on new unseen data and not on the training data.
+
+    verbose : bool, default False
+        Enable verbose output.
+
+    Attributes
+    ----------
+    anomaly_score_ : array-like of shape (n_samples,)
+        Anomaly score for each training data.
+
+    bin_edges_ : array-like
+        Bin edges.
+
+    bin_widths_ : array-like
+        Bin widths.
+
+    data_min_ : array-like of shape (n_features,)
+        Per feature minimum seen in the data.
+
+    data_max_ : array-like of shape (n_features,)
+        Per feature maximum seen in the data.
+
+    fit_time_ : float
+        Time spent for fitting in seconds.
+
+    hist_ : array-like of shape (n_features, bins)
+        Values of the histogram.
+
+    threshold_ : float
+        Threshold.
+
+    X_ : array-like of shape (n_samples, n_features)
+        Training data.
+
+    References
+    ----------
+    M. Goldstein and A. Dengel,
+    "Histogram-based outlier score (HBOS): A fast unsupervised anomaly
+    detection algorithm,"
+    KI'12: Poster and Demo Track, pp. 59-63, 2012.
+    """
+
+    def __init__(
+        self, bins='auto', contamination=0.1, novelty=False,
+        verbose=False
+    ):
+        super().__init__(contamination=contamination, verbose=verbose)
+
+        self.bins    = bins
+        self.novelty = novelty
+
+    def _fit(self, X):
+        self.data_min_          = np.min(X, axis=0)
+        self.data_max_          = np.max(X, axis=0)
+        self.hist_              = np.empty(self._n_features, dtype=object)
+        self.bin_edges_         = np.empty(self._n_features, dtype=object)
+        self.bin_widths_        = np.empty(self._n_features)
+
+        for j in range(self._n_features):
+            self.hist_[j], self.bin_edges_[j] = np.histogram(
+                X[:, j], bins=self.bins, density=True
+            )
+            self.bin_widths_[j] = (
+                self.bin_edges_[j][1] - self.bin_edges_[j][0]
+            )
+
+        return self
+
+    def _anomaly_score(self, X):
+        n_samples, n_features                = X.shape
+        anomaly_score                        = np.zeros(n_samples)
+
+        for j in range(n_features):
+            bins                             = self.hist_[j].size
+
+            is_in_range                      = (
+                (self.data_min_[j] <= X[:, j]) & (X[:, j] <= self.data_max_[j])
+            )
+
+            ind                              = np.digitize(
+                X[:, j], self.bin_edges_[j]
+            ) - 1
+            ind[is_in_range & (ind == bins)] = bins - 1
+
+            prob                             = np.zeros(n_samples)
+            prob[is_in_range]                = (
+                self.hist_[j][ind[is_in_range]] * self.bin_widths_[j]
+            )
+
+            with np.errstate(divide='ignore'):
+                anomaly_score               -= np.log(prob)
+
+        return anomaly_score
 
 
 class SparseStructureLearning(BaseOutlierDetector):
