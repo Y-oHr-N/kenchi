@@ -332,6 +332,12 @@ class HBOS(BaseOutlierDetector):
     contamination : float, default 0.1
         Proportion of outliers in the data set. Used to define the threshold.
 
+    novelty : bool, default False
+        By default, HBOS is only meant to be used for outlier detection. Set
+        novelty to True if you want to use HBOS for novelty detection. In this
+        case be aware that that you should only use predict, decision_function
+        and anomaly_score on new unseen data and not on the training data.
+
     verbose : bool, default False
         Enable verbose output.
 
@@ -345,6 +351,12 @@ class HBOS(BaseOutlierDetector):
 
     bin_widths_ : array-like of shape (n_features,)
         Bin widths.
+
+    data_min_ : array-like of shape (n_features,)
+        Per feature minimum seen in the data.
+
+    data_max_ : array-like of shape (n_features,)
+        Per feature maximum seen in the data.
 
     fit_time_ : float
         Time spent for fitting in seconds.
@@ -366,13 +378,16 @@ class HBOS(BaseOutlierDetector):
     KI'12: Poster and Demo Track, pp. 59-63, 2012.
     """
 
-    def __init__(self, bins='sqrt', contamination=0.1, verbose=False):
+    def __init__(
+        self, bins='sqrt', contamination=0.1, novelty=False,
+        verbose=False
+    ):
         super().__init__(contamination=contamination, verbose=verbose)
 
-        self.bins = bins
+        self.bins    = bins
+        self.novelty = novelty
 
     def _fit(self, X):
-        self.X_                 = X
         n_samples, n_features   = X.shape
 
         if self.bins == 'sqrt':
@@ -380,6 +395,8 @@ class HBOS(BaseOutlierDetector):
         else:
             bins                = self.bins
 
+        self.data_min_          = np.min(X, axis=0)
+        self.data_max_          = np.max(X, axis=0)
         self.hist_              = np.empty((n_features, bins))
         self.bin_edges_         = np.empty((n_features, bins + 1))
         self.bin_widths_        = np.empty(n_features)
@@ -395,19 +412,27 @@ class HBOS(BaseOutlierDetector):
         return self
 
     def _anomaly_score(self, X):
-        if X is not self.X_:
-            raise NotImplementedError()
-
-        n_samples, n_features = X.shape
-        anomaly_score         = np.zeros(n_samples)
+        n_samples, n_features                = X.shape
+        _, bins                              = self.hist_.shape
+        anomaly_score                        = np.zeros(n_samples)
 
         for j in range(n_features):
-            ind               = np.digitize(
-                X[:, j], self.bin_edges_[j], right=True
+            is_in_range                      = (
+                (self.data_min_[j] <= X[:, j]) & (X[:, j] <= self.data_max_[j])
             )
-            anomaly_score    -= np.log(
-                self.hist_[j, ind - 1] * self.bin_widths_[j]
+
+            ind                              = np.digitize(
+                X[:, j], self.bin_edges_[j]
+            ) - 1
+            ind[is_in_range & (ind == bins)] = bins - 1
+
+            prob                             = np.zeros(n_samples)
+            prob[is_in_range]                = (
+                self.hist_[j, ind[is_in_range]] * self.bin_widths_[j]
             )
+
+            with np.errstate(divide='ignore'):
+                anomaly_score               -= np.log(prob)
 
         return anomaly_score
 
