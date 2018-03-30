@@ -507,6 +507,13 @@ class SparseStructureLearning(BaseOutlierDetector):
     """
 
     @property
+    def _apcluster_params(self):
+        if self.apcluster_params is None:
+            return dict()
+        else:
+            return self.apcluster_params
+
+    @property
     def covariance_(self):
         return self._estimator.covariance_
 
@@ -524,14 +531,9 @@ class SparseStructureLearning(BaseOutlierDetector):
 
     @property
     def labels_(self):
-        if self.apcluster_params is None:
-            apcluster_params = {}
-        else:
-            apcluster_params = self.apcluster_params
-
         # cluster using affinity propagation
-        _, labels            = affinity_propagation(
-            self.partial_corrcoef_, **apcluster_params
+        _, labels = affinity_propagation(
+            self.partial_corrcoef_, **self._apcluster_params
         )
 
         return labels
