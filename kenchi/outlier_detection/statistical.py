@@ -344,6 +344,12 @@ class HBOS(BaseOutlierDetector):
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
 
+    fit_time_ : float
+        Time spent for fitting in seconds.
+
+    threshold_ : float
+        Threshold.
+
     bin_edges_ : array-like
         Bin edges.
 
@@ -356,14 +362,8 @@ class HBOS(BaseOutlierDetector):
     data_max_ : array-like of shape (n_features,)
         Per feature maximum seen in the data.
 
-    fit_time_ : float
-        Time spent for fitting in seconds.
-
     hist_ : array-like of shape (n_features, bins)
         Values of the histogram.
-
-    threshold_ : float
-        Threshold.
 
     X_ : array-like of shape (n_samples, n_features)
         Training data.

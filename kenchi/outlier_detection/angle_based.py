@@ -54,11 +54,11 @@ class FastABOD(BaseOutlierDetector):
     fit_time_ : float
         Time spent for fitting in seconds.
 
-    n_neighbors_ : int
-        Actual number of neighbors used for `kneighbors` queries.
-
     threshold_ : float
         Threshold.
+
+    n_neighbors_ : int
+        Actual number of neighbors used for `kneighbors` queries.
 
     X_ : array-like of shape (n_samples, n_features)
         Training data.

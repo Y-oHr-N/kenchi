@@ -52,14 +52,14 @@ class LOF(BaseOutlierDetector):
     fit_time_ : float
         Time spent for fitting in seconds.
 
+    threshold_ : float
+        Threshold.
+
     negative_outlier_factor_ : array-like of shape (n_samples,)
         Opposite LOF of the training samples.
 
     n_neighbors_ : int
         Actual number of neighbors used for `kneighbors` queries.
-
-    threshold_ : float
-        Threshold.
 
     X_ : array-like of shape (n_samples, n_features)
         Training data.
