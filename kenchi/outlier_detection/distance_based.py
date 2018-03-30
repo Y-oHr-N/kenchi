@@ -30,10 +30,8 @@ class KNN(BaseOutlierDetector):
         Distance metric to use.
 
     novelty : bool, default False
-        By default, KNN is only meant to be used for outlier detection. Set
-        novelty to True if you want to use KNN for novelty detection. In this
-        case be aware that that you should only use predict, decision_function
-        and anomaly_score on new unseen data and not on the training data.
+        If True, you can use predict, decision_function and anomaly_score on
+        new unseen data and not on the training data.
 
     n_jobs : int, default 1
         Number of jobs to run in parallel. If -1, then the number of jobs is
@@ -59,6 +57,9 @@ class KNN(BaseOutlierDetector):
     fit_time_ : float
         Time spent for fitting in seconds.
 
+    n_neighbors_ : int
+        Actual number of neighbors used for `kneighbors` queries.
+
     threshold_ : float
         Threshold.
 
@@ -67,13 +68,13 @@ class KNN(BaseOutlierDetector):
 
     References
     ----------
-    S. Ramaswamy, R. Rastogi and K. Shim,
-    "Efficient algorithms for mining outliers from large data sets,"
-    In Proceedings of SIGMOD'00, pp. 427-438, 2000.
+    .. [1] S. Ramaswamy, R. Rastogi, and K. Shim,
+        "Efficient algorithms for mining outliers from large data sets,"
+        In Proceedings of SIGMOD'00, pp. 427-438, 2000.
 
-    F. Angiulli and C. Pizzuti,
-    "Fast outlier detection in high dimensional spaces,"
-    In Proceedings of PKDD'02, pp. 15-27, 2002.
+    .. [2] F. Angiulli and C. Pizzuti,
+        "Fast outlier detection in high dimensional spaces,"
+        In Proceedings of PKDD'02, pp. 15-27, 2002.
     """
 
     @property
@@ -98,12 +99,16 @@ class KNN(BaseOutlierDetector):
         self.metric_params = metric_params
 
     def _fit(self, X):
+        n_samples, _      = X.shape
+        self.n_neighbors_ = np.maximum(
+            1, np.minimum(self.n_neighbors, n_samples - 1)
+        )
         self._estimator   = NearestNeighbors(
             algorithm     = self.algorithm,
             leaf_size     = self.leaf_size,
             metric        = self.metric,
             n_jobs        = self.n_jobs,
-            n_neighbors   = self.n_neighbors,
+            n_neighbors   = self.n_neighbors_,
             p             = self.p,
             metric_params = self.metric_params
         ).fit(X)

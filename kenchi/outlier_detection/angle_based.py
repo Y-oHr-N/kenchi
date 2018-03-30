@@ -54,6 +54,9 @@ class FastABOD(BaseOutlierDetector):
     fit_time_ : float
         Time spent for fitting in seconds.
 
+    n_neighbors_ : int
+        Actual number of neighbors used for `kneighbors` queries.
+
     threshold_ : float
         Threshold.
 
@@ -62,13 +65,13 @@ class FastABOD(BaseOutlierDetector):
 
     References
     ----------
-    H.-P. Kriegel, M. Schubert and A. Zimek,
-    "Angle-based outlier detection in high-dimensional data,"
-    In Proceedings of SIGKDD'08, pp. 444-452, 2008.
+    .. [1] H.-P. Kriegel, M. Schubert and A. Zimek,
+        "Angle-based outlier detection in high-dimensional data,"
+        In Proceedings of SIGKDD'08, pp. 444-452, 2008.
 
-    H.-P. Kriegel, P. Kroger, E. Schubert and A. Zimek,
-    "Interpreting and unifying outlier scores,"
-    In Proceedings of SDM'11, pp. 13-24, 2011.
+    .. [2] H.-P. Kriegel, P. Kroger, E. Schubert and A. Zimek,
+        "Interpreting and unifying outlier scores,"
+        In Proceedings of SDM'11, pp. 13-24, 2011.
     """
 
     @property
@@ -92,12 +95,16 @@ class FastABOD(BaseOutlierDetector):
         self.metric_params = metric_params
 
     def _fit(self, X):
+        n_samples, _      = X.shape
+        self.n_neighbors_ = np.maximum(
+            1, np.minimum(self.n_neighbors, n_samples - 1)
+        )
         self._estimator   = NearestNeighbors(
             algorithm     = self.algorithm,
             leaf_size     = self.leaf_size,
             metric        = self.metric,
             n_jobs        = self.n_jobs,
-            n_neighbors   = self.n_neighbors,
+            n_neighbors   = self.n_neighbors_,
             p             = self.p,
             metric_params = self.metric_params
         ).fit(X)
