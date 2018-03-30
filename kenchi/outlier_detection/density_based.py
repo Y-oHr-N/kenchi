@@ -25,10 +25,8 @@ class LOF(BaseOutlierDetector):
         Distance metric to use.
 
     novelty : bool, default False
-        By default, LOF is only meant to be used for outlier detection. Set
-        novelty to True if you want to use LOF for novelty detection. In this
-        case be aware that that you should only use predict, decision_function
-        and anomaly_score on new unseen data and not on the training data.
+        If True, you can use predict, decision_function and anomaly_score on
+        new unseen data and not on the training data.
 
     n_jobs : int, default 1
         Number of jobs to run in parallel. If -1, then the number of jobs is
@@ -54,6 +52,12 @@ class LOF(BaseOutlierDetector):
     fit_time_ : float
         Time spent for fitting in seconds.
 
+    negative_outlier_factor_ : array-like of shape (n_samples,)
+        Opposite LOF of the training samples.
+
+    n_neighbors_ : int
+        Actual number of neighbors used for `kneighbors` queries.
+
     threshold_ : float
         Threshold.
 
@@ -62,10 +66,22 @@ class LOF(BaseOutlierDetector):
 
     References
     ----------
-    M. M. Breunig, H.-P. Kriegel, R. T. Ng and J. Sander,
+    .. [1] M. M. Breunig, H.-P. Kriegel, R. T. Ng and J. Sander,
     "LOF: identifying density-based local outliers,"
     In ACM sigmod record, pp. 93-104, 2000.
+
+    .. [2] H.-P. Kriegel, P. Kroger, E. Schubert and A. Zimek,
+    "Interpreting and unifying outlier scores,"
+    In Proceedings of SDM'11, pp. 13-24, 2011.
     """
+
+    @property
+    def negative_outlier_factor_(self):
+        return self._estimator.negative_outlier_factor_
+
+    @property
+    def n_neighbors_(self):
+        return self._estimator.n_neighbors_
 
     @property
     def X_(self):
@@ -112,6 +128,6 @@ class LOF(BaseOutlierDetector):
         """Compute the Local Outlier Factor (LOF) for each sample."""
 
         if X is self.X_:
-            return -self._estimator.negative_outlier_factor_
+            return -self.negative_outlier_factor_
         else:
             return -self._estimator._decision_function(X)
