@@ -3,8 +3,6 @@ from . import outlier_detection
 from . import pipeline
 from . import visualization
 
-# TODO: Implement ensemble module
-
 __version__ = '0.8.0'
 
 __all__     = [
