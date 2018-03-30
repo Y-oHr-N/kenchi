@@ -1,25 +1,11 @@
-import itertools
+from itertools import combinations
 
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
-from sklearn.externals.joblib import delayed, Parallel
-from sklearn.utils import gen_even_slices
 
 from .base import BaseOutlierDetector
 
 __all__ = ['FastABOD']
-
-
-def _abof(X, X_train, neigh_ind):
-    with np.errstate(invalid='raise'):
-        return np.var([
-            [
-                (diff_a @ diff_b) / (diff_a @ diff_a) / (diff_b @ diff_b)
-                for diff_a, diff_b in itertools.combinations(
-                    X_neigh - query_point, 2
-                )
-            ] for query_point, X_neigh in zip(X, X_train[neigh_ind])
-        ], axis=1)
 
 
 class FastABOD(BaseOutlierDetector):
@@ -41,11 +27,8 @@ class FastABOD(BaseOutlierDetector):
         Distance metric to use.
 
     novelty : bool, default False
-        By default, FastABOD is only meant to be used for outlier detection.
-        Set novelty to True if you want to use FastABOD for novelty detection.
-        In this case be aware that that you should only use predict,
-        decision_function and anomaly_score on new unseen data and not on the
-        training data.
+        If True, you can use predict, decision_function and anomaly_score on
+        new unseen data and not on the training data.
 
     n_jobs : int, default 1
         Number of jobs to run in parallel. If -1, then the number of jobs is
@@ -138,11 +121,10 @@ class FastABOD(BaseOutlierDetector):
         else:
             neigh_ind = self._estimator.kneighbors(X, return_distance=False)
 
-        n_samples, _  = X.shape
-        result        = Parallel(n_jobs=self.n_jobs)(
-            delayed(_abof)(
-                X[s], self.X_, neigh_ind[s]
-            ) for s in gen_even_slices(n_samples, self.n_jobs)
-        )
-
-        return np.concatenate(result)
+        return np.var([
+            [
+                (pa @ pb) / (pa @ pa) / (pb @ pb) for pa, pb in combinations(
+                    X_neigh - query_point, 2
+                )
+            ] for query_point, X_neigh in zip(X, self.X_[neigh_ind])
+        ], axis=1)
