@@ -95,20 +95,20 @@ class FastABOD(BaseOutlierDetector):
         self.metric_params = metric_params
 
     def _fit(self, X):
-        n_samples, _      = X.shape
-        self.n_neighbors_ = np.maximum(
+        n_samples, _            = X.shape
+        self.n_neighbors_       = np.maximum(
             1, np.minimum(self.n_neighbors, n_samples - 1)
         )
-        self._estimator   = NearestNeighbors(
-            algorithm     = self.algorithm,
-            leaf_size     = self.leaf_size,
-            metric        = self.metric,
-            n_jobs        = self.n_jobs,
-            n_neighbors   = self.n_neighbors_,
-            p             = self.p,
-            metric_params = self.metric_params
+        self._estimator         = NearestNeighbors(
+            algorithm           = self.algorithm,
+            leaf_size           = self.leaf_size,
+            metric              = self.metric,
+            n_jobs              = self.n_jobs,
+            n_neighbors         = self.n_neighbors_,
+            p                   = self.p,
+            metric_params       = self.metric_params
         ).fit(X)
-        self._abof_max    = np.max(self._anomaly_score(X, regularize=False))
+        self._anomaly_score_min = np.max(self._anomaly_score(X, regularize=False))
 
         return self
 
@@ -116,7 +116,7 @@ class FastABOD(BaseOutlierDetector):
         abof = self._abof(X)
 
         if regularize:
-            return -np.log(abof / self._abof_max)
+            return -np.log(abof / self._anomaly_score_min)
         else:
             return abof
 
