@@ -67,12 +67,12 @@ class LOF(BaseOutlierDetector):
     References
     ----------
     .. [1] M. M. Breunig, H.-P. Kriegel, R. T. Ng and J. Sander,
-    "LOF: identifying density-based local outliers,"
-    In ACM sigmod record, pp. 93-104, 2000.
+        "LOF: identifying density-based local outliers,"
+        In ACM sigmod record, pp. 93-104, 2000.
 
     .. [2] H.-P. Kriegel, P. Kroger, E. Schubert and A. Zimek,
-    "Interpreting and unifying outlier scores,"
-    In Proceedings of SDM'11, pp. 13-24, 2011.
+        "Interpreting and unifying outlier scores,"
+        In Proceedings of SDM'11, pp. 13-24, 2011.
     """
 
     @property

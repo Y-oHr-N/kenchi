@@ -1,4 +1,4 @@
-from sklearn.pipeline import _name_estimators, Pipeline as SKLearnPipeline
+from sklearn.pipeline import _name_estimators, Pipeline as _Pipeline
 from sklearn.utils.metaestimators import if_delegate_has_method
 
 __all__ = ['make_pipeline', 'Pipeline']
@@ -23,7 +23,7 @@ def make_pipeline(*steps):
     return Pipeline(_name_estimators(steps))
 
 
-class Pipeline(SKLearnPipeline):
+class Pipeline(_Pipeline):
     """Pipeline of transforms with a final estimator.
 
     Parameters
@@ -83,6 +83,10 @@ class Pipeline(SKLearnPipeline):
         -------
         anomaly_score : array-like of shape (n_samples,)
             Anomaly score for each sample.
+
+        Raises
+        ------
+        ValueError
         """
 
         return self._final_estimator.anomaly_score(
@@ -103,6 +107,10 @@ class Pipeline(SKLearnPipeline):
         -------
         anomaly_score : array-like of shape (n_samples, n_features)
             Feature-wise anomaly scores for each sample.
+
+        Raises
+        ------
+        ValueError
         """
 
         return self._final_estimator.featurewise_anomaly_score(
@@ -159,6 +167,10 @@ class Pipeline(SKLearnPipeline):
         -------
         ax : matplotlib Axes
             Axes on which the plot was drawn.
+
+        Raises
+        ------
+        ValueError
         """
 
         kwargs['X'] = self._pre_transform(X)
@@ -203,6 +215,10 @@ class Pipeline(SKLearnPipeline):
         -------
         ax : matplotlib Axes
             Axes on which the plot was drawn.
+
+        Raises
+        ------
+        ValueError
         """
 
         kwargs['X'] = self._pre_transform(X)
@@ -239,6 +255,10 @@ class Pipeline(SKLearnPipeline):
         -------
         ax : matplotlib Axes
             Axes on which the plot was drawn.
+
+        Raises
+        ------
+        ValueError
         """
 
         return self._final_estimator.plot_graphical_model
@@ -272,6 +292,10 @@ class Pipeline(SKLearnPipeline):
         -------
         ax : matplotlib Axes
             Axes on which the plot was drawn.
+
+        Raises
+        ------
+        ValueError
         """
 
         return self._final_estimator.plot_partial_corrcoef

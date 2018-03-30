@@ -333,10 +333,8 @@ class HBOS(BaseOutlierDetector):
         Proportion of outliers in the data set. Used to define the threshold.
 
     novelty : bool, default False
-        By default, HBOS is only meant to be used for outlier detection. Set
-        novelty to True if you want to use HBOS for novelty detection. In this
-        case be aware that that you should only use predict, decision_function
-        and anomaly_score on new unseen data and not on the training data.
+        If True, you can use predict, decision_function and anomaly_score on
+        new unseen data and not on the training data.
 
     verbose : bool, default False
         Enable verbose output.
@@ -372,10 +370,10 @@ class HBOS(BaseOutlierDetector):
 
     References
     ----------
-    M. Goldstein and A. Dengel,
-    "Histogram-based outlier score (HBOS): A fast unsupervised anomaly
-    detection algorithm,"
-    KI'12: Poster and Demo Track, pp. 59-63, 2012.
+    .. [1] M. Goldstein and A. Dengel,
+        "Histogram-based outlier score (HBOS): A fast unsupervised anomaly
+        detection algorithm,"
+        KI'12: Poster and Demo Track, pp. 59-63, 2012.
     """
 
     def __init__(
@@ -503,9 +501,9 @@ class SparseStructureLearning(BaseOutlierDetector):
 
     References
     ----------
-    T. Ide, C. Lozano, N. Abe and Y. Liu,
-    "Proximity-based anomaly detection using sparse structure learning,"
-    In Proceedings of SDM'09, pp. 97-108, 2009.
+    .. [1] T. Ide, C. Lozano, N. Abe and Y. Liu,
+        "Proximity-based anomaly detection using sparse structure learning,"
+        In Proceedings of SDM'09, pp. 97-108, 2009.
     """
 
     @property
