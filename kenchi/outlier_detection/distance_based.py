@@ -139,11 +139,8 @@ class OneTimeSampling(BaseOutlierDetector):
         Distance metric to use.
 
     novelty : bool, default False
-        By default, OneTimeSampling is only meant to be used for outlier
-        detection. Set novelty to True if you want to use OneTimeSampling for
-        novelty detection. In this case be aware that that you should only use
-        predict, decision_function and anomaly_score on new unseen data and not
-        on the training data.
+        If True, you can use predict, decision_function and anomaly_score on
+        new unseen data and not on the training data.
 
     n_subsamples : int, default 20
         Number of random samples to be used.
@@ -168,17 +165,17 @@ class OneTimeSampling(BaseOutlierDetector):
     threshold_ : float
         Threshold.
 
-    sampled_ : array-like of shape (n_subsamples,)
+    subsamples_ : array-like of shape (n_subsamples,)
         Indices of subsamples.
 
-    X_sampled_ : array-like of shape (n_subsamples, n_features)
+    S_ : array-like of shape (n_subsamples, n_features)
         Subset of the given training data.
 
     References
     ----------
-    M. Sugiyama, and K. Borgwardt,
-    "Rapid distance-based outlier detection via sampling,"
-    Advances in NIPS'13, pp. 467-475, 2013.
+    .. [1] M. Sugiyama and K. Borgwardt,
+        "Rapid distance-based outlier detection via sampling,"
+        Advances in NIPS'13, pp. 467-475, 2013.
     """
 
     @property
@@ -221,22 +218,22 @@ class OneTimeSampling(BaseOutlierDetector):
         return X
 
     def _fit(self, X):
-        n_samples, _    = X.shape
-        rnd             = check_random_state(self.random_state)
+        n_samples, _     = X.shape
+        rnd              = check_random_state(self.random_state)
 
-        sampled         = rnd.choice(
+        subsamples       = rnd.choice(
             n_samples, size=self.n_subsamples, replace=False
         )
 
         # sort again as choice does not guarantee sorted order
-        self.sampled_   = np.sort(sampled)
-        self.X_sampled_ = X[self.sampled_]
+        self.subsamples_ = np.sort(subsamples)
+        self.S_          = X[self.subsamples_]
 
-        self._metric    = DistanceMetric.get_metric(
+        self._metric     = DistanceMetric.get_metric(
             self.metric, **self._metric_params
         )
 
         return self
 
     def _anomaly_score(self, X):
-        return np.min(self._metric.pairwise(X, self.X_sampled_), axis=1)
+        return np.min(self._metric.pairwise(X, self.S_), axis=1)
