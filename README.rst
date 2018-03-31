@@ -24,7 +24,22 @@ kenchi
 
 This is a set of python modules for anomaly detection.
 
-Requirements
+Anomaly detection methods
+-------------------------
+
+#. FastABOD [#kriegel08]_
+#. MiniBatchKMeans
+#. KNN [#angiulli02]_, [#ramaswamy00]_
+#. OneTimeSampling [#sugiyama13]_
+#. LOF [#breunig00]_
+#. IForest [#liu08]_
+#. PCA
+#. GMM
+#. HBOS [#goldstein12]_
+#. KDE
+#. SparseStructureLearning [#ide09]_
+
+Dependencies
 ------------
 
 -  Python (>=3.6)
@@ -50,8 +65,8 @@ or ``conda``.
 
     conda install -c y_ohr_n kenchi
 
-Usage
------
+Examples
+--------
 
 .. code:: python
 
@@ -68,13 +83,14 @@ Usage
         MiniBatchKMeans(random_state=0),
         LOF(),
         KNN(),
+        IForest(random_state=0),
         PCA(),
         KDE()
     ]
 
     for det in detectors:
         # Fit the model, and plot the ROC curve
-        det.fit(X).plot_roc_curve(X, y, ax=ax)
+        det.fit(X).plot_roc_curve(X=None, y=y, ax=ax)
 
     plt.show()
 
@@ -86,3 +102,42 @@ License
 The MIT License (MIT)
 
 Copyright (c) 2017 Kon
+
+References
+----------
+
+.. [#angiulli02] Angiulli, F., and Pizzuti, C.,
+    "Fast outlier detection in high dimensional spaces,"
+    In Proceedings of PKDD'02, pp. 15-27, 2002.
+
+.. [#breunig00] Breunig, M. M., Kriegel, H.-P., Ng, R. T., and Sander, J.,
+    "LOF: identifying density-based local outliers,"
+    In ACM sigmod record, pp. 93-104, 2000.
+
+.. [#goldstein12] Goldstein, M., and Dengel, A.,
+    "Histogram-based outlier score (HBOS): A fast unsupervised anomaly detection algorithm,"
+    KI'12: Poster and Demo Track, pp. 59-63, 2012.
+
+.. [#ide09] Ide, T., Lozano, C., Abe N., and Liu, Y.,
+    "Proximity-based anomaly detection using sparse structure learning,"
+    In Proceedings of SDM'09, pp. 97-108, 2009.
+
+.. [#kriegel11] Kriegel, H.-P., Kroger, P., Schubert E., and Zimek, A.,
+    "Interpreting and unifying outlier scores,"
+    In Proceedings of SDM'11, pp. 13-24, 2011.
+
+.. [#kriegel08] Kriegel, H.-P., Schubert M., and Zimek, A.,
+    "Angle-based outlier detection in high-dimensional data,"
+    In Proceedings of SIGKDD'08, pp. 444-452, 2008.
+
+.. [#liu08] Liu, F. T., Ting K. M., and Zhou, Z.-H.,
+    "Isolation forest,"
+    In Proceedings of ICDM'08, pp. 413-422, 2008.
+
+.. [#ramaswamy00] Ramaswamy, S., Rastogi R., and Shim, K.,
+    "Efficient algorithms for mining outliers from large data sets,"
+    In Proceedings of SIGMOD'00, pp. 427-438, 2000.
+
+.. [#sugiyama13] Sugiyama M., and Borgwardt, K.,
+    "Rapid distance-based outlier detection via sampling,"
+    Advances in NIPS'13, pp. 467-475, 2013.
