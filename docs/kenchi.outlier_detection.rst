@@ -9,7 +9,9 @@ Submodules
    kenchi.outlier_detection.angle_based
    kenchi.outlier_detection.base
    kenchi.outlier_detection.clustering_based
+   kenchi.outlier_detection.density_based
    kenchi.outlier_detection.distance_based
+   kenchi.outlier_detection.ensemble
    kenchi.outlier_detection.reconstruction_based
    kenchi.outlier_detection.statistical
 
