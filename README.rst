@@ -31,7 +31,6 @@ Dependencies
 -  matplotlib (>=2.1.1)
 -  networkx (>=2.0)
 -  numpy (>=1.14.0)
--  pandas (>=0.22.0)
 -  scikit-learn (>=0.19.1)
 -  scipy (>=1.0.0)
 
