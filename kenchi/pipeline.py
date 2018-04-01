@@ -83,10 +83,6 @@ class Pipeline(_Pipeline):
         -------
         anomaly_score : array-like of shape (n_samples,)
             Anomaly score for each sample.
-
-        Raises
-        ------
-        ValueError
         """
 
         return self._final_estimator.anomaly_score(
@@ -167,10 +163,6 @@ class Pipeline(_Pipeline):
         -------
         ax : matplotlib Axes
             Axes on which the plot was drawn.
-
-        Raises
-        ------
-        ValueError
         """
 
         kwargs['X'] = self._pre_transform(X)
@@ -215,10 +207,6 @@ class Pipeline(_Pipeline):
         -------
         ax : matplotlib Axes
             Axes on which the plot was drawn.
-
-        Raises
-        ------
-        ValueError
         """
 
         kwargs['X'] = self._pre_transform(X)
@@ -255,10 +243,6 @@ class Pipeline(_Pipeline):
         -------
         ax : matplotlib Axes
             Axes on which the plot was drawn.
-
-        Raises
-        ------
-        ValueError
         """
 
         return self._final_estimator.plot_graphical_model
@@ -292,10 +276,6 @@ class Pipeline(_Pipeline):
         -------
         ax : matplotlib Axes
             Axes on which the plot was drawn.
-
-        Raises
-        ------
-        ValueError
         """
 
         return self._final_estimator.plot_partial_corrcoef

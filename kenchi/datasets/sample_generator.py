@@ -48,9 +48,9 @@ def make_blobs(
 
     References
     ----------
-    H.-P. Kriegel, M. Schubert and A. Zimek,
-    "Angle-based outlier detection in high-dimensional data,"
-    In Proceedings of SIGKDD'08, pp. 444-452, 2008.
+    .. [#kriegel11] Kriegel, H.-P., Kroger, P., Schubert E., and Zimek, A.,
+        "Interpreting and unifying outlier scores,"
+        In Proceedings of SDM'11, pp. 13-24, 2011.
     """
 
     rnd              = check_random_state(random_state)

@@ -29,9 +29,9 @@ def load_wdbc(contamination=0.0272, random_state=None, shuffle=True):
 
     References
     ----------
-    H.-P. Kriegel, P. Kroger, E. Schubert and A. Zimek,
-    "Interpreting and unifying outlier scores,"
-    In Proceedings of SDM'11, pp. 13-24, 2011.
+    .. [#kriegel11] Kriegel, H.-P., Kroger, P., Schubert E., and Zimek, A.,
+        "Interpreting and unifying outlier scores,"
+        In Proceedings of SDM'11, pp. 13-24, 2011.
     """
 
     rnd                    = check_random_state(random_state)
@@ -83,9 +83,9 @@ def load_pendigits(contamination=0.002, random_state=None, shuffle=True):
 
     References
     ----------
-    H.-P. Kriegel, P. Kroger, E. Schubert and A. Zimek,
-    "Interpreting and unifying outlier scores,"
-    In Proceedings of SDM'11, pp. 13-24, 2011.
+    .. [#kriegel11] Kriegel, H.-P., Kroger, P., Schubert E., and Zimek, A.,
+        "Interpreting and unifying outlier scores,"
+        In Proceedings of SDM'11, pp. 13-24, 2011.
     """
 
     rnd                    = check_random_state(random_state)
