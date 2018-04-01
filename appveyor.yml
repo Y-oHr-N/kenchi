@@ -1,7 +1,6 @@
 branches:
   only:
     - master
-    - develop
 
 environment:
   matrix:
@@ -13,7 +12,7 @@ install:
   - "conda install --yes --quiet wheel"
   - "conda install --yes --quiet --file requirements.txt"
 
-build: off
+build: false
 
 test_script:
   - "python setup.py test"
