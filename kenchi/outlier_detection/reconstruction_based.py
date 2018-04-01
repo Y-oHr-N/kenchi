@@ -33,9 +33,6 @@ class PCA(BaseOutlierDetector):
         Tolerance to declare convergence for singular values computed by
         svd_solver == 'arpack'.
 
-    verbose : bool, default False
-        Enable verbose output.
-
     whiten : bool, default False
         When True the `components_` vectors are multiplied by the square root
         of n_samples and then divided by the singular values to ensure
@@ -45,9 +42,6 @@ class PCA(BaseOutlierDetector):
     ----------
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
-
-    fit_time_ : float
-        Time spent for fitting in seconds.
 
     threshold_ : float
         Threshold.
@@ -106,10 +100,9 @@ class PCA(BaseOutlierDetector):
 
     def __init__(
         self, contamination=0.1, iterated_power='auto', n_components=None,
-        random_state=None, svd_solver='auto', tol=0., verbose=False,
-        whiten=False
+        random_state=None, svd_solver='auto', tol=0., whiten=False
     ):
-        super().__init__(contamination=contamination, verbose=verbose)
+        super().__init__(contamination=contamination)
 
         self.iterated_power = iterated_power
         self.n_components   = n_components
@@ -154,10 +147,6 @@ class PCA(BaseOutlierDetector):
         -------
         score : float
             Mean log-likelihood of the given data.
-
-        Raises
-        ------
-        ValueError
         """
 
         check_is_fitted(self, '_estimator')

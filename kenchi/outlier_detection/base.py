@@ -1,10 +1,8 @@
-import time
 from abc import abstractmethod, ABC
 
 import numpy as np
 from scipy.stats import norm
 from sklearn.base import BaseEstimator
-from sklearn.externals.joblib import logger
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
@@ -35,17 +33,16 @@ class BaseOutlierDetector(BaseEstimator, ABC):
 
     References
     ----------
-    H.-P. Kriegel, P. Kroger, E. Schubert and A. Zimek,
-    "Interpreting and unifying outlier scores,"
-    In Proceedings of SDM'11, pp. 13-24, 2011.
+    .. [#kriegel11] Kriegel, H.-P., Kroger, P., Schubert E., and Zimek, A.,
+        "Interpreting and unifying outlier scores,"
+        In Proceedings of SDM'11, pp. 13-24, 2011.
     """
 
     _estimator_type = 'outlier_detector'
 
     @abstractmethod
-    def __init__(self, contamination=0.1, verbose=False):
+    def __init__(self, contamination=0.1):
         self.contamination = contamination
-        self.verbose       = verbose
 
     def _check_params(self):
         """Check validity of parameters and raise ValueError if not valid."""
@@ -107,10 +104,6 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         -------
         y_pred : array-like of shape (n_samples,)
             Return -1 for outliers and +1 for inliers.
-
-        Raises
-        ------
-        ValueError
         """
 
         if getattr(self, 'novelty', False):
@@ -142,16 +135,11 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         X                   = self._check_array(X, estimator=self)
         _, self._n_features = X.shape
 
-        start_time          = time.time()
         self._fit(X)
-        self.fit_time_      = time.time() - start_time
 
         self.anomaly_score_ = self._anomaly_score(X)
         self.threshold_     = self._get_threshold()
         self._rv            = self._get_rv()
-
-        if getattr(self, 'verbose', False):
-            print(f'elaplsed: {logger.short_format_time(self.fit_time_)}')
 
         return self
 
@@ -171,10 +159,6 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         -------
         y_pred : array-like of shape (n_samples,)
             Return -1 for outliers and +1 for inliers.
-
-        Raises
-        ------
-        ValueError
         """
 
         return np.where(
@@ -198,10 +182,6 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         y_score : array-like of shape (n_samples,)
             Shifted opposite of the anomaly score for each sample. Negative
             scores represent outliers and positive scores represent inliers.
-
-        Raises
-        ------
-        ValueError
         """
 
         anomaly_score = self.anomaly_score(X)
@@ -226,10 +206,6 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         -------
         anomaly_score : array-like of shape (n_samples,)
             Anomaly score for each sample.
-
-        Raises
-        ------
-        ValueError
         """
 
         check_is_fitted(self, 'anomaly_score_')
@@ -309,10 +285,6 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         -------
         ax : matplotlib Axes
             Axes on which the plot was drawn.
-
-        Raises
-        ------
-        ValueError
         """
 
         kwargs['anomaly_score'] = self.anomaly_score(X, normalize=normalize)
@@ -369,10 +341,6 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         -------
         ax : matplotlib Axes
             Axes on which the plot was drawn.
-
-        Raises
-        ------
-        ValueError
         """
 
         kwargs['y_true']  = y

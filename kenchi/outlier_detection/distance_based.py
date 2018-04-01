@@ -43,9 +43,6 @@ class KNN(BaseOutlierDetector):
     p : int, default 2
         Power parameter for the Minkowski metric.
 
-    verbose : bool, default False
-        Enable verbose output.
-
     metric_params : dict, default None
         Additioal parameters passed to the requested metric.
 
@@ -53,9 +50,6 @@ class KNN(BaseOutlierDetector):
     ----------
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
-
-    fit_time_ : float
-        Time spent for fitting in seconds.
 
     threshold_ : float
         Threshold.
@@ -68,13 +62,13 @@ class KNN(BaseOutlierDetector):
 
     References
     ----------
-    .. [1] S. Ramaswamy, R. Rastogi, and K. Shim,
-        "Efficient algorithms for mining outliers from large data sets,"
-        In Proceedings of SIGMOD'00, pp. 427-438, 2000.
-
-    .. [2] F. Angiulli and C. Pizzuti,
+    .. [#angiulli02] Angiulli, F., and Pizzuti, C.,
         "Fast outlier detection in high dimensional spaces,"
         In Proceedings of PKDD'02, pp. 15-27, 2002.
+
+    .. [#ramaswamy00] Ramaswamy, S., Rastogi R., and Shim, K.,
+        "Efficient algorithms for mining outliers from large data sets,"
+        In Proceedings of SIGMOD'00, pp. 427-438, 2000.
     """
 
     @property
@@ -84,9 +78,9 @@ class KNN(BaseOutlierDetector):
     def __init__(
         self, aggregate=False, algorithm='auto', contamination=0.1,
         leaf_size=30, metric='minkowski', novelty=False, n_jobs=1,
-        n_neighbors=20, p=2, verbose=False, metric_params=None
+        n_neighbors=20, p=2, metric_params=None
     ):
-        super().__init__(contamination=contamination, verbose=verbose)
+        super().__init__(contamination=contamination)
 
         self.aggregate     = aggregate
         self.algorithm     = algorithm
@@ -148,9 +142,6 @@ class OneTimeSampling(BaseOutlierDetector):
     random_state : int, RandomState instance, default None
         Seed of the pseudo random number generator.
 
-    verbose : bool, default False
-        Enable verbose output.
-
     metric_params : dict, default None
         Additional parameters passed to the requested metric.
 
@@ -158,9 +149,6 @@ class OneTimeSampling(BaseOutlierDetector):
     ----------
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
-
-    fit_time_ : float
-        Time spent for fitting in seconds.
 
     threshold_ : float
         Threshold.
@@ -173,7 +161,7 @@ class OneTimeSampling(BaseOutlierDetector):
 
     References
     ----------
-    .. [1] M. Sugiyama and K. Borgwardt,
+    .. [#sugiyama13] Sugiyama M., and Borgwardt, K.,
         "Rapid distance-based outlier detection via sampling,"
         Advances in NIPS'13, pp. 467-475, 2013.
     """
@@ -187,9 +175,9 @@ class OneTimeSampling(BaseOutlierDetector):
 
     def __init__(
         self, contamination=0.1, metric='euclidean', novelty=False,
-        n_subsamples=20, random_state=None, verbose=False, metric_params=None
+        n_subsamples=20, random_state=None, metric_params=None
     ):
-        super().__init__(contamination=contamination, verbose=verbose)
+        super().__init__(contamination=contamination)
 
         self.metric        = metric
         self.novelty       = novelty

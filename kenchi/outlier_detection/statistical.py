@@ -8,7 +8,7 @@ from sklearn.utils.validation import check_is_fitted
 from .base import BaseOutlierDetector
 from ..visualization import plot_graphical_model, plot_partial_corrcoef
 
-__all__ = ['GMM', 'KDE', 'HBOS', 'SparseStructureLearning']
+__all__ = ['GMM', 'HBOS', 'KDE', 'SparseStructureLearning']
 
 
 class GMM(BaseOutlierDetector):
@@ -51,9 +51,6 @@ class GMM(BaseOutlierDetector):
     tol : float, default 1e-03
         Tolerance to declare convergence.
 
-    verbose : bool, default False
-        Enable verbose output.
-
     warm_start : bool, default False
         If True, the solution of the last fitting is used as initialization for
         the next call of `fit`.
@@ -65,9 +62,6 @@ class GMM(BaseOutlierDetector):
     ----------
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
-
-    fit_time_ : float
-        Time spent for fitting in seconds.
 
     threshold_ : float
         Threshold.
@@ -134,9 +128,9 @@ class GMM(BaseOutlierDetector):
         self, contamination=0.1, covariance_type='full', init_params='kmeans',
         max_iter=100, means_init=None, n_components=1, n_init=1,
         precisions_init=None, random_state=None, reg_covar=1e-06, tol=1e-03,
-        verbose=False, warm_start=False, weights_init=None
+        warm_start=False, weights_init=None
     ):
-        super().__init__(contamination=contamination, verbose=verbose)
+        super().__init__(contamination=contamination)
 
         self.covariance_type = covariance_type
         self.init_params     = init_params
@@ -186,10 +180,6 @@ class GMM(BaseOutlierDetector):
         -------
         score : float
             Mean log-likelihood of the given data.
-
-        Raises
-        ------
-        ValueError
         """
 
         check_is_fitted(self, '_estimator')
@@ -197,128 +187,6 @@ class GMM(BaseOutlierDetector):
         X = self._check_array(X, n_features=self._n_features, estimator=self)
 
         return self._estimator.score(X)
-
-
-class KDE(BaseOutlierDetector):
-    """Outlier detector using Kernel Density Estimation (KDE).
-
-    Parameters
-    ----------
-    algorithm : str, default 'auto'
-        Tree algorithm to use. Valid algorithms are
-        ['kd_tree'|'ball_tree'|'auto'].
-
-    atol : float, default 0.0
-        Desired absolute tolerance of the result.
-
-    bandwidth : float, default 1.0
-        Bandwidth of the kernel.
-
-    breadth_first : bool, default True
-        If true, use a breadth-first approach to the problem. Otherwise use a
-        depth-first approach.
-
-    contamination : float, default 0.1
-        Proportion of outliers in the data set. Used to define the threshold.
-
-    kernel : str, default 'gaussian'
-        Kernel to use. Valid kernels are
-        ['gaussian'|'tophat'|'epanechnikov'|'exponential'|'linear'|'cosine'].
-
-    leaf_size : int, default 40
-        Leaf size of the underlying tree.
-
-    metric : str, default 'euclidean'
-        Distance metric to use.
-
-    rtol : float, default 0.0
-        Desired relative tolerance of the result.
-
-    verbose : bool, default False
-        Enable verbose output.
-
-    metric_params : dict, default None
-        Additional parameters to be passed to the requested metric.
-
-    Attributes
-    ----------
-    anomaly_score_ : array-like of shape (n_samples,)
-        Anomaly score for each training data.
-
-    fit_time_ : float
-        Time spent for fitting in seconds.
-
-    threshold_ : float
-        Threshold.
-
-    X_ : array-like of shape (n_samples, n_features)
-        Training data.
-    """
-
-    @property
-    def X_(self):
-        return self._estimator.tree_.data
-
-    def __init__(
-        self, algorithm='auto', atol=0., bandwidth=1.,
-        breadth_first=True, contamination=0.1, kernel='gaussian', leaf_size=40,
-        metric='euclidean', rtol=0., verbose=False, metric_params=None
-    ):
-        super().__init__(contamination=contamination, verbose=verbose)
-
-        self.algorithm     = algorithm
-        self.atol          = atol
-        self.bandwidth     = bandwidth
-        self.breadth_first = breadth_first
-        self.kernel        = kernel
-        self.leaf_size     = leaf_size
-        self.metric        = metric
-        self.rtol          = rtol
-        self.metric_params = metric_params
-
-    def _fit(self, X):
-        self._estimator   = KernelDensity(
-            algorithm     = self.algorithm,
-            atol          = self.atol,
-            bandwidth     = self.bandwidth,
-            breadth_first = self.breadth_first,
-            kernel        = self.kernel,
-            leaf_size     = self.leaf_size,
-            metric        = self.metric,
-            rtol          = self.rtol,
-            metric_params = self.metric_params
-        ).fit(X)
-
-        return self
-
-    def _anomaly_score(self, X):
-        return -self._estimator.score_samples(X)
-
-    def score(self, X, y=None):
-        """Compute the mean log-likelihood of the given data.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Data.
-
-        y : ignored
-
-        Returns
-        -------
-        score : float
-            Mean log-likelihood of the given data.
-
-        Raises
-        ------
-        ValueError
-        """
-
-        check_is_fitted(self, '_estimator')
-
-        X = self._check_array(X, n_features=self._n_features, estimator=self)
-
-        return np.mean(self._estimator.score_samples(X))
 
 
 class HBOS(BaseOutlierDetector):
@@ -336,16 +204,10 @@ class HBOS(BaseOutlierDetector):
         If True, you can use predict, decision_function and anomaly_score on
         new unseen data and not on the training data.
 
-    verbose : bool, default False
-        Enable verbose output.
-
     Attributes
     ----------
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
-
-    fit_time_ : float
-        Time spent for fitting in seconds.
 
     threshold_ : float
         Threshold.
@@ -370,17 +232,14 @@ class HBOS(BaseOutlierDetector):
 
     References
     ----------
-    .. [1] M. Goldstein and A. Dengel,
-        "Histogram-based outlier score (HBOS): A fast unsupervised anomaly
-        detection algorithm,"
+    .. [#goldstein12] Goldstein, M., and Dengel, A.,
+        "Histogram-based outlier score (HBOS):
+        A fast unsupervised anomaly detection algorithm,"
         KI'12: Poster and Demo Track, pp. 59-63, 2012.
     """
 
-    def __init__(
-        self, bins='auto', contamination=0.1, novelty=False,
-        verbose=False
-    ):
-        super().__init__(contamination=contamination, verbose=verbose)
+    def __init__(self, bins='auto', contamination=0.1, novelty=False):
+        super().__init__(contamination=contamination)
 
         self.bins    = bins
         self.novelty = novelty
@@ -429,6 +288,118 @@ class HBOS(BaseOutlierDetector):
         return anomaly_score
 
 
+class KDE(BaseOutlierDetector):
+    """Outlier detector using Kernel Density Estimation (KDE).
+
+    Parameters
+    ----------
+    algorithm : str, default 'auto'
+        Tree algorithm to use. Valid algorithms are
+        ['kd_tree'|'ball_tree'|'auto'].
+
+    atol : float, default 0.0
+        Desired absolute tolerance of the result.
+
+    bandwidth : float, default 1.0
+        Bandwidth of the kernel.
+
+    breadth_first : bool, default True
+        If true, use a breadth-first approach to the problem. Otherwise use a
+        depth-first approach.
+
+    contamination : float, default 0.1
+        Proportion of outliers in the data set. Used to define the threshold.
+
+    kernel : str, default 'gaussian'
+        Kernel to use. Valid kernels are
+        ['gaussian'|'tophat'|'epanechnikov'|'exponential'|'linear'|'cosine'].
+
+    leaf_size : int, default 40
+        Leaf size of the underlying tree.
+
+    metric : str, default 'euclidean'
+        Distance metric to use.
+
+    rtol : float, default 0.0
+        Desired relative tolerance of the result.
+
+    metric_params : dict, default None
+        Additional parameters to be passed to the requested metric.
+
+    Attributes
+    ----------
+    anomaly_score_ : array-like of shape (n_samples,)
+        Anomaly score for each training data.
+
+    threshold_ : float
+        Threshold.
+
+    X_ : array-like of shape (n_samples, n_features)
+        Training data.
+    """
+
+    @property
+    def X_(self):
+        return self._estimator.tree_.data
+
+    def __init__(
+        self, algorithm='auto', atol=0., bandwidth=1.,
+        breadth_first=True, contamination=0.1, kernel='gaussian', leaf_size=40,
+        metric='euclidean', rtol=0., metric_params=None
+    ):
+        super().__init__(contamination=contamination)
+
+        self.algorithm     = algorithm
+        self.atol          = atol
+        self.bandwidth     = bandwidth
+        self.breadth_first = breadth_first
+        self.kernel        = kernel
+        self.leaf_size     = leaf_size
+        self.metric        = metric
+        self.rtol          = rtol
+        self.metric_params = metric_params
+
+    def _fit(self, X):
+        self._estimator   = KernelDensity(
+            algorithm     = self.algorithm,
+            atol          = self.atol,
+            bandwidth     = self.bandwidth,
+            breadth_first = self.breadth_first,
+            kernel        = self.kernel,
+            leaf_size     = self.leaf_size,
+            metric        = self.metric,
+            rtol          = self.rtol,
+            metric_params = self.metric_params
+        ).fit(X)
+
+        return self
+
+    def _anomaly_score(self, X):
+        return -self._estimator.score_samples(X)
+
+    def score(self, X, y=None):
+        """Compute the mean log-likelihood of the given data.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Data.
+
+        y : ignored
+
+        Returns
+        -------
+        score : float
+            Mean log-likelihood of the given data.
+        """
+
+        check_is_fitted(self, '_estimator')
+
+        X = self._check_array(X, n_features=self._n_features, estimator=self)
+
+        return np.mean(self._estimator.score_samples(X))
+
+
 class SparseStructureLearning(BaseOutlierDetector):
     """Outlier detector using sparse structure learning.
 
@@ -458,9 +429,6 @@ class SparseStructureLearning(BaseOutlierDetector):
     tol : float, default 1e-04
         Tolerance to declare convergence.
 
-    verbose : bool, default False
-        Enable verbose output.
-
     apcluster_params : dict, default None
         Additional parameters passed to `sklearn.cluster.affinity_propagation`.
 
@@ -468,9 +436,6 @@ class SparseStructureLearning(BaseOutlierDetector):
     ----------
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
-
-    fit_time_ : float
-        Time spent for fitting in seconds.
 
     threshold_ : float
         Threshold.
@@ -501,7 +466,7 @@ class SparseStructureLearning(BaseOutlierDetector):
 
     References
     ----------
-    .. [1] T. Ide, C. Lozano, N. Abe and Y. Liu,
+    .. [#ide09] Ide, T., Lozano, C., Abe N., and Liu, Y.,
         "Proximity-based anomaly detection using sparse structure learning,"
         In Proceedings of SDM'09, pp. 97-108, 2009.
     """
@@ -562,9 +527,9 @@ class SparseStructureLearning(BaseOutlierDetector):
     def __init__(
         self, alpha=0.01, assume_centered=False, contamination=0.1,
         enet_tol=1e-04, max_iter=100, mode='cd', tol=1e-04,
-        verbose=False, apcluster_params=None
+        apcluster_params=None
     ):
-        super().__init__(contamination=contamination, verbose=verbose)
+        super().__init__(contamination=contamination)
 
         self.alpha            = alpha
         self.apcluster_params = apcluster_params
@@ -601,10 +566,6 @@ class SparseStructureLearning(BaseOutlierDetector):
         -------
         anomaly_score : array-like of shape (n_samples, n_features)
             Feature-wise anomaly scores for each sample.
-
-        Raises
-        ------
-        ValueError
         """
 
         check_is_fitted(self, '_estimator')
@@ -631,10 +592,6 @@ class SparseStructureLearning(BaseOutlierDetector):
         -------
         score : float
             Mean log-likelihood of the given data.
-
-        Raises
-        ------
-        ValueError
         """
 
         check_is_fitted(self, '_estimator')
@@ -670,10 +627,6 @@ class SparseStructureLearning(BaseOutlierDetector):
         -------
         ax : matplotlib Axes
             Axes on which the plot was drawn.
-
-        Raises
-        ------
-        ValueError
         """
 
         check_is_fitted(self, '_estimator')
@@ -719,10 +672,6 @@ class SparseStructureLearning(BaseOutlierDetector):
         -------
         ax : matplotlib Axes
             Axes on which the plot was drawn.
-
-        Raises
-        ------
-        ValueError
         """
 
         check_is_fitted(self, '_estimator')

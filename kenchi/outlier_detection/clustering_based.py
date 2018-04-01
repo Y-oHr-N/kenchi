@@ -49,16 +49,10 @@ class MiniBatchKMeans(BaseOutlierDetector):
     tol : float, default 0.0
         Tolerance to declare convergence.
 
-    verbose : bool, default False
-        Enable verbose output.
-
     Attributes
     ----------
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
-
-    fit_time_ : float
-        Time spent for fitting in seconds.
 
     threshold_ : float
         Threshold.
@@ -88,10 +82,9 @@ class MiniBatchKMeans(BaseOutlierDetector):
     def __init__(
         self, batch_size=100, contamination=0.1, init='k-means++',
         init_size=None, max_iter=100, max_no_improvement=10, n_clusters=8,
-        n_init=3, random_state=None, reassignment_ratio=0.01, tol=0.0,
-        verbose=False
+        n_init=3, random_state=None, reassignment_ratio=0.01, tol=0.0
     ):
-        super().__init__(contamination=contamination, verbose=verbose)
+        super().__init__(contamination=contamination)
 
         self.batch_size         = batch_size
         self.init               = init
@@ -138,10 +131,6 @@ class MiniBatchKMeans(BaseOutlierDetector):
         -------
         score : float
             Opposite value of the given data on the K-means objective.
-
-        Raises
-        ------
-        ValueError
         """
 
         check_is_fitted(self, '_estimator')

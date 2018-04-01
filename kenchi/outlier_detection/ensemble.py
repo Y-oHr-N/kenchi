@@ -6,7 +6,7 @@ __all__ = ['IForest']
 
 
 class IForest(BaseOutlierDetector):
-    """Isolation forest.
+    """Isolation forest (iForest).
 
     Parameters
     ----------
@@ -34,16 +34,10 @@ class IForest(BaseOutlierDetector):
     random_state : int or RandomState instance, default None
         Seed of the pseudo random number generator.
 
-    verbose : bool, default False
-        Enable verbose output.
-
     Attributes
     ----------
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
-
-    fit_time_ : float
-        Time spent for fitting in seconds.
 
     threshold_ : float
         Threshold.
@@ -59,7 +53,7 @@ class IForest(BaseOutlierDetector):
 
     References
     ----------
-    .. [1] F. T. Liu, K. M. Ting and Z.-H. Zhou,
+    .. [#liu08] Liu, F. T., Ting K. M., and Zhou, Z.-H.,
         "Isolation forest,"
         In Proceedings of ICDM'08, pp. 413-422, 2008.
     """
@@ -78,10 +72,9 @@ class IForest(BaseOutlierDetector):
 
     def __init__(
         self, bootstrap=False, contamination=0.1, max_features=1.0,
-        max_samples='auto', n_estimators=100, n_jobs=1, random_state=None,
-        verbose=False
+        max_samples='auto', n_estimators=100, n_jobs=1, random_state=None
     ):
-        super().__init__(contamination=contamination, verbose=verbose)
+        super().__init__(contamination=contamination)
 
         self.bootstrap    = bootstrap
         self.max_features = max_features

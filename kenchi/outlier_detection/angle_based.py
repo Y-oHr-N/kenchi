@@ -40,9 +40,6 @@ class FastABOD(BaseOutlierDetector):
     p : int, default 2
         Power parameter for the Minkowski metric.
 
-    verbose : bool, default False
-        Enable verbose output.
-
     metric_params : dict, default None
         Additioal parameters passed to the requested metric.
 
@@ -50,9 +47,6 @@ class FastABOD(BaseOutlierDetector):
     ----------
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
-
-    fit_time_ : float
-        Time spent for fitting in seconds.
 
     threshold_ : float
         Threshold.
@@ -65,13 +59,13 @@ class FastABOD(BaseOutlierDetector):
 
     References
     ----------
-    .. [1] H.-P. Kriegel, M. Schubert and A. Zimek,
-        "Angle-based outlier detection in high-dimensional data,"
-        In Proceedings of SIGKDD'08, pp. 444-452, 2008.
-
-    .. [2] H.-P. Kriegel, P. Kroger, E. Schubert and A. Zimek,
+    .. [#kriegel11] Kriegel, H.-P., Kroger, P., Schubert E., and Zimek, A.,
         "Interpreting and unifying outlier scores,"
         In Proceedings of SDM'11, pp. 13-24, 2011.
+
+    .. [#kriegel08] Kriegel, H.-P., Schubert M., and Zimek, A.,
+        "Angle-based outlier detection in high-dimensional data,"
+        In Proceedings of SIGKDD'08, pp. 444-452, 2008.
     """
 
     @property
@@ -81,9 +75,9 @@ class FastABOD(BaseOutlierDetector):
     def __init__(
         self, algorithm='auto', contamination=0.1, leaf_size=30,
         metric='minkowski', novelty=False, n_jobs=1, n_neighbors=20,
-        p=2, verbose=False, metric_params=None
+        p=2, metric_params=None
     ):
-        super().__init__(contamination=contamination, verbose=verbose)
+        super().__init__(contamination=contamination)
 
         self.algorithm     = algorithm
         self.leaf_size     = leaf_size
@@ -108,7 +102,9 @@ class FastABOD(BaseOutlierDetector):
             p                   = self.p,
             metric_params       = self.metric_params
         ).fit(X)
-        self._anomaly_score_min = np.max(self._anomaly_score(X, regularize=False))
+        self._anomaly_score_min = np.max(
+            self._anomaly_score(X, regularize=False)
+        )
 
         return self
 

@@ -38,9 +38,6 @@ class LOF(BaseOutlierDetector):
     p : int, default 2
         Power parameter for the Minkowski metric.
 
-    verbose : bool, default False
-        Enable verbose output.
-
     metric_params : dict, default None
         Additioal parameters passed to the requested metric.
 
@@ -48,9 +45,6 @@ class LOF(BaseOutlierDetector):
     ----------
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
-
-    fit_time_ : float
-        Time spent for fitting in seconds.
 
     threshold_ : float
         Threshold.
@@ -66,11 +60,11 @@ class LOF(BaseOutlierDetector):
 
     References
     ----------
-    .. [1] M. M. Breunig, H.-P. Kriegel, R. T. Ng and J. Sander,
+    .. [#breunig00] Breunig, M. M., Kriegel, H.-P., Ng, R. T., and Sander, J.,
         "LOF: identifying density-based local outliers,"
         In ACM sigmod record, pp. 93-104, 2000.
 
-    .. [2] H.-P. Kriegel, P. Kroger, E. Schubert and A. Zimek,
+    .. [#kriegel11] Kriegel, H.-P., Kroger, P., Schubert E., and Zimek, A.,
         "Interpreting and unifying outlier scores,"
         In Proceedings of SDM'11, pp. 13-24, 2011.
     """
@@ -90,9 +84,9 @@ class LOF(BaseOutlierDetector):
     def __init__(
         self, algorithm='auto', contamination=0.1, leaf_size=30,
         metric='minkowski', novelty=False, n_jobs=1, n_neighbors=20,
-        p=2, verbose=False, metric_params=None
+        p=2, metric_params=None
     ):
-        super().__init__(contamination=contamination, verbose=verbose)
+        super().__init__(contamination=contamination)
 
         self.algorithm     = algorithm
         self.leaf_size     = leaf_size

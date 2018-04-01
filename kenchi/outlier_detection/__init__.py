@@ -21,5 +21,6 @@ from .statistical import * # noqa
 # TODO: Implement density_based.KDEOS class
 # TODO: Implement distance_based.ROF class
 # TODO: Implement distance_based.IterativeSampling class
+# TODO: Implement ensemble.FeatureBagging class
 # TODO: Implement statistical.KLIEP class
 # TODO: Implement statistical.ULSIF class
