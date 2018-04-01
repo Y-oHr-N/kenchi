@@ -98,9 +98,9 @@ Examples
 License
 -------
 
-The MIT License (MIT)
+BSD 3-Clause "New" or "Revised" License
 
-Copyright (c) 2017 Kon
+Copyright (c) 2018, Kon
 
 References
 ----------
