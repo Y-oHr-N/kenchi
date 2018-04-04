@@ -28,11 +28,11 @@ Dependencies
 ------------
 
 -  Python (>=3.6)
--  matplotlib (>=2.1.1)
--  networkx (>=2.0)
--  numpy (>=1.14.0)
--  scikit-learn (>=0.19.1)
--  scipy (>=1.0.0)
+-  `matplotlib <https://matplotlib.org>`_ (>=2.1.1)
+-  `networkx <https://networkx.github.io/>`_ (>=2.0)
+-  `numpy <https://www.numpy.org/>`_ (>=1.14.0)
+-  `scikit-learn <https://scikit-learn.org/>`_ (>=0.19.1)
+-  `scipy <https://www.scipy.org/>`_ (>=1.0.0)
 
 Installation
 ------------
@@ -49,14 +49,14 @@ or ``conda``.
 
     conda install -c y_ohr_n kenchi
 
-Anomaly detection methods
--------------------------
+Algorithms
+----------
 
 #. FastABOD [#kriegel08]_
 #. MiniBatchKMeans
+#. LOF [#breunig00]_
 #. KNN [#angiulli02]_, [#ramaswamy00]_
 #. OneTimeSampling [#sugiyama13]_
-#. LOF [#breunig00]_
 #. IForest [#liu08]_
 #. PCA
 #. GMM
@@ -87,9 +87,9 @@ Examples
         KDE()
     ]
 
-    for det in detectors:
+    for detector in detectors:
         # Fit the model, and plot the ROC curve
-        det.fit(X).plot_roc_curve(X=None, y=y, ax=ax)
+        detector.fit(X).plot_roc_curve(X=None, y=y, ax=ax)
 
     plt.show()
 
@@ -107,36 +107,40 @@ References
 
 .. [#angiulli02] Angiulli, F., and Pizzuti, C.,
     `"Fast outlier detection in high dimensional spaces," <https://doi.org/10.1007/3-540-45681-3_2>`_
-    In Proceedings of PKDD'02, pp. 15-27, 2002.
+    In Proceedings of PKDD, pp. 15-27, 2002.
 
 .. [#breunig00] Breunig, M. M., Kriegel, H.-P., Ng, R. T., and Sander, J.,
     `"LOF: identifying density-based local outliers," <https://doi.org/10.1145/335191.335388>`_
-    In ACM sigmod record, pp. 93-104, 2000.
+    In Proceedings of SIGMOD, pp. 93-104, 2000.
+
+.. [#dua17] Dua, D., and Karra Taniskidou, E.,
+    `"UCI Machine Learning Repository," <https://archive.ics.uci.edu/ml>`_
+    2017.
 
 .. [#goldstein12] Goldstein, M., and Dengel, A.,
     "Histogram-based outlier score (HBOS): A fast unsupervised anomaly detection algorithm,"
-    KI'12: Poster and Demo Track, pp. 59-63, 2012.
+    KI: Poster and Demo Track, pp. 59-63, 2012.
 
-.. [#ide09] Ide, T., Lozano, C., Abe N., and Liu, Y.,
+.. [#ide09] Ide, T., Lozano, C., Abe, N., and Liu, Y.,
     `"Proximity-based anomaly detection using sparse structure learning," <https://doi.org/10.1137/1.9781611972795.9>`_
-    In Proceedings of SDM'09, pp. 97-108, 2009.
+    In Proceedings of SDM, pp. 97-108, 2009.
 
-.. [#kriegel11] Kriegel, H.-P., Kroger, P., Schubert E., and Zimek, A.,
+.. [#kriegel11] Kriegel, H.-P., Kroger, P., Schubert, E., and Zimek, A.,
     `"Interpreting and unifying outlier scores," <https://doi.org/10.1137/1.9781611972818.2>`_
-    In Proceedings of SDM'11, pp. 13-24, 2011.
+    In Proceedings of SDM, pp. 13-24, 2011.
 
-.. [#kriegel08] Kriegel, H.-P., Schubert M., and Zimek, A.,
+.. [#kriegel08] Kriegel, H.-P., Schubert, M., and Zimek, A.,
     `"Angle-based outlier detection in high-dimensional data," <https://doi.org/10.1145/1401890.1401946>`_
-    In Proceedings of SIGKDD'08, pp. 444-452, 2008.
+    In Proceedings of SIGKDD, pp. 444-452, 2008.
 
-.. [#liu08] Liu, F. T., Ting K. M., and Zhou, Z.-H.,
+.. [#liu08] Liu, F. T., Ting, K. M., and Zhou, Z.-H.,
     `"Isolation forest," <https://doi.org/10.1145/2133360.2133363>`_
-    In Proceedings of ICDM'08, pp. 413-422, 2008.
+    In Proceedings of ICDM, pp. 413-422, 2008.
 
-.. [#ramaswamy00] Ramaswamy, S., Rastogi R., and Shim, K.,
+.. [#ramaswamy00] Ramaswamy, S., Rastogi, R., and Shim, K.,
     `"Efficient algorithms for mining outliers from large data sets," <https://doi.org/10.1145/335191.335437>`_
-    In Proceedings of SIGMOD'00, pp. 427-438, 2000.
+    In Proceedings of SIGMOD, pp. 427-438, 2000.
 
-.. [#sugiyama13] Sugiyama M., and Borgwardt, K.,
+.. [#sugiyama13] Sugiyama, M., and Borgwardt, K.,
     "Rapid distance-based outlier detection via sampling,"
-    Advances in NIPS'13, pp. 467-475, 2013.
+    Advances in NIPS, pp. 467-475, 2013.
