@@ -103,10 +103,6 @@ class Pipeline(_Pipeline):
         -------
         anomaly_score : array-like of shape (n_samples, n_features)
             Feature-wise anomaly scores for each sample.
-
-        Raises
-        ------
-        ValueError
         """
 
         return self._final_estimator.featurewise_anomaly_score(

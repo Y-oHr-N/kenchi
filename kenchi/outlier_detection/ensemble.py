@@ -53,9 +53,9 @@ class IForest(BaseOutlierDetector):
 
     References
     ----------
-    .. [#liu08] Liu, F. T., Ting K. M., and Zhou, Z.-H.,
+    .. [#liu08] Liu, F. T., Ting, K. M., and Zhou, Z.-H.,
         "Isolation forest,"
-        In Proceedings of ICDM'08, pp. 413-422, 2008.
+        In Proceedings of ICDM, pp. 413-422, 2008.
     """
 
     @property

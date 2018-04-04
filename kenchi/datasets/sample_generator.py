@@ -40,17 +40,17 @@ def make_blobs(
 
     Returns
     -------
-    X : ndarray of shape (n_samples, n_features)
+    X : array-like of shape (n_samples, n_features)
         Generated data.
 
-    y : ndarray of shape (n_samples,)
+    y : array-like of shape (n_samples,)
         Return -1 for outliers and +1 for inliers.
 
     References
     ----------
     .. [#kriegel11] Kriegel, H.-P., Kroger, P., Schubert E., and Zimek, A.,
         "Interpreting and unifying outlier scores,"
-        In Proceedings of SDM'11, pp. 13-24, 2011.
+        In Proceedings of SDM, pp. 13-24, 2011.
     """
 
     rnd              = check_random_state(random_state)

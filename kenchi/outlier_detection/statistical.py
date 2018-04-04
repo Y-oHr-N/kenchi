@@ -235,7 +235,7 @@ class HBOS(BaseOutlierDetector):
     .. [#goldstein12] Goldstein, M., and Dengel, A.,
         "Histogram-based outlier score (HBOS):
         A fast unsupervised anomaly detection algorithm,"
-        KI'12: Poster and Demo Track, pp. 59-63, 2012.
+        KI: Poster and Demo Track, pp. 59-63, 2012.
     """
 
     def __init__(self, bins='auto', contamination=0.1, novelty=False):
@@ -466,9 +466,9 @@ class SparseStructureLearning(BaseOutlierDetector):
 
     References
     ----------
-    .. [#ide09] Ide, T., Lozano, C., Abe N., and Liu, Y.,
+    .. [#ide09] Ide, T., Lozano, C., Abe, N., and Liu, Y.,
         "Proximity-based anomaly detection using sparse structure learning,"
-        In Proceedings of SDM'09, pp. 97-108, 2009.
+        In Proceedings of SDM, pp. 97-108, 2009.
     """
 
     @property

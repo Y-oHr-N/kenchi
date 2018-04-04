@@ -33,9 +33,9 @@ class BaseOutlierDetector(BaseEstimator, ABC):
 
     References
     ----------
-    .. [#kriegel11] Kriegel, H.-P., Kroger, P., Schubert E., and Zimek, A.,
+    .. [#kriegel11] Kriegel, H.-P., Kroger, P., Schubert, E., and Zimek, A.,
         "Interpreting and unifying outlier scores,"
-        In Proceedings of SDM'11, pp. 13-24, 2011.
+        In Proceedings of SDM, pp. 13-24, 2011.
     """
 
     _estimator_type = 'outlier_detector'

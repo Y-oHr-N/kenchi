@@ -64,11 +64,11 @@ class KNN(BaseOutlierDetector):
     ----------
     .. [#angiulli02] Angiulli, F., and Pizzuti, C.,
         "Fast outlier detection in high dimensional spaces,"
-        In Proceedings of PKDD'02, pp. 15-27, 2002.
+        In Proceedings of PKDD, pp. 15-27, 2002.
 
-    .. [#ramaswamy00] Ramaswamy, S., Rastogi R., and Shim, K.,
+    .. [#ramaswamy00] Ramaswamy, S., Rastogi, R., and Shim, K.,
         "Efficient algorithms for mining outliers from large data sets,"
-        In Proceedings of SIGMOD'00, pp. 427-438, 2000.
+        In Proceedings of SIGMOD, pp. 427-438, 2000.
     """
 
     @property
@@ -161,9 +161,9 @@ class OneTimeSampling(BaseOutlierDetector):
 
     References
     ----------
-    .. [#sugiyama13] Sugiyama M., and Borgwardt, K.,
+    .. [#sugiyama13] Sugiyama, M., and Borgwardt, K.,
         "Rapid distance-based outlier detection via sampling,"
-        Advances in NIPS'13, pp. 467-475, 2013.
+        Advances in NIPS, pp. 467-475, 2013.
     """
 
     @property

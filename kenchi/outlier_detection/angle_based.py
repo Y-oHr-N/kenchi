@@ -59,13 +59,13 @@ class FastABOD(BaseOutlierDetector):
 
     References
     ----------
-    .. [#kriegel11] Kriegel, H.-P., Kroger, P., Schubert E., and Zimek, A.,
+    .. [#kriegel11] Kriegel, H.-P., Kroger, P., Schubert, E., and Zimek, A.,
         "Interpreting and unifying outlier scores,"
-        In Proceedings of SDM'11, pp. 13-24, 2011.
+        In Proceedings of SDM, pp. 13-24, 2011.
 
-    .. [#kriegel08] Kriegel, H.-P., Schubert M., and Zimek, A.,
+    .. [#kriegel08] Kriegel, H.-P., Schubert, M., and Zimek, A.,
         "Angle-based outlier detection in high-dimensional data,"
-        In Proceedings of SIGKDD'08, pp. 444-452, 2008.
+        In Proceedings of SIGKDD, pp. 444-452, 2008.
     """
 
     @property

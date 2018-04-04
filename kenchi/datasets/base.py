@@ -21,17 +21,21 @@ def load_wdbc(contamination=0.0272, random_state=None, shuffle=True):
 
     Returns
     -------
-    X : ndarray of shape (n_samples, n_features)
+    X : array-like of shape (n_samples, n_features)
         Data.
 
-    y : ndarray of shape (n_samples,)
+    y : array-like of shape (n_samples,)
         Return -1 (malignant) for outliers and +1 (benign) for inliers.
 
     References
     ----------
+    .. [#dua17] Dua, D., and Karra Taniskidou, E.,
+        "UCI Machine Learning Repository,"
+        2017.
+
     .. [#kriegel11] Kriegel, H.-P., Kroger, P., Schubert E., and Zimek, A.,
         "Interpreting and unifying outlier scores,"
-        In Proceedings of SDM'11, pp. 13-24, 2011.
+        In Proceedings of SDM, pp. 13-24, 2011.
     """
 
     rnd                    = check_random_state(random_state)
@@ -75,17 +79,21 @@ def load_pendigits(contamination=0.002, random_state=None, shuffle=True):
 
     Returns
     -------
-    X : ndarray of shape (n_samples, n_features)
+    X : array-like of shape (n_samples, n_features)
         Data.
 
-    y : ndarray of shape (n_samples,)
+    y : array-like of shape (n_samples,)
         Return -1 (digit 4) for outliers and +1 (otherwise) for inliers.
 
     References
     ----------
+    .. [#dua17] Dua, D., and Karra Taniskidou, E.,
+        "UCI Machine Learning Repository,"
+        2017.
+
     .. [#kriegel11] Kriegel, H.-P., Kroger, P., Schubert E., and Zimek, A.,
         "Interpreting and unifying outlier scores,"
-        In Proceedings of SDM'11, pp. 13-24, 2011.
+        In Proceedings of SDM, pp. 13-24, 2011.
     """
 
     rnd                    = check_random_state(random_state)
