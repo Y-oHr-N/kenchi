@@ -88,11 +88,24 @@ class FastABOD(BaseOutlierDetector):
         self.p             = p
         self.metric_params = metric_params
 
+    def _check_params(self):
+        super()._check_params()
+
+        if self.n_neighbors <= 2:
+            raise ValueError(
+                f'n_neighbors must be greater than 2 '
+                f'but was {self.n_neighbors}'
+            )
+
+    def _check_array(self, X, **kwargs):
+        kwargs['ensure_min_features'] = 2
+        kwargs['ensure_min_samples']  = 4
+
+        return super()._check_array(X, **kwargs)
+
     def _fit(self, X):
         n_samples, _            = X.shape
-        self.n_neighbors_       = np.maximum(
-            1, np.minimum(self.n_neighbors, n_samples - 1)
-        )
+        self.n_neighbors_       = np.minimum(self.n_neighbors, n_samples - 1)
         self._estimator         = NearestNeighbors(
             algorithm           = self.algorithm,
             leaf_size           = self.leaf_size,
