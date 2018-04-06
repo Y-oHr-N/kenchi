@@ -67,6 +67,18 @@ class LOF(BaseOutlierDetector):
     .. [#kriegel11] Kriegel, H.-P., Kroger, P., Schubert, E., and Zimek, A.,
         "Interpreting and unifying outlier scores,"
         In Proceedings of SDM, pp. 13-24, 2011.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from kenchi.outlier_detection import LOF
+    >>> X   = np.array([
+    ...     [0, 0], [1, 1], [2, 0], [3, -1], [4, 0],
+    ...     [5, 1], [6, 0], [7, -1], [8, 0], [1000, 1]
+    ... ])
+    >>> det = LOF(n_neighbors=3)
+    >>> det.fit_predict(X)
+    array([ 1,  1,  1,  1,  1,  1,  1,  1,  1, -1])
     """
 
     @property

@@ -66,6 +66,18 @@ class FastABOD(BaseOutlierDetector):
     .. [#kriegel08] Kriegel, H.-P., Schubert, M., and Zimek, A.,
         "Angle-based outlier detection in high-dimensional data,"
         In Proceedings of SIGKDD, pp. 444-452, 2008.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from kenchi.outlier_detection import FastABOD
+    >>> X   = np.array([
+    ...     [0, 0], [1, 1], [2, 0], [3, -1], [4, 0],
+    ...     [5, 1], [6, 0], [7, -1], [8, 0], [1000, 1]
+    ... ])
+    >>> det = FastABOD(n_neighbors=3)
+    >>> det.fit_predict(X)
+    array([ 1,  1,  1,  1,  1,  1,  1,  1,  1, -1])
     """
 
     @property

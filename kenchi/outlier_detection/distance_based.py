@@ -69,6 +69,18 @@ class KNN(BaseOutlierDetector):
     .. [#ramaswamy00] Ramaswamy, S., Rastogi, R., and Shim, K.,
         "Efficient algorithms for mining outliers from large data sets,"
         In Proceedings of SIGMOD, pp. 427-438, 2000.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from kenchi.outlier_detection import KNN
+    >>> X   = np.array([
+    ...     [0, 0], [1, 1], [2, 0], [3, -1], [4, 0],
+    ...     [5, 1], [6, 0], [7, -1], [8, 0], [1000, 1]
+    ... ])
+    >>> det = KNN(n_neighbors=3)
+    >>> det.fit_predict(X)
+    array([ 1,  1,  1,  1,  1,  1,  1,  1,  1, -1])
     """
 
     @property
@@ -164,6 +176,18 @@ class OneTimeSampling(BaseOutlierDetector):
     .. [#sugiyama13] Sugiyama, M., and Borgwardt, K.,
         "Rapid distance-based outlier detection via sampling,"
         Advances in NIPS, pp. 467-475, 2013.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from kenchi.outlier_detection import OneTimeSampling
+    >>> X   = np.array([
+    ...     [0, 0], [1, 1], [2, 0], [3, -1], [4, 0],
+    ...     [5, 1], [6, 0], [7, -1], [8, 0], [1000, 1]
+    ... ])
+    >>> det = OneTimeSampling(n_subsamples=3, random_state=0)
+    >>> det.fit_predict(X)
+    array([ 1,  1,  1,  1,  1,  1,  1,  1,  1, -1])
     """
 
     @property

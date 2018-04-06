@@ -56,6 +56,18 @@ class IForest(BaseOutlierDetector):
     .. [#liu08] Liu, F. T., Ting, K. M., and Zhou, Z.-H.,
         "Isolation forest,"
         In Proceedings of ICDM, pp. 413-422, 2008.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from kenchi.outlier_detection import IForest
+    >>> X   = np.array([
+    ...     [0, 0], [1, 1], [2, 0], [3, -1], [4, 0],
+    ...     [5, 1], [6, 0], [7, -1], [8, 0], [1000, 1]
+    ... ])
+    >>> det = IForest(random_state=0)
+    >>> det.fit_predict(X)
+    array([ 1,  1,  1,  1,  1,  1,  1,  1,  1, -1])
     """
 
     @property

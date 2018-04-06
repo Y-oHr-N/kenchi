@@ -1,3 +1,4 @@
+import doctest
 import unittest
 
 import matplotlib
@@ -7,17 +8,23 @@ from sklearn.exceptions import NotFittedError
 from sklearn.utils.estimator_checks import check_estimator
 
 from kenchi.datasets import make_blobs
-from kenchi.outlier_detection import IForest
+from kenchi.outlier_detection import ensemble
 
 matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
 
 
+def load_tests(loader, tests, ignore):
+    tests.addTests(doctest.DocTestSuite(ensemble))
+
+    return tests
+
+
 class IForestTest(unittest.TestCase):
     def setUp(self):
-        self.X, self.y = make_blobs(random_state=1)
-        self.sut       = IForest()
+        self.X, self.y = make_blobs(random_state=0)
+        self.sut       = ensemble.IForest(random_state=0)
         _, self.ax     = plt.subplots()
 
     def tearDown(self):
@@ -27,7 +34,7 @@ class IForestTest(unittest.TestCase):
         self.assertIsNone(check_estimator(self.sut))
 
     def test_fit(self):
-        self.assertIsInstance(self.sut.fit(self.X), IForest)
+        self.assertIsInstance(self.sut.fit(self.X), ensemble.IForest)
 
     def test_fit_predict(self):
         self.assertIsInstance(self.sut.fit_predict(self.X), np.ndarray)

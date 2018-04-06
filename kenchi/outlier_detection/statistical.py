@@ -90,6 +90,18 @@ class GMM(BaseOutlierDetector):
 
     weights_ : array-like of shape (n_components,)
         Weight of each mixture components.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from kenchi.outlier_detection import GMM
+    >>> X   = np.array([
+    ...     [0, 0], [1, 1], [2, 0], [3, -1], [4, 0],
+    ...     [5, 1], [6, 0], [7, -1], [8, 0], [1000, 1]
+    ... ])
+    >>> det = GMM(random_state=0)
+    >>> det.fit_predict(X)
+    array([ 1,  1,  1,  1,  1,  1,  1,  1,  1, -1])
     """
 
     @property
@@ -236,6 +248,18 @@ class HBOS(BaseOutlierDetector):
         "Histogram-based outlier score (HBOS):
         A fast unsupervised anomaly detection algorithm,"
         KI: Poster and Demo Track, pp. 59-63, 2012.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from kenchi.outlier_detection import HBOS
+    >>> X   = np.array([
+    ...     [0, 0], [1, 1], [2, 0], [3, -1], [4, 0],
+    ...     [5, 1], [6, 0], [7, -1], [8, 0], [1000, 1]
+    ... ])
+    >>> det = HBOS()
+    >>> det.fit_predict(X)
+    array([ 1,  1,  1,  1,  1,  1,  1,  1,  1, -1])
     """
 
     def __init__(self, bins='auto', contamination=0.1, novelty=False):
@@ -336,6 +360,18 @@ class KDE(BaseOutlierDetector):
 
     X_ : array-like of shape (n_samples, n_features)
         Training data.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from kenchi.outlier_detection import KDE
+    >>> X   = np.array([
+    ...     [0, 0], [1, 1], [2, 0], [3, -1], [4, 0],
+    ...     [5, 1], [6, 0], [7, -1], [8, 0], [1000, 1]
+    ... ])
+    >>> det = KDE()
+    >>> det.fit_predict(X)
+    array([ 1,  1,  1,  1,  1,  1,  1,  1,  1, -1])
     """
 
     @property
@@ -469,6 +505,18 @@ class SparseStructureLearning(BaseOutlierDetector):
     .. [#ide09] Ide, T., Lozano, C., Abe, N., and Liu, Y.,
         "Proximity-based anomaly detection using sparse structure learning,"
         In Proceedings of SDM, pp. 97-108, 2009.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from kenchi.outlier_detection import SparseStructureLearning
+    >>> X   = np.array([
+    ...     [0, 0], [1, 1], [2, 0], [3, -1], [4, 0],
+    ...     [5, 1], [6, 0], [7, -1], [8, 0], [1000, 1]
+    ... ])
+    >>> det = SparseStructureLearning()
+    >>> det.fit_predict(X)
+    array([ 1,  1,  1,  1,  1,  1,  1,  1,  1, -1])
     """
 
     @property
