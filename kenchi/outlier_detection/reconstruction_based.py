@@ -68,6 +68,18 @@ class PCA(BaseOutlierDetector):
 
     singular_values_ : array-like of shape (n_components,)
         Singular values corresponding to each of the selected components.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from kenchi.outlier_detection import PCA
+    >>> X   = np.array([
+    ...     [0, 0], [1, 1], [2, 0], [3, -1], [4, 0],
+    ...     [5, 1], [6, 0], [7, -1], [8, 0], [1000, 1]
+    ... ])
+    >>> det = PCA()
+    >>> det.fit_predict(X)
+    array([ 1,  1,  1,  1,  1,  1,  1,  1,  1, -1])
     """
 
     @property

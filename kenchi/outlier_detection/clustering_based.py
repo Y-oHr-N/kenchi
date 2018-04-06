@@ -65,6 +65,18 @@ class MiniBatchKMeans(BaseOutlierDetector):
 
     labels_ : array-like of shape (n_samples,)
         Label of each point.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from kenchi.outlier_detection import MiniBatchKMeans
+    >>> X   = np.array([
+    ...     [0, 0], [1, 1], [2, 0], [3, -1], [4, 0],
+    ...     [5, 1], [6, 0], [7, -1], [8, 0], [1000, 1]
+    ... ])
+    >>> det = MiniBatchKMeans(n_clusters=1, random_state=0)
+    >>> det.fit_predict(X)
+    array([ 1,  1,  1,  1,  1,  1,  1,  1,  1, -1])
     """
 
     @property

@@ -1,3 +1,4 @@
+import doctest
 import unittest
 
 import matplotlib
@@ -7,17 +8,23 @@ from sklearn.exceptions import NotFittedError
 from sklearn.utils.estimator_checks import check_estimator
 
 from kenchi.datasets import make_blobs
-from kenchi.outlier_detection import PCA
+from kenchi.outlier_detection import reconstruction_based
 
 matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
 
 
+def load_tests(loader, tests, ignore):
+    tests.addTests(doctest.DocTestSuite(reconstruction_based))
+
+    return tests
+
+
 class PCATest(unittest.TestCase):
     def setUp(self):
-        self.X, self.y = make_blobs(random_state=1)
-        self.sut       = PCA()
+        self.X, self.y = make_blobs(random_state=0)
+        self.sut       = reconstruction_based.PCA()
         _, self.ax     = plt.subplots()
 
     def tearDown(self):
@@ -27,7 +34,7 @@ class PCATest(unittest.TestCase):
         self.assertIsNone(check_estimator(self.sut))
 
     def test_fit(self):
-        self.assertIsInstance(self.sut.fit(self.X), PCA)
+        self.assertIsInstance(self.sut.fit(self.X), reconstruction_based.PCA)
 
     def test_fit_predict(self):
         self.assertIsInstance(self.sut.fit_predict(self.X), np.ndarray)

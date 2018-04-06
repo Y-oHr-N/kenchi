@@ -1,3 +1,4 @@
+import doctest
 import unittest
 
 import matplotlib
@@ -7,17 +8,23 @@ from sklearn.exceptions import NotFittedError
 from sklearn.utils.estimator_checks import check_estimator
 
 from kenchi.datasets import make_blobs
-from kenchi.outlier_detection import KNN, OneTimeSampling
+from kenchi.outlier_detection import distance_based
 
 matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
 
 
+def load_tests(loader, tests, ignore):
+    tests.addTests(doctest.DocTestSuite(distance_based))
+
+    return tests
+
+
 class KNNTest(unittest.TestCase):
     def setUp(self):
-        self.X, self.y = make_blobs(random_state=1)
-        self.sut       = KNN(n_neighbors=5)
+        self.X, self.y = make_blobs(random_state=0)
+        self.sut       = distance_based.KNN(n_neighbors=3)
         _, self.ax     = plt.subplots()
 
     def tearDown(self):
@@ -28,7 +35,7 @@ class KNNTest(unittest.TestCase):
         self.assertIsNone(check_estimator(self.sut))
 
     def test_fit(self):
-        self.assertIsInstance(self.sut.fit(self.X), KNN)
+        self.assertIsInstance(self.sut.fit(self.X), distance_based.KNN)
 
     def test_fit_predict(self):
         self.assertIsInstance(self.sut.fit_predict(self.X), np.ndarray)
@@ -57,8 +64,10 @@ class KNNTest(unittest.TestCase):
 
 class OneTimeSamplingTest(unittest.TestCase):
     def setUp(self):
-        self.X, self.y = make_blobs(random_state=1)
-        self.sut       = OneTimeSampling(n_subsamples=2, random_state=1)
+        self.X, self.y = make_blobs(random_state=0)
+        self.sut       = distance_based.OneTimeSampling(
+            n_subsamples=3, random_state=0
+        )
         _, self.ax     = plt.subplots()
 
     def tearDown(self):
@@ -69,7 +78,9 @@ class OneTimeSamplingTest(unittest.TestCase):
         self.assertIsNone(check_estimator(self.sut))
 
     def test_fit(self):
-        self.assertIsInstance(self.sut.fit(self.X), OneTimeSampling)
+        self.assertIsInstance(
+            self.sut.fit(self.X), distance_based.OneTimeSampling
+        )
 
     def test_fit_predict(self):
         self.assertIsInstance(self.sut.fit_predict(self.X), np.ndarray)

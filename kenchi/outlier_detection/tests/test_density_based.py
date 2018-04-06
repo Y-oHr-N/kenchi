@@ -1,3 +1,4 @@
+import doctest
 import unittest
 
 import matplotlib
@@ -7,17 +8,23 @@ from sklearn.exceptions import NotFittedError
 from sklearn.utils.estimator_checks import check_estimator
 
 from kenchi.datasets import make_blobs
-from kenchi.outlier_detection import LOF
+from kenchi.outlier_detection import density_based
 
 matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
 
 
+def load_tests(loader, tests, ignore):
+    tests.addTests(doctest.DocTestSuite(density_based))
+
+    return tests
+
+
 class LOFTest(unittest.TestCase):
     def setUp(self):
-        self.X, self.y = make_blobs(random_state=1)
-        self.sut       = LOF(n_neighbors=5)
+        self.X, self.y = make_blobs(random_state=0)
+        self.sut       = density_based.LOF(n_neighbors=3)
         _, self.ax     = plt.subplots()
 
     def tearDown(self):
@@ -28,7 +35,7 @@ class LOFTest(unittest.TestCase):
         self.assertIsNone(check_estimator(self.sut))
 
     def test_fit(self):
-        self.assertIsInstance(self.sut.fit(self.X), LOF)
+        self.assertIsInstance(self.sut.fit(self.X), density_based.LOF)
 
     def test_fit_predict(self):
         self.assertIsInstance(self.sut.fit_predict(self.X), np.ndarray)

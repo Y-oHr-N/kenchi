@@ -1,3 +1,4 @@
+import doctest
 import unittest
 
 import matplotlib
@@ -7,17 +8,23 @@ from sklearn.exceptions import NotFittedError
 from sklearn.utils.estimator_checks import check_estimator
 
 from kenchi.datasets import make_blobs
-from kenchi.outlier_detection import GMM, KDE, HBOS, SparseStructureLearning
+from kenchi.outlier_detection import statistical
 
 matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
 
 
+def load_tests(loader, tests, ignore):
+    tests.addTests(doctest.DocTestSuite(statistical))
+
+    return tests
+
+
 class GMMTest(unittest.TestCase):
     def setUp(self):
-        self.X, self.y = make_blobs(random_state=1)
-        self.sut       = GMM()
+        self.X, self.y = make_blobs(random_state=0)
+        self.sut       = statistical.GMM(random_state=0)
         _, self.ax     = plt.subplots()
 
     def tearDown(self):
@@ -27,7 +34,7 @@ class GMMTest(unittest.TestCase):
         self.assertIsNone(check_estimator(self.sut))
 
     def test_fit(self):
-        self.assertIsInstance(self.sut.fit(self.X), GMM)
+        self.assertIsInstance(self.sut.fit(self.X), statistical.GMM)
 
     def test_fit_predict(self):
         self.assertIsInstance(self.sut.fit_predict(self.X), np.ndarray)
@@ -62,8 +69,8 @@ class GMMTest(unittest.TestCase):
 
 class KDETest(unittest.TestCase):
     def setUp(self):
-        self.X, self.y = make_blobs(random_state=1)
-        self.sut       = KDE()
+        self.X, self.y = make_blobs(random_state=0)
+        self.sut       = statistical.KDE()
         _, self.ax     = plt.subplots()
 
     def tearDown(self):
@@ -73,7 +80,7 @@ class KDETest(unittest.TestCase):
         self.assertIsNone(check_estimator(self.sut))
 
     def test_fit(self):
-        self.assertIsInstance(self.sut.fit(self.X), KDE)
+        self.assertIsInstance(self.sut.fit(self.X), statistical.KDE)
 
     def test_fit_predict(self):
         self.assertIsInstance(self.sut.fit_predict(self.X), np.ndarray)
@@ -108,9 +115,9 @@ class KDETest(unittest.TestCase):
 
 class HBOSTest(unittest.TestCase):
     def setUp(self):
-        self.X_train, _          = make_blobs(random_state=1)
-        self.X_test, self.y_test = make_blobs(random_state=2)
-        self.sut                 = HBOS()
+        self.X_train, _          = make_blobs(random_state=0)
+        self.X_test, self.y_test = make_blobs(random_state=1)
+        self.sut                 = statistical.HBOS()
         _, self.ax               = plt.subplots()
 
     def tearDown(self):
@@ -121,7 +128,7 @@ class HBOSTest(unittest.TestCase):
         self.assertIsNone(check_estimator(self.sut))
 
     def test_fit(self):
-        self.assertIsInstance(self.sut.fit(self.X_train), HBOS)
+        self.assertIsInstance(self.sut.fit(self.X_train), statistical.HBOS)
 
     def test_fit_predict(self):
         self.assertIsInstance(self.sut.fit_predict(self.X_train), np.ndarray)
@@ -152,8 +159,8 @@ class HBOSTest(unittest.TestCase):
 
 class SparseStructureLearningTest(unittest.TestCase):
     def setUp(self):
-        self.X, self.y = make_blobs(centers=1, random_state=1)
-        self.sut       = SparseStructureLearning(tol=0.02)
+        self.X, self.y = make_blobs(centers=1, random_state=0)
+        self.sut       = statistical.SparseStructureLearning(tol=0.02)
         _, self.ax     = plt.subplots()
 
     def tearDown(self):
@@ -163,7 +170,9 @@ class SparseStructureLearningTest(unittest.TestCase):
         self.assertIsNone(check_estimator(self.sut))
 
     def test_fit(self):
-        self.assertIsInstance(self.sut.fit(self.X), SparseStructureLearning)
+        self.assertIsInstance(
+            self.sut.fit(self.X), statistical.SparseStructureLearning
+        )
 
     def test_fit_predict(self):
         self.assertIsInstance(self.sut.fit_predict(self.X), np.ndarray)
