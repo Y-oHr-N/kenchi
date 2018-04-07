@@ -537,15 +537,6 @@ class SparseStructureLearning(BaseOutlierDetector):
         return np.array(list(nx.isolates(self.graphical_model_)))
 
     @property
-    def labels_(self):
-        # cluster using affinity propagation
-        _, labels = affinity_propagation(
-            self.partial_corrcoef_, **self._apcluster_params
-        )
-
-        return labels
-
-    @property
     def location_(self):
         return self._estimator.location_
 
@@ -590,6 +581,10 @@ class SparseStructureLearning(BaseOutlierDetector):
             mode            = self.mode,
             tol             = self.tol
         ).fit(X)
+
+        _, self.labels_     = affinity_propagation(
+            self.partial_corrcoef_, **self._apcluster_params
+        )
 
         return self
 
@@ -673,11 +668,13 @@ class SparseStructureLearning(BaseOutlierDetector):
 
         check_is_fitted(self, '_estimator')
 
+        n_clusters  = np.max(self.labels_) + 1
+        n_isolates, = self.isolates_.shape
         title       = (
             f'GGM ('
-            f'n_clusters={np.max(self.labels_) + 1}, '
+            f'n_clusters={n_clusters}, '
             f'n_features={self._n_features}, '
-            f'n_isolates={self.isolates_.size}'
+            f'n_isolates={n_isolates}'
             f')'
         )
         kwargs['G'] = self.graphical_model_
