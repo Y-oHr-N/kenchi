@@ -123,6 +123,18 @@ class PCA(BaseOutlierDetector):
         self.tol            = tol
         self.whiten         = whiten
 
+    def _check_is_fitted(self):
+        super()._check_is_fitted()
+
+        check_is_fitted(
+            self, [
+                'components_', 'explained_variance_',
+                'explained_variance_ratio_', 'mean_',
+                'noise_variance_', 'n_components_',
+                'singular_values_'
+            ]
+        )
+
     def _fit(self, X):
         self._estimator    = _PCA(
             iterated_power = self.iterated_power,
@@ -161,7 +173,7 @@ class PCA(BaseOutlierDetector):
             Mean log-likelihood of the given data.
         """
 
-        check_is_fitted(self, '_estimator')
+        self._check_is_fitted()
 
         X = self._check_array(X, n_features=self._n_features, estimator=self)
 

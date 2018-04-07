@@ -157,6 +157,16 @@ class GMM(BaseOutlierDetector):
         self.warm_start      = warm_start
         self.weights_init    = weights_init
 
+    def _check_is_fitted(self):
+        super()._check_is_fitted()
+
+        check_is_fitted(
+            self, [
+                'converged_', 'covariances_', 'lower_bound_', 'means_',
+                'n_iter_', 'precisions_', 'precisions_cholesky_', 'weights_'
+            ]
+        )
+
     def _fit(self, X):
         self._estimator     = GaussianMixture(
             covariance_type = self.covariance_type,
@@ -194,7 +204,7 @@ class GMM(BaseOutlierDetector):
             Mean log-likelihood of the given data.
         """
 
-        check_is_fitted(self, '_estimator')
+        self._check_is_fitted()
 
         X = self._check_array(X, n_features=self._n_features, estimator=self)
 
@@ -389,6 +399,11 @@ class KDE(BaseOutlierDetector):
         self.rtol          = rtol
         self.metric_params = metric_params
 
+    def _check_is_fitted(self):
+        super()._check_is_fitted()
+
+        check_is_fitted(self, 'X_')
+
     def _fit(self, X):
         self._estimator   = KernelDensity(
             algorithm     = self.algorithm,
@@ -423,7 +438,7 @@ class KDE(BaseOutlierDetector):
             Mean log-likelihood of the given data.
         """
 
-        check_is_fitted(self, '_estimator')
+        self._check_is_fitted()
 
         X = self._check_array(X, n_features=self._n_features, estimator=self)
 
@@ -572,6 +587,16 @@ class SparseStructureLearning(BaseOutlierDetector):
         self.mode             = mode
         self.tol              = tol
 
+    def _check_is_fitted(self):
+        super()._check_is_fitted()
+
+        check_is_fitted(
+            self, [
+                'covariance_', 'graphical_model_', 'labels_', 'location_',
+                'isolates_', 'n_iter_', 'partial_corrcoef_', 'precision_'
+            ]
+        )
+
     def _fit(self, X):
         self._estimator     = GraphLasso(
             alpha           = self.alpha,
@@ -605,7 +630,7 @@ class SparseStructureLearning(BaseOutlierDetector):
             Feature-wise anomaly scores for each sample.
         """
 
-        check_is_fitted(self, '_estimator')
+        self._check_is_fitted()
 
         X = self._check_array(X, n_features=self._n_features, estimator=self)
 
@@ -631,7 +656,7 @@ class SparseStructureLearning(BaseOutlierDetector):
             Mean log-likelihood of the given data.
         """
 
-        check_is_fitted(self, '_estimator')
+        self._check_is_fitted()
 
         X = self._check_array(X, n_features=self._n_features, estimator=self)
 
@@ -666,7 +691,7 @@ class SparseStructureLearning(BaseOutlierDetector):
             Axes on which the plot was drawn.
         """
 
-        check_is_fitted(self, '_estimator')
+        self._check_is_fitted()
 
         n_clusters  = np.max(self.labels_) + 1
         n_isolates, = self.isolates_.shape
@@ -713,7 +738,7 @@ class SparseStructureLearning(BaseOutlierDetector):
             Axes on which the plot was drawn.
         """
 
-        check_is_fitted(self, '_estimator')
+        self._check_is_fitted()
 
         kwargs['partial_corrcoef'] = self.partial_corrcoef_
 

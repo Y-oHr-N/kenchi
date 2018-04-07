@@ -1,4 +1,5 @@
 from sklearn.ensemble import IsolationForest
+from sklearn.utils.validation import check_is_fitted
 
 from .base import BaseOutlierDetector
 
@@ -94,6 +95,13 @@ class IForest(BaseOutlierDetector):
         self.n_estimators = n_estimators
         self.n_jobs       = n_jobs
         self.random_state = random_state
+
+    def _check_is_fitted(self):
+        super()._check_is_fitted()
+
+        check_is_fitted(
+            self, ['estimators_', 'estimators_samples_', 'max_samples_']
+        )
 
     def _fit(self, X):
         self._estimator  = IsolationForest(

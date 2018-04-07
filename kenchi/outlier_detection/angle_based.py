@@ -2,6 +2,7 @@ from itertools import combinations
 
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
+from sklearn.utils.validation import check_is_fitted
 
 from .base import BaseOutlierDetector
 
@@ -114,6 +115,11 @@ class FastABOD(BaseOutlierDetector):
         kwargs['ensure_min_samples']  = 4
 
         return super()._check_array(X, **kwargs)
+
+    def _check_is_fitted(self):
+        super()._check_is_fitted()
+
+        check_is_fitted(self, ['n_neighbors_', 'X_'])
 
     def _fit(self, X):
         n_samples, _            = X.shape

@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn.neighbors import DistanceMetric, NearestNeighbors
 from sklearn.utils import check_random_state
+from sklearn.utils.validation import check_is_fitted
 
 from .base import BaseOutlierDetector
 
@@ -103,6 +104,11 @@ class KNN(BaseOutlierDetector):
         self.n_neighbors   = n_neighbors
         self.p             = p
         self.metric_params = metric_params
+
+    def _check_is_fitted(self):
+        super()._check_is_fitted()
+
+        check_is_fitted(self, ['n_neighbors_', 'X_'])
 
     def _fit(self, X):
         n_samples, _      = X.shape
@@ -228,6 +234,11 @@ class OneTimeSampling(BaseOutlierDetector):
             )
 
         return X
+
+    def _check_is_fitted(self):
+        super()._check_is_fitted()
+
+        check_is_fitted(self, ['subsamples_', 'S_'])
 
     def _fit(self, X):
         n_samples, _     = X.shape

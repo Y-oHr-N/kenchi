@@ -67,6 +67,11 @@ class BaseOutlierDetector(BaseEstimator, ABC):
 
         return X
 
+    def _check_is_fitted(self):
+        """Checks if the estimator is fitted and raises NotFittedError."""
+
+        check_is_fitted(self, ['anomaly_score_', 'threshold_'])
+
     def _get_threshold(self):
         """Get the threshold according to the derived anomaly scores."""
 
@@ -208,7 +213,7 @@ class BaseOutlierDetector(BaseEstimator, ABC):
             Anomaly score for each sample.
         """
 
-        check_is_fitted(self, 'anomaly_score_')
+        self._check_is_fitted()
 
         if X is None:
             anomaly_score = self.anomaly_score_

@@ -109,6 +109,11 @@ class MiniBatchKMeans(BaseOutlierDetector):
         self.reassignment_ratio = reassignment_ratio
         self.tol                = tol
 
+    def _check_is_fitted(self):
+        super()._check_is_fitted()
+
+        check_is_fitted(self, ['cluster_centers_', 'inertia_', 'labels_'])
+
     def _fit(self, X):
         self._estimator        = _MiniBatchKMeans(
             batch_size         = self.batch_size,
@@ -145,7 +150,7 @@ class MiniBatchKMeans(BaseOutlierDetector):
             Opposite value of the given data on the K-means objective.
         """
 
-        check_is_fitted(self, '_estimator')
+        self._check_is_fitted()
 
         X = self._check_array(X, n_features=self._n_features, estimator=self)
 
