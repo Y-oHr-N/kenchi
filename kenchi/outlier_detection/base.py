@@ -45,7 +45,7 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         self.contamination = contamination
 
     def _check_params(self):
-        """Check validity of parameters and raise ValueError if not valid."""
+        """Raise ValueError if parameters are not valid."""
 
         if not 0. < self.contamination <= 0.5:
             raise ValueError(
@@ -54,7 +54,7 @@ class BaseOutlierDetector(BaseEstimator, ABC):
             )
 
     def _check_array(self, X, n_features=None, **kwargs):
-        """Check validity of the array and raise ValueError if not valid."""
+        """Raise ValueError if the array is not valid."""
 
         X              = check_array(X, **kwargs)
         _, _n_features = X.shape
@@ -68,7 +68,7 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         return X
 
     def _check_is_fitted(self):
-        """Checks if the estimator is fitted and raises NotFittedError."""
+        """Raise NotFittedError if the estimator is not fitted."""
 
         check_is_fitted(self, ['anomaly_score_', 'threshold_'])
 
@@ -248,7 +248,7 @@ class BaseOutlierDetector(BaseEstimator, ABC):
             Data. If None, plot the anomaly score for each training samples.
 
         normalize : bool, default False
-            If True, return the normalized anomaly score.
+            If True, plot the normalized anomaly score.
 
         ax : matplotlib Axes, default None
             Target axes instance.

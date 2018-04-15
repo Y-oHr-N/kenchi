@@ -256,7 +256,7 @@ class Pipeline(_Pipeline):
             Target axes instance.
 
         cbar : bool, default True.
-            Whether to draw a colorbar.
+            If True, draw a colorbar.
 
         figsize : tuple, default None
             Tuple denoting figure size of the plot.

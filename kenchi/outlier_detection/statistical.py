@@ -718,7 +718,7 @@ class SparseStructureLearning(BaseOutlierDetector):
             Target axes instance.
 
         cbar : bool, default True.
-            Whether to draw a colorbar.
+            If Ture, to draw a colorbar.
 
         figsize : tuple, default None
             Tuple denoting figure size of the plot.
