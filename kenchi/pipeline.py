@@ -67,14 +67,14 @@ class Pipeline(_Pipeline):
         return X
 
     @if_delegate_has_method(delegate='_final_estimator')
-    def anomaly_score(self, X, normalize=False):
+    def anomaly_score(self, X=None, normalize=False):
         """Apply transforms, and compute the anomaly score for each sample with
         the final estimator.
 
         Parameters
         ----------
         X : array-like of shape (n_samples, n_features)
-            Data.
+            Data. If None, compute the anomaly score for each training samples.
 
         normalize : bool, default False
             If True, return the normalized anomaly score.
@@ -110,14 +110,17 @@ class Pipeline(_Pipeline):
         )
 
     @if_delegate_has_method(delegate='_final_estimator')
-    def plot_anomaly_score(self, X, **kwargs):
+    def plot_anomaly_score(self, X=None, normalize=False, **kwargs):
         """Apply transoforms, and plot the anomaly score for each sample with
         the final estimator.
 
         Parameters
         ----------
-        X : array-like of shape (n_samples, n_features)
-            Data.
+        X : array-like of shape (n_samples, n_features), default None
+            Data. If None, plot the anomaly score for each training samples.
+
+        normalize : bool, default False
+            If True, plot the normalized anomaly score.
 
         ax : matplotlib Axes, default None
             Target axes instance.
@@ -161,9 +164,9 @@ class Pipeline(_Pipeline):
             Axes on which the plot was drawn.
         """
 
-        kwargs['X'] = self._pre_transform(X)
-
-        return self._final_estimator.plot_anomaly_score(**kwargs)
+        return self._final_estimator.plot_anomaly_score(
+            self._pre_transform(X), normalize=normalize, **kwargs
+        )
 
     @if_delegate_has_method(delegate='_final_estimator')
     def plot_roc_curve(self, X, y, **kwargs):
@@ -205,10 +208,9 @@ class Pipeline(_Pipeline):
             Axes on which the plot was drawn.
         """
 
-        kwargs['X'] = self._pre_transform(X)
-        kwargs['y'] = y
-
-        return self._final_estimator.plot_roc_curve(**kwargs)
+        return self._final_estimator.plot_roc_curve(
+            self._pre_transform(X), y, **kwargs
+        )
 
     @property
     def plot_graphical_model(self):
