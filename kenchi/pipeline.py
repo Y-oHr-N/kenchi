@@ -60,6 +60,9 @@ class Pipeline(_Pipeline):
         return iter(self.named_steps)
 
     def _pre_transform(self, X):
+        if X is None:
+            return X
+
         for _, transform in self.steps[:-1]:
             if transform is not None:
                 X = transform.transform(X)
