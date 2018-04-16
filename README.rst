@@ -72,12 +72,15 @@ Examples
     import matplotlib.pyplot as plt
     from kenchi.datasets import load_wdbc
     from kenchi.outlier_detection import *
+    from kenchi.pipeline import make_pipeline
+    from sklearn.preprocessing import StandardScaler
 
     # Load the breast cancer wisconsin dataset
-    X, y      = load_wdbc(random_state=0)
+    X, y         = load_wdbc(random_state=0)
 
-    f, ax     = plt.subplots()
-    detectors = [
+    f, ax        = plt.subplots()
+    scaler       = StandardScaler()
+    detectors    = [
         FastABOD(),
         MiniBatchKMeans(random_state=0),
         LOF(),
@@ -88,6 +91,8 @@ Examples
     ]
 
     for detector in detectors:
+        pipeline = make_pipeline(scaler, detector)
+
         # Fit the model, and plot the ROC curve
         detector.fit(X).plot_roc_curve(X=None, y=y, ax=ax)
 
