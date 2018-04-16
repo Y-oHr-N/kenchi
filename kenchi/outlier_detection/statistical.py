@@ -63,6 +63,15 @@ class GMM(BaseOutlierDetector):
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
 
+    data_max_ : array-like of shape (n_features,)
+        Per feature maximum seen in the data.
+
+    data_min_ : array-like of shape (n_features,)
+        Per feature minimum seen in the data.
+
+    data_volume_ : float
+        Volume of the hypercube enclosing the data.
+
     threshold_ : float
         Threshold.
 
@@ -231,14 +240,17 @@ class HBOS(BaseOutlierDetector):
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
 
-    threshold_ : float
-        Threshold.
-
     data_max_ : array-like of shape (n_features,)
         Per feature maximum seen in the data.
 
     data_min_ : array-like of shape (n_features,)
         Per feature minimum seen in the data.
+
+    data_volume_ : float
+        Volume of the hypercube enclosing the data.
+
+    threshold_ : float
+        Threshold.
 
     bin_edges_ : array-like
         Bin edges.
@@ -275,13 +287,9 @@ class HBOS(BaseOutlierDetector):
     def _check_is_fitted(self):
         super()._check_is_fitted()
 
-        check_is_fitted(
-            self, ['data_max_', 'data_min_', 'bin_edges_', 'hist_']
-        )
+        check_is_fitted(self, ['bin_edges_', 'hist_'])
 
     def _fit(self, X):
-        self.data_min_  = np.min(X, axis=0)
-        self.data_max_  = np.max(X, axis=0)
         self.hist_      = np.empty(self._n_features, dtype=object)
         self.bin_edges_ = np.empty(self._n_features, dtype=object)
 
@@ -358,6 +366,15 @@ class KDE(BaseOutlierDetector):
     ----------
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
+
+    data_max_ : array-like of shape (n_features,)
+        Per feature maximum seen in the data.
+
+    data_min_ : array-like of shape (n_features,)
+        Per feature minimum seen in the data.
+
+    data_volume_ : float
+        Volume of the hypercube enclosing the data.
 
     threshold_ : float
         Threshold.
@@ -481,6 +498,15 @@ class SparseStructureLearning(BaseOutlierDetector):
     ----------
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
+
+    data_max_ : array-like of shape (n_features,)
+        Per feature maximum seen in the data.
+
+    data_min_ : array-like of shape (n_features,)
+        Per feature minimum seen in the data.
+
+    data_volume_ : float
+        Volume of the hypercube enclosing the data.
 
     threshold_ : float
         Threshold.

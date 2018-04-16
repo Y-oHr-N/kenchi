@@ -49,6 +49,15 @@ class FastABOD(BaseOutlierDetector):
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
 
+    data_max_ : array-like of shape (n_features,)
+        Per feature maximum seen in the data.
+
+    data_min_ : array-like of shape (n_features,)
+        Per feature minimum seen in the data.
+
+    data_volume_ : float
+        Volume of the hypercube enclosing the data.
+
     threshold_ : float
         Threshold.
 

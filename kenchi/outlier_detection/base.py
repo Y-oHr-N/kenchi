@@ -6,6 +6,7 @@ from sklearn.base import BaseEstimator
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
+from ..metrics import negative_mv_auc_score
 from ..visualization import plot_anomaly_score, plot_roc_curve
 
 __all__ = ['is_outlier_detector', 'BaseOutlierDetector']
@@ -39,6 +40,10 @@ class BaseOutlierDetector(BaseEstimator, ABC):
     """
 
     _estimator_type = 'outlier_detector'
+
+    @property
+    def data_volume_(self):
+        return np.prod(self.data_max_ - self.data_min_)
 
     @abstractmethod
     def __init__(self, contamination=0.1):
@@ -142,6 +147,8 @@ class BaseOutlierDetector(BaseEstimator, ABC):
 
         self._fit(X)
 
+        self.data_min_      = np.min(X, axis=0)
+        self.data_max_      = np.max(X, axis=0)
         self.anomaly_score_ = self._anomaly_score(X)
         self.threshold_     = self._get_threshold()
         self._rv            = self._get_rv()
@@ -238,6 +245,24 @@ class BaseOutlierDetector(BaseEstimator, ABC):
             'anomaly_score is not available when novelty=False, use '
             'novelty=True if you want to predict on new unseen data'
         )
+
+    def score(self, X=None, y=None):
+        """Compute the opposite of the area under the Mass-Volume (MV) curve.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features), default None
+            Data.
+
+        y : ignored
+
+        Returns
+        -------
+        score : float
+            Opposite of the area under the MV curve.
+        """
+
+        return negative_mv_auc_score(self, X)
 
     def plot_anomaly_score(self, X=None, normalize=False, **kwargs):
         """Plot the anomaly score for each sample.
