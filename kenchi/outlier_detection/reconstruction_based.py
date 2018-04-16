@@ -123,11 +123,12 @@ class PCA(BaseOutlierDetector):
         self, contamination=0.1, iterated_power='auto', n_components=None,
         random_state=None, svd_solver='auto', tol=0., whiten=False
     ):
-        super().__init__(contamination=contamination)
+        super().__init__(
+            contamination=contamination, random_state=random_state
+        )
 
         self.iterated_power = iterated_power
         self.n_components   = n_components
-        self.random_state   = random_state
         self.svd_solver     = svd_solver
         self.tol            = tol
         self.whiten         = whiten
