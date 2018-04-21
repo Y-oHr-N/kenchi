@@ -53,7 +53,7 @@ def negative_mv_auc_score(
     )
     is_in_range     = (interval[0] <= mass) & (mass <= interval[1])
 
-    return auc(mass[is_in_range], volume[is_in_range], reorder=True)
+    return -auc(mass[is_in_range], volume[is_in_range], reorder=True)
 
 
 def mv_curve(detector, X=None, n_uniform_samples=10000):
