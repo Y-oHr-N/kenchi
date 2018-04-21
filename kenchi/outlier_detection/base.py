@@ -247,7 +247,10 @@ class BaseOutlierDetector(BaseEstimator, ABC):
             'novelty=True if you want to predict on new unseen data'
         )
 
-    def score(self, X=None, y=None):
+    def score(
+        self, X=None, y=None, interval=(0.9, 0.999),
+        n_uniform_samples=10000
+    ):
         """Compute the opposite of the area under the Mass-Volume (MV) curve.
 
         Parameters
@@ -257,13 +260,22 @@ class BaseOutlierDetector(BaseEstimator, ABC):
 
         y : ignored
 
+        interval : tuple, default (0.9, 0.999)
+            Interval of probabilities.
+
+        n_uniform_samples : int, default 10000
+            Number of samples which are drawn from the uniform distribution
+            over the hypercube enclosing the data.
+
         Returns
         -------
         score : float
             Opposite of the area under the MV curve.
         """
 
-        return negative_mv_auc_score(self, X)
+        return negative_mv_auc_score(
+            self, X, interval=interval, n_uniform_samples=n_uniform_samples
+        )
 
     def plot_anomaly_score(self, X=None, normalize=False, **kwargs):
         """Plot the anomaly score for each sample.
