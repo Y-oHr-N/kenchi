@@ -30,9 +30,9 @@ Dependencies
 -  Python (>=3.6)
 -  `matplotlib <https://matplotlib.org>`_ (>=2.1.1)
 -  `networkx <https://networkx.github.io/>`_ (>=2.0)
--  `numpy <https://www.numpy.org/>`_ (>=1.14.0)
--  `scikit-learn <https://scikit-learn.org/>`_ (>=0.19.1)
--  `scipy <https://www.scipy.org/>`_ (>=1.0.0)
+-  `numpy <http://www.numpy.org/>`_ (>=1.14.0)
+-  `scikit-learn <http://scikit-learn.org/>`_ (>=0.19.1)
+-  `scipy <https://www.scipy.org/scipylib/>`_ (>=1.0.0)
 
 Installation
 ------------
@@ -70,31 +70,47 @@ Examples
 .. code:: python
 
     import matplotlib.pyplot as plt
+    import numpy as np
     from kenchi.datasets import load_wdbc
     from kenchi.outlier_detection import *
     from kenchi.pipeline import make_pipeline
+    from scipy.stats import randint, uniform
+    from sklearn.model_selection import RandomizedSearchCV
     from sklearn.preprocessing import StandardScaler
 
-    # Load the breast cancer wisconsin dataset
-    X, y         = load_wdbc(random_state=0)
+    np.random.seed(0)
 
-    f, ax        = plt.subplots()
-    scaler       = StandardScaler()
-    detectors    = [
-        FastABOD(),
-        MiniBatchKMeans(random_state=0),
-        LOF(),
-        KNN(),
-        IForest(random_state=0),
-        PCA(),
+    f, ax             = plt.subplots()
+
+    scaler            = StandardScaler()
+
+    detectors         = [
+        FastABOD(novelty=True, n_jobs=-1), MiniBatchKMeans(),
+        LOF(novelty=True, n_jobs=-1),      KNN(novelty=True, n_jobs=-1),
+        IForest(n_jobs=-1),                PCA(),
         KDE()
     ]
 
-    for detector in detectors:
-        pipeline = make_pipeline(scaler, detector)
+    param_grids       = [
+        {'fastabod__n_neighbors':       randint(3, 21)},
+        {'minibatchkmeans__n_clusters': randint(1, 21)},
+        {'lof__n_neighbors':            randint(1, 21)},
+        {'knn__n_neighbors':            randint(1, 21)},
+        {'iforest__max_features':       uniform(0.05, 0.95)},
+        {'pca__n_components':           uniform(0.05, 0.95)},
+        {'kde__bandwidth':              10. ** np.arange(-2, 2, 0.05)}
+    ]
 
-        # Fit the model, and plot the ROC curve
-        detector.fit(X).plot_roc_curve(X=None, y=y, ax=ax)
+    # Load the breast cancer wisconsin dataset
+    X, y              = load_wdbc()
+
+    for detector, param_grid in zip(detectors, param_grids):
+        # Fit the model
+        pipeline      = make_pipeline(scaler, detector)
+        random_search = RandomizedSearchCV(pipeline, param_grid).fit(X)
+
+        # Plot the ROC curve
+        random_search.best_estimator_.plot_roc_curve(X=None, y=y, ax=ax)
 
     plt.show()
 
@@ -123,7 +139,7 @@ References
     2017.
 
 .. [#goix16] Goix, N.,
-    "How to evaluate the quality of unsupervised anomaly detection algorithms?,"
+    "How to evaluate the quality of unsupervised anomaly detection algorithms?"
     In ICML Anomaly Detection Workshop, 2016.
 
 .. [#goldstein12] Goldstein, M., and Dengel, A.,
