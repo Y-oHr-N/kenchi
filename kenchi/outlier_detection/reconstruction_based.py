@@ -43,6 +43,15 @@ class PCA(BaseOutlierDetector):
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
 
+    data_max_ : array-like of shape (n_features,)
+        Per feature maximum seen in the data.
+
+    data_min_ : array-like of shape (n_features,)
+        Per feature minimum seen in the data.
+
+    data_volume_ : float
+        Volume of the hypercube enclosing the data.
+
     threshold_ : float
         Threshold.
 
@@ -114,11 +123,12 @@ class PCA(BaseOutlierDetector):
         self, contamination=0.1, iterated_power='auto', n_components=None,
         random_state=None, svd_solver='auto', tol=0., whiten=False
     ):
-        super().__init__(contamination=contamination)
+        super().__init__(
+            contamination=contamination, random_state=random_state
+        )
 
         self.iterated_power = iterated_power
         self.n_components   = n_components
-        self.random_state   = random_state
         self.svd_solver     = svd_solver
         self.tol            = tol
         self.whiten         = whiten

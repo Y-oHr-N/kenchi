@@ -44,6 +44,9 @@ class KNN(BaseOutlierDetector):
     p : int, default 2
         Power parameter for the Minkowski metric.
 
+    random_state : int or RandomState instance, default None
+        Seed of the pseudo random number generator.
+
     metric_params : dict, default None
         Additioal parameters passed to the requested metric.
 
@@ -51,6 +54,15 @@ class KNN(BaseOutlierDetector):
     ----------
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
+
+    data_max_ : array-like of shape (n_features,)
+        Per feature maximum seen in the data.
+
+    data_min_ : array-like of shape (n_features,)
+        Per feature minimum seen in the data.
+
+    data_volume_ : float
+        Volume of the hypercube enclosing the data.
 
     threshold_ : float
         Threshold.
@@ -91,9 +103,11 @@ class KNN(BaseOutlierDetector):
     def __init__(
         self, aggregate=False, algorithm='auto', contamination=0.1,
         leaf_size=30, metric='minkowski', novelty=False, n_jobs=1,
-        n_neighbors=20, p=2, metric_params=None
+        n_neighbors=20, p=2, random_state=None, metric_params=None
     ):
-        super().__init__(contamination=contamination)
+        super().__init__(
+            contamination=contamination, random_state=random_state
+        )
 
         self.aggregate     = aggregate
         self.algorithm     = algorithm
@@ -168,6 +182,15 @@ class OneTimeSampling(BaseOutlierDetector):
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
 
+    data_max_ : array-like of shape (n_features,)
+        Per feature maximum seen in the data.
+
+    data_min_ : array-like of shape (n_features,)
+        Per feature minimum seen in the data.
+
+    data_volume_ : float
+        Volume of the hypercube enclosing the data.
+
     threshold_ : float
         Threshold.
 
@@ -207,12 +230,13 @@ class OneTimeSampling(BaseOutlierDetector):
         self, contamination=0.1, metric='euclidean', novelty=False,
         n_subsamples=20, random_state=None, metric_params=None
     ):
-        super().__init__(contamination=contamination)
+        super().__init__(
+            contamination=contamination, random_state=random_state
+        )
 
         self.metric        = metric
         self.novelty       = novelty
         self.n_subsamples  = n_subsamples
-        self.random_state  = random_state
         self.metric_params = metric_params
 
     def _check_params(self):

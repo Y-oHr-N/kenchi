@@ -63,6 +63,15 @@ class GMM(BaseOutlierDetector):
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
 
+    data_max_ : array-like of shape (n_features,)
+        Per feature maximum seen in the data.
+
+    data_min_ : array-like of shape (n_features,)
+        Per feature minimum seen in the data.
+
+    data_volume_ : float
+        Volume of the hypercube enclosing the data.
+
     threshold_ : float
         Threshold.
 
@@ -142,7 +151,9 @@ class GMM(BaseOutlierDetector):
         precisions_init=None, random_state=None, reg_covar=1e-06, tol=1e-03,
         warm_start=False, weights_init=None
     ):
-        super().__init__(contamination=contamination)
+        super().__init__(
+            contamination=contamination, random_state=random_state
+        )
 
         self.covariance_type = covariance_type
         self.init_params     = init_params
@@ -151,7 +162,6 @@ class GMM(BaseOutlierDetector):
         self.n_components    = n_components
         self.n_init          = n_init
         self.precisions_init = precisions_init
-        self.random_state    = random_state
         self.reg_covar       = reg_covar
         self.tol             = tol
         self.warm_start      = warm_start
@@ -226,19 +236,25 @@ class HBOS(BaseOutlierDetector):
         If True, you can use predict, decision_function and anomaly_score on
         new unseen data and not on the training data.
 
+    random_state : int or RandomState instance, default None
+        Seed of the pseudo random number generator.
+
     Attributes
     ----------
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
-
-    threshold_ : float
-        Threshold.
 
     data_max_ : array-like of shape (n_features,)
         Per feature maximum seen in the data.
 
     data_min_ : array-like of shape (n_features,)
         Per feature minimum seen in the data.
+
+    data_volume_ : float
+        Volume of the hypercube enclosing the data.
+
+    threshold_ : float
+        Threshold.
 
     bin_edges_ : array-like
         Bin edges.
@@ -266,8 +282,13 @@ class HBOS(BaseOutlierDetector):
     array([ 1,  1,  1,  1,  1,  1,  1,  1,  1, -1])
     """
 
-    def __init__(self, bins='auto', contamination=0.1, novelty=False):
-        super().__init__(contamination=contamination)
+    def __init__(
+        self, bins='auto', contamination=0.1, novelty=False,
+        random_state=None
+    ):
+        super().__init__(
+            contamination=contamination, random_state=random_state
+        )
 
         self.bins    = bins
         self.novelty = novelty
@@ -275,13 +296,9 @@ class HBOS(BaseOutlierDetector):
     def _check_is_fitted(self):
         super()._check_is_fitted()
 
-        check_is_fitted(
-            self, ['data_max_', 'data_min_', 'bin_edges_', 'hist_']
-        )
+        check_is_fitted(self, ['bin_edges_', 'hist_'])
 
     def _fit(self, X):
-        self.data_min_  = np.min(X, axis=0)
-        self.data_max_  = np.max(X, axis=0)
         self.hist_      = np.empty(self._n_features, dtype=object)
         self.bin_edges_ = np.empty(self._n_features, dtype=object)
 
@@ -348,6 +365,9 @@ class KDE(BaseOutlierDetector):
     metric : str, default 'euclidean'
         Distance metric to use.
 
+    random_state : int or RandomState instance, default None
+        Seed of the pseudo random number generator.
+
     rtol : float, default 0.0
         Desired relative tolerance of the result.
 
@@ -358,6 +378,15 @@ class KDE(BaseOutlierDetector):
     ----------
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
+
+    data_max_ : array-like of shape (n_features,)
+        Per feature maximum seen in the data.
+
+    data_min_ : array-like of shape (n_features,)
+        Per feature minimum seen in the data.
+
+    data_volume_ : float
+        Volume of the hypercube enclosing the data.
 
     threshold_ : float
         Threshold.
@@ -385,9 +414,11 @@ class KDE(BaseOutlierDetector):
     def __init__(
         self, algorithm='auto', atol=0., bandwidth=1.,
         breadth_first=True, contamination=0.1, kernel='gaussian', leaf_size=40,
-        metric='euclidean', rtol=0., metric_params=None
+        metric='euclidean', random_state=None, rtol=0., metric_params=None
     ):
-        super().__init__(contamination=contamination)
+        super().__init__(
+            contamination=contamination, random_state=random_state
+        )
 
         self.algorithm     = algorithm
         self.atol          = atol
@@ -471,6 +502,9 @@ class SparseStructureLearning(BaseOutlierDetector):
     mode : str, default 'cd'
         Lasso solver to use: coordinate descent or LARS.
 
+    random_state : int or RandomState instance, default None
+        Seed of the pseudo random number generator.
+
     tol : float, default 1e-04
         Tolerance to declare convergence.
 
@@ -481,6 +515,15 @@ class SparseStructureLearning(BaseOutlierDetector):
     ----------
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
+
+    data_max_ : array-like of shape (n_features,)
+        Per feature maximum seen in the data.
+
+    data_min_ : array-like of shape (n_features,)
+        Per feature minimum seen in the data.
+
+    data_volume_ : float
+        Volume of the hypercube enclosing the data.
 
     threshold_ : float
         Threshold.
@@ -574,10 +617,12 @@ class SparseStructureLearning(BaseOutlierDetector):
 
     def __init__(
         self, alpha=0.01, assume_centered=False, contamination=0.1,
-        enet_tol=1e-04, max_iter=100, mode='cd', tol=1e-04,
-        apcluster_params=None
+        enet_tol=1e-04, max_iter=100, mode='cd', random_state=None,
+        tol=1e-04, apcluster_params=None
     ):
-        super().__init__(contamination=contamination)
+        super().__init__(
+            contamination=contamination, random_state=random_state
+        )
 
         self.alpha            = alpha
         self.apcluster_params = apcluster_params

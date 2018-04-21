@@ -48,6 +48,11 @@ class LOFTest(unittest.TestCase):
         with self.assertRaises(NotFittedError):
             self.sut.predict(self.X)
 
+    def test_score(self):
+        self.assertIsInstance(
+            self.sut.set_params(novelty=True).fit(self.X).score(), float
+        )
+
     def test_plot_anomaly_score(self):
         self.assertIsInstance(
             self.sut.fit(self.X).plot_anomaly_score(ax=self.ax),

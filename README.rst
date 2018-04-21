@@ -122,6 +122,10 @@ References
     `"UCI Machine Learning Repository," <https://archive.ics.uci.edu/ml>`_
     2017.
 
+.. [#goix16] Goix, N.,
+    "How to evaluate the quality of unsupervised anomaly detection algorithms?,"
+    In ICML Anomaly Detection Workshop, 2016.
+
 .. [#goldstein12] Goldstein, M., and Dengel, A.,
     "Histogram-based outlier score (HBOS): A fast unsupervised anomaly detection algorithm,"
     KI: Poster and Demo Track, pp. 59-63, 2012.
