@@ -141,6 +141,11 @@ class HBOSTest(unittest.TestCase):
         with self.assertRaises(NotFittedError):
             self.sut.predict(self.X_train)
 
+    def test_score(self):
+        self.assertIsInstance(
+            self.sut.set_params(novelty=True).fit(self.X_train).score(), float
+        )
+
     def test_plot_anomaly_score(self):
         self.assertIsInstance(
             self.sut.fit(self.X_train).plot_anomaly_score(ax=self.ax),
