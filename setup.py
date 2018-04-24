@@ -17,7 +17,7 @@ setup(
     url              = 'http://kenchi.readthedocs.io',
     description      = 'A set of python modules for anomaly detection',
     long_description = readme,
-    license          = 'MIT',
+    license          = 'new BSD',
     packages         = find_packages(exclude=['tests']),
     install_requires = requires,
     test_suite       = 'kenchi.tests.suite'
