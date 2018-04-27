@@ -2,9 +2,74 @@ import os
 
 import numpy as np
 from sklearn.datasets import load_breast_cancer
-from sklearn.utils import check_random_state, shuffle as _shuffle
+from sklearn.utils import check_random_state, shuffle as _shuffle, Bunch
 
-__all__ = ['load_wdbc', 'load_pendigits']
+__all__ = ['load_pendigits', 'load_pima', 'load_wdbc']
+
+
+def load_pima(return_X_y=False):
+    """Load and return the Pima Indians diabetes dataset.
+
+    ============= =======
+    anomaly class class 1
+    n_samples     768
+    n_outliers    268
+    n_features    8
+    contamination 0.349
+    ============= =======
+
+    Parameters
+    ----------
+    return_X_y : bool, False
+        If True, return `(data, target)` instead of a Bunch object.
+
+    Returns
+    -------
+    data : Bunch
+        Dictionary-like object.
+
+    References
+    ----------
+    .. [#dua17] Dua, D., and Karra Taniskidou, E.,
+        "UCI Machine Learning Repository,"
+        2017.
+
+    .. [#goix16] Goix, N.,
+        "How to evaluate the quality of unsupervised anomaly detection
+        algorithms?"
+        In ICML Anomaly Detection Workshop, 2016.
+
+    .. [#liu08] Liu, F. T., Ting, K. M., and Zhou, Z.-H.,
+        "Isolation forest,"
+        In Proceedings of ICDM, pp. 413-422, 2008.
+
+    .. [#sugiyama13] Sugiyama, M., and Borgwardt, K.,
+        "Rapid distance-based outlier detection via sampling,"
+        Advances in NIPS, pp. 467-475, 2013.
+
+    Examples
+    --------
+    >>> from kenchi.datasets import load_pima
+    >>> pima = load_pima()
+    >>> pima.data.shape
+    (768, 8)
+    """
+
+    module_path    = os.path.dirname(__file__)
+    filename       = os.path.join(module_path, 'data', 'pima.csv.gz')
+
+    data           = np.loadtxt(filename, delimiter=',', skiprows=1)
+    X              = data[:, :-1]
+    y              = data[:, -1].astype(int)
+
+    is_outlier     = y == 1
+    y[~is_outlier] = 1
+    y[is_outlier]  = -1
+
+    if return_X_y:
+        return X, y
+
+    return Bunch(data=X, target=y)
 
 
 def load_wdbc(contamination=0.0272, random_state=None, shuffle=True):
