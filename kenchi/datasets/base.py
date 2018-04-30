@@ -72,8 +72,13 @@ def load_pima(return_X_y=False):
     return Bunch(data=X, target=y)
 
 
-def load_wdbc(contamination=0.0272, random_state=None, shuffle=True):
+def load_wdbc(return_X_y=False, contamination=0.0272, random_state=None, shuffle=True):
     """Load and return the breast cancer wisconsin dataset.
+
+    Parameters
+    ----------
+    return_X_y : bool, default False
+        If True, return `(data, target)` instead of a Bunch object.
 
     contamination : float, default 0.0272
         Proportion of outliers in the data set.
@@ -86,11 +91,8 @@ def load_wdbc(contamination=0.0272, random_state=None, shuffle=True):
 
     Returns
     -------
-    X : array-like of shape (n_samples, n_features)
-        Data.
-
-    y : array-like of shape (n_samples,)
-        Return -1 (malignant) for outliers and +1 (benign) for inliers.
+    data : Bunch
+        Dictionary-like object.
 
     References
     ----------
@@ -127,11 +129,19 @@ def load_wdbc(contamination=0.0272, random_state=None, shuffle=True):
     if shuffle:
         X, y               = _shuffle(X, y, random_state=rnd)
 
-    return X, y
+    if return_X_y:
+        return X, y
+
+    return Bunch(data=X, target=y)
 
 
-def load_pendigits(contamination=0.002, random_state=None, shuffle=True):
+def load_pendigits(return_X_y=False, contamination=0.002, random_state=None, shuffle=True):
     """Load and return the pendigits dataset.
+
+    Parameters
+    ----------
+    return_X_y : bool, default False
+        If True, return `(data, target)` instead of a Bunch object.
 
     contamination : float, default 0.002
         Proportion of outliers in the data set.
@@ -144,11 +154,8 @@ def load_pendigits(contamination=0.002, random_state=None, shuffle=True):
 
     Returns
     -------
-    X : array-like of shape (n_samples, n_features)
-        Data.
-
-    y : array-like of shape (n_samples,)
-        Return -1 (digit 4) for outliers and +1 (otherwise) for inliers.
+    data : Bunch
+        Dictionary-like object.
 
     References
     ----------
@@ -191,4 +198,7 @@ def load_pendigits(contamination=0.002, random_state=None, shuffle=True):
     if shuffle:
         X, y               = _shuffle(X, y, random_state=rnd)
 
-    return X, y
+    if return_X_y:
+        return X, y
+
+    return Bunch(data=X, target=y)
