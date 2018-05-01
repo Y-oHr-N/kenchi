@@ -2,7 +2,7 @@ import os
 
 import numpy as np
 from sklearn.datasets import load_breast_cancer
-from sklearn.utils import check_random_state, shuffle as _shuffle, Bunch
+from sklearn.utils import check_random_state, Bunch
 
 __all__ = ['load_pendigits', 'load_pima', 'load_wdbc']
 
@@ -71,8 +71,10 @@ def load_pima(return_X_y=False):
     return Bunch(data=X, target=y)
 
 
-def load_wdbc(return_X_y=False, contamination=0.0272, random_state=None, shuffle=True):
-    """Load and return the breast cancer wisconsin dataset.
+def load_wdbc(random_state=None, return_X_y=False, subset='kriegel11'):
+    """Load and return the breast cancer Wisconsin dataset.
+
+    Goldstein's structure (subset='goldstein12') :
 
     =============== =========
     anomalous class malignant
@@ -82,19 +84,37 @@ def load_wdbc(return_X_y=False, contamination=0.0272, random_state=None, shuffle
     contamination   0.027
     =============== =========
 
+    Kriegel's structure (subset='kriegel11') :
+
+    =============== =========
+    anomalous class malignant
+    n_samples       367
+    n_outliers      10
+    n_features      30
+    contamination   0.027
+    =============== =========
+
+    Sugiyama's structure (subset='sugiyama13') :
+
+    =============== =========
+    anomalous class malignant
+    n_samples       569
+    n_outliers      212
+    n_features      30
+    contamination   0.373
+    =============== =========
+
     Parameters
     ----------
-    return_X_y : bool, default False
-        If True, return `(data, target)` instead of a Bunch object.
-
-    contamination : float, default 0.0272
-        Proportion of outliers in the data set.
-
     random_state : int, RandomState instance, default None
         Seed of the pseudo random number generator.
 
-    shuffle : bool, default True
-        If True, shuffle samples.
+    return_X_y : bool, default False
+        If True, return `(data, target)` instead of a Bunch object.
+
+    subset : str, default 'kriegel11'
+        Specify the structure. Valid options are
+        ['goldstein12'|'kriegel11'|'sugiyama13'].
 
     Returns
     -------
@@ -106,41 +126,58 @@ def load_wdbc(return_X_y=False, contamination=0.0272, random_state=None, shuffle
     .. [#dua17] Dua, D., and Karra Taniskidou, E.,
         "UCI Machine Learning Repository," 2017.
 
+    .. [#goldstein12] Goldstein, M., and Dengel, A.,
+        "Histogram-based outlier score (HBOS):
+        A fast unsupervised anomaly detection algorithm,"
+        KI: Poster and Demo Track, pp. 59-63, 2012.
+
     .. [#kriegel11] Kriegel, H.-P., Kroger, P., Schubert E., and Zimek, A.,
         "Interpreting and unifying outlier scores,"
         In Proceedings of SDM, pp. 13-24, 2011.
 
+    .. [#sugiyama13] Sugiyama, M., and Borgwardt, K.,
+        "Rapid distance-based outlier detection via sampling,"
+        Advances in NIPS, pp. 467-475, 2013.
+
     Examples
     --------
     >>> from kenchi.datasets import load_wdbc
-    >>> wdbc = load_wdbc()
+    >>> wdbc = load_wdbc(subset='goldstein12')
     >>> wdbc.data.shape
     (367, 30)
+    >>> wdbc = load_wdbc(subset='kriegel11')
+    >>> wdbc.data.shape
+    (367, 30)
+    >>> wdbc = load_wdbc(subset='sugiyama13')
+    >>> wdbc.data.shape
+    (569, 30)
     """
 
-    rnd                    = check_random_state(random_state)
-    X, y                   = load_breast_cancer(return_X_y=True)
+    X, y          = load_breast_cancer(return_X_y=True)
 
-    is_inlier              = y != 0
-    n_inliers              = np.sum(is_inlier)
-    X_inliers              = X[is_inlier]
-    y_inliers              = y[is_inlier]
+    n_outliers    = 10
+    is_outlier    = y == 0
+    idx_inlier    = np.flatnonzero(~is_outlier)
+    idx_outlier   = np.flatnonzero(is_outlier)
+    y[is_outlier] = -1
 
-    n_outliers             = int(
-        np.round(contamination / (1. - contamination) * n_inliers)
-    )
-    X_outliers             = X[~is_inlier]
-    y_outliers             = y[~is_inlier]
-    X_outliers, y_outliers = _shuffle(
-        X_outliers, y_outliers, n_samples=n_outliers, random_state=rnd
-    )
-    y_outliers[:]          = -1
+    if subset not in ['goldstein12', 'kriegel11', 'sugiyama13']:
+        raise ValueError(f'invalid subset: {subset}')
 
-    X                      = np.concatenate([X_outliers, X_inliers])
-    y                      = np.concatenate([y_outliers, y_inliers])
+    if subset == 'goldstein12':
+        s         = np.union1d(idx_inlier, idx_outlier[:n_outliers])
 
-    if shuffle:
-        X, y               = _shuffle(X, y, random_state=rnd)
+    if subset == 'kriegel11':
+        rnd       = check_random_state(random_state)
+        s         = np.union1d(
+            idx_inlier,
+            rnd.choice(idx_outlier, size=n_outliers, replace=False)
+        )
+
+    if subset != 'sugiyama13':
+        # downsample outliers
+        X         = X[s]
+        y         = y[s]
 
     if return_X_y:
         return X, y
@@ -148,8 +185,10 @@ def load_wdbc(return_X_y=False, contamination=0.0272, random_state=None, shuffle
     return Bunch(data=X, target=y)
 
 
-def load_pendigits(return_X_y=False, contamination=0.002, random_state=None, shuffle=True):
+def load_pendigits(random_state=None, return_X_y=False, subset='kriegel11'):
     """Load and return the pendigits dataset.
+
+    Kriegel's structure (subset='kriegel11') :
 
     =============== =======
     anomalous class class 4
@@ -159,19 +198,37 @@ def load_pendigits(return_X_y=False, contamination=0.002, random_state=None, shu
     contamination   0.002
     =============== =======
 
+    Goldstein's global structure (subset='goldstein12-global') :
+
+    =============== =================================
+    anomalous class classes 0, 1, 2, 3, 4, 5, 6, 7, 9
+    n_samples       809
+    n_outliers      90
+    n_features      16
+    contamination   0.111
+    =============== =================================
+
+    Goldstein's local structure (subset='goldstein12-local') :
+
+    =============== =======
+    anomalous class class 4
+    n_samples       6724
+    n_outliers      10
+    n_features      16
+    contamination   0.001
+    =============== =======
+
     Parameters
     ----------
-    return_X_y : bool, default False
-        If True, return `(data, target)` instead of a Bunch object.
-
-    contamination : float, default 0.002
-        Proportion of outliers in the data set.
-
     random_state : int, RandomState instance, default None
         Seed of the pseudo random number generator.
 
-    shuffle : bool, default True
-        If True, shuffle samples.
+    return_X_y : bool, default False
+        If True, return `(data, target)` instead of a Bunch object.
+
+    subset : str, default 'kriegel11'
+        Specify the structure. Valid options are
+        ['goldstein12-global'|'goldstein12-local'|'kriegel11'].
 
     Returns
     -------
@@ -183,6 +240,11 @@ def load_pendigits(return_X_y=False, contamination=0.002, random_state=None, shu
     .. [#dua17] Dua, D., and Karra Taniskidou, E.,
         "UCI Machine Learning Repository," 2017.
 
+    .. [#goldstein12] Goldstein, M., and Dengel, A.,
+        "Histogram-based outlier score (HBOS):
+        A fast unsupervised anomaly detection algorithm,"
+        KI: Poster and Demo Track, pp. 59-63, 2012.
+
     .. [#kriegel11] Kriegel, H.-P., Kroger, P., Schubert E., and Zimek, A.,
         "Interpreting and unifying outlier scores,"
         In Proceedings of SDM, pp. 13-24, 2011.
@@ -190,40 +252,84 @@ def load_pendigits(return_X_y=False, contamination=0.002, random_state=None, shu
     Examples
     --------
     >>> from kenchi.datasets import load_pendigits
-    >>> pendigits = load_pendigits()
+    >>> pendigits = load_pendigits(subset='kriegel11')
     >>> pendigits.data.shape
     (9868, 16)
+    >>> pendigits = load_pendigits(subset='goldstein12-global')
+    >>> pendigits.data.shape
+    (809, 16)
+    >>> pendigits = load_pendigits(subset='goldstein12-local')
+    >>> pendigits.data.shape
+    (6724, 16)
     """
 
-    rnd                    = check_random_state(random_state)
-    module_path            = os.path.dirname(__file__)
-    data                   = np.loadtxt(
-        os.path.join(module_path, 'data', 'pendigits.csv.gz'), delimiter=','
+    module_path              = os.path.dirname(__file__)
+
+    filename_tra             = os.path.join(
+        module_path, 'data', 'pendigits.tra.csv.gz'
     )
-    X                      = data[:, :-1]
-    y                      = data[:, -1].astype(np.int)
+    data_tra                 = np.loadtxt(filename_tra, delimiter=',')
+    X_tra                    = data_tra[:, :-1]
+    y_tra                    = data_tra[:, -1].astype(int)
 
-    is_inlier              = y != 4
-    n_inliers              = np.sum(is_inlier)
-    X_inliers              = X[is_inlier]
-    y_inliers              = y[is_inlier]
-    y_inliers[:]           = 1
+    if subset not in ['goldstein12-global', 'goldstein12-local', 'kriegel11']:
+        raise ValueError(f'invalid subset: {subset}')
 
-    n_outliers             = int(
-        np.round(contamination / (1. - contamination) * n_inliers)
-    )
-    X_outliers             = X[~is_inlier]
-    y_outliers             = y[~is_inlier]
-    X_outliers, y_outliers = _shuffle(
-        X_outliers, y_outliers, n_samples=n_outliers, random_state=rnd
-    )
-    y_outliers[:]          = -1
+    if subset == 'goldstein12-global':
+        X                    = X_tra
+        y                    = y_tra
 
-    X                      = np.concatenate([X_outliers, X_inliers])
-    y                      = np.concatenate([y_outliers, y_inliers])
+        n_outliers_per_class = 10
+        boolarr              = np.array([y == i for i in np.unique(y)])
+        is_outlier           = boolarr[8]
+        s                    = np.empty(0, dtype=int)
 
-    if shuffle:
-        X, y               = _shuffle(X, y, random_state=rnd)
+        for i, row in enumerate(boolarr):
+            idx              = np.flatnonzero(row)
+
+            if i == 8:
+                s            = np.union1d(s, idx)
+            else:
+                s            = np.union1d(s, idx[:n_outliers_per_class])
+
+    if subset == 'goldstein12-local':
+        X                    = X_tra
+        y                    = y_tra
+
+        n_outliers           = 10
+        is_outlier           = y == 4
+        idx_inlier           = np.flatnonzero(~is_outlier)
+        idx_outlier          = np.flatnonzero(is_outlier)
+
+        s                    = np.union1d(idx_inlier, idx_outlier[:n_outliers])
+
+    if subset == 'kriegel11':
+        filename_tes         = os.path.join(
+            module_path, 'data', 'pendigits.tes.csv.gz'
+        )
+        data_tes             = np.loadtxt(filename_tes, delimiter=',')
+        X_tes                = data_tes[:, :-1]
+        y_tes                = data_tes[:, -1].astype(int)
+        X                    = np.concatenate([X_tra, X_tes])
+        y                    = np.concatenate([y_tra, y_tes])
+
+        n_outliers           = 20
+        is_outlier           = y == 4
+        idx_inlier           = np.flatnonzero(~is_outlier)
+        idx_outlier          = np.flatnonzero(is_outlier)
+
+        rnd                  = check_random_state(random_state)
+        s                    = np.union1d(
+            idx_inlier,
+            rnd.choice(idx_outlier, size=n_outliers, replace=False)
+        )
+
+    y[~is_outlier]           = 1
+    y[is_outlier]            = -1
+
+    # downsample outliers
+    X                        = X[s]
+    y                        = y[s]
 
     if return_X_y:
         return X, y
