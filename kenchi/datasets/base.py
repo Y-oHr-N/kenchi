@@ -10,17 +10,17 @@ __all__ = ['load_pendigits', 'load_pima', 'load_wdbc']
 def load_pima(return_X_y=False):
     """Load and return the Pima Indians diabetes dataset.
 
-    ============= =======
-    anomaly class class 1
-    n_samples     768
-    n_outliers    268
-    n_features    8
-    contamination 0.349
-    ============= =======
+    =============== =======
+    anomalous class class 1
+    n_samples       768
+    n_outliers      268
+    n_features      8
+    contamination   0.349
+    =============== =======
 
     Parameters
     ----------
-    return_X_y : bool, False
+    return_X_y : bool, default False
         If True, return `(data, target)` instead of a Bunch object.
 
     Returns
@@ -31,8 +31,7 @@ def load_pima(return_X_y=False):
     References
     ----------
     .. [#dua17] Dua, D., and Karra Taniskidou, E.,
-        "UCI Machine Learning Repository,"
-        2017.
+        "UCI Machine Learning Repository," 2017.
 
     .. [#goix16] Goix, N.,
         "How to evaluate the quality of unsupervised anomaly detection
@@ -75,6 +74,14 @@ def load_pima(return_X_y=False):
 def load_wdbc(return_X_y=False, contamination=0.0272, random_state=None, shuffle=True):
     """Load and return the breast cancer wisconsin dataset.
 
+    =============== =========
+    anomalous class malignant
+    n_samples       367
+    n_outliers      10
+    n_features      30
+    contamination   0.027
+    =============== =========
+
     Parameters
     ----------
     return_X_y : bool, default False
@@ -97,12 +104,18 @@ def load_wdbc(return_X_y=False, contamination=0.0272, random_state=None, shuffle
     References
     ----------
     .. [#dua17] Dua, D., and Karra Taniskidou, E.,
-        "UCI Machine Learning Repository,"
-        2017.
+        "UCI Machine Learning Repository," 2017.
 
     .. [#kriegel11] Kriegel, H.-P., Kroger, P., Schubert E., and Zimek, A.,
         "Interpreting and unifying outlier scores,"
         In Proceedings of SDM, pp. 13-24, 2011.
+
+    Examples
+    --------
+    >>> from kenchi.datasets import load_wdbc
+    >>> wdbc = load_wdbc()
+    >>> wdbc.data.shape
+    (367, 30)
     """
 
     rnd                    = check_random_state(random_state)
@@ -138,6 +151,14 @@ def load_wdbc(return_X_y=False, contamination=0.0272, random_state=None, shuffle
 def load_pendigits(return_X_y=False, contamination=0.002, random_state=None, shuffle=True):
     """Load and return the pendigits dataset.
 
+    =============== =======
+    anomalous class class 4
+    n_samples       9868
+    n_outliers      20
+    n_features      16
+    contamination   0.002
+    =============== =======
+
     Parameters
     ----------
     return_X_y : bool, default False
@@ -160,12 +181,18 @@ def load_pendigits(return_X_y=False, contamination=0.002, random_state=None, shu
     References
     ----------
     .. [#dua17] Dua, D., and Karra Taniskidou, E.,
-        "UCI Machine Learning Repository,"
-        2017.
+        "UCI Machine Learning Repository," 2017.
 
     .. [#kriegel11] Kriegel, H.-P., Kroger, P., Schubert E., and Zimek, A.,
         "Interpreting and unifying outlier scores,"
         In Proceedings of SDM, pp. 13-24, 2011.
+
+    Examples
+    --------
+    >>> from kenchi.datasets import load_pendigits
+    >>> pendigits = load_pendigits()
+    >>> pendigits.data.shape
+    (9868, 16)
     """
 
     rnd                    = check_random_state(random_state)
