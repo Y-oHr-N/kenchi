@@ -4,7 +4,7 @@ import numpy as np
 from sklearn.datasets import load_breast_cancer
 from sklearn.utils import check_random_state, Bunch
 
-__all__   = ['load_pendigits', 'load_pima', 'load_wdbc']
+__all__   = ['load_pendigits', 'load_pima', 'load_wdbc', 'load_wilt']
 
 NEG_LABEL = -1
 POS_LABEL = 1
@@ -333,6 +333,77 @@ def load_pendigits(random_state=None, return_X_y=False, subset='kriegel11'):
     # downsample outliers
     X                        = X[s]
     y                        = y[s]
+
+    if return_X_y:
+        return X, y
+
+    return Bunch(data=X, target=y)
+
+
+def load_wilt(return_X_y=False):
+    """Load and return the wilt dataset.
+
+    =============== =========
+    anomalous class class 'w'
+    n_samples       4839
+    n_outliers      261
+    n_features      5
+    contamination   0.053
+    =============== =========
+
+    Parameters
+    ----------
+    return_X_y : bool, default False
+        If True, return `(data, target)` instead of a Bunch object.
+
+    Returns
+    -------
+    data : Bunch
+        Dictionary-like object.
+
+    References
+    ----------
+    .. [#dua17] Dua, D., and Karra Taniskidou, E.,
+        "UCI Machine Learning Repository," 2017.
+
+    .. [#goix16] Goix, N.,
+        "How to evaluate the quality of unsupervised anomaly detection
+        algorithms?"
+        In ICML Anomaly Detection Workshop, 2016.
+
+    Examples
+    --------
+    >>> from kenchi.datasets import load_wilt
+    >>> wilt = load_wilt()
+    >>> wilt.data.shape
+    (4839, 5)
+    """
+
+    module_path    = os.path.dirname(__file__)
+
+    filename_tra   = os.path.join(module_path, 'data', 'wilt.tra.csv.gz')
+    data_tra       = np.loadtxt(
+        filename_tra, delimiter=',', dtype=object, skiprows=1
+    )
+    X_tra          = data_tra[:, 1:]
+    y_tra          = data_tra[:, 0]
+
+    filename_tes   = os.path.join(module_path, 'data', 'wilt.tes.csv.gz')
+    data_tes       = np.loadtxt(
+        filename_tes, delimiter=',', dtype=object, skiprows=1
+    )
+    X_tes          = data_tes[:, 1:]
+    y_tes          = data_tes[:, 0]
+
+    X              = np.concatenate([X_tra, X_tes])
+    y              = np.concatenate([y_tra, y_tes])
+
+    is_outlier     = y == 'w'
+    y[~is_outlier] = POS_LABEL
+    y[is_outlier]  = NEG_LABEL
+
+    X              = X.astype(float)
+    y              = y.astype(int)
 
     if return_X_y:
         return X, y
