@@ -4,7 +4,10 @@ import numpy as np
 from sklearn.datasets import load_breast_cancer
 from sklearn.utils import check_random_state, Bunch
 
-__all__ = ['load_pendigits', 'load_pima', 'load_wdbc']
+__all__   = ['load_pendigits', 'load_pima', 'load_wdbc']
+
+NEG_LABEL = -1
+POS_LABEL = 1
 
 
 def load_pima(return_X_y=False):
@@ -55,15 +58,15 @@ def load_pima(return_X_y=False):
     """
 
     module_path    = os.path.dirname(__file__)
-    filename       = os.path.join(module_path, 'data', 'pima.csv.gz')
 
+    filename       = os.path.join(module_path, 'data', 'pima.csv.gz')
     data           = np.loadtxt(filename, delimiter=',', skiprows=1)
     X              = data[:, :-1]
     y              = data[:, -1].astype(int)
 
     is_outlier     = y == 1
-    y[~is_outlier] = 1
-    y[is_outlier]  = -1
+    y[~is_outlier] = POS_LABEL
+    y[is_outlier]  = NEG_LABEL
 
     if return_X_y:
         return X, y
@@ -159,7 +162,7 @@ def load_wdbc(random_state=None, return_X_y=False, subset='kriegel11'):
     is_outlier    = y == 0
     idx_inlier    = np.flatnonzero(~is_outlier)
     idx_outlier   = np.flatnonzero(is_outlier)
-    y[is_outlier] = -1
+    y[is_outlier] = NEG_LABEL
 
     if subset not in ['goldstein12', 'kriegel11', 'sugiyama13']:
         raise ValueError(f'invalid subset: {subset}')
@@ -324,8 +327,8 @@ def load_pendigits(random_state=None, return_X_y=False, subset='kriegel11'):
             rnd.choice(idx_outlier, size=n_outliers, replace=False)
         )
 
-    y[~is_outlier]           = 1
-    y[is_outlier]            = -1
+    y[~is_outlier]           = POS_LABEL
+    y[is_outlier]            = NEG_LABEL
 
     # downsample outliers
     X                        = X[s]
