@@ -2,6 +2,8 @@ import numpy as np
 from sklearn.datasets import make_blobs as _make_blobs
 from sklearn.utils import check_random_state, shuffle as _shuffle
 
+from .base import NEG_LABEL, POS_LABEL
+
 __all__ = ['make_blobs']
 
 
@@ -48,9 +50,13 @@ def make_blobs(
 
     References
     ----------
-    .. [#kriegel11] Kriegel, H.-P., Kroger, P., Schubert E., and Zimek, A.,
-        "Interpreting and unifying outlier scores,"
-        In Proceedings of SDM, pp. 13-24, 2011.
+    .. [#kriegel08] Kriegel, H.-P., Schubert, M., and Zimek, A.,
+        "Angle-based outlier detection in high-dimensional data,"
+        In Proceedings of SIGKDD, pp. 444-452, 2008.
+
+    .. [#sugiyama13] Sugiyama, M., and Borgwardt, K.,
+        "Rapid distance-based outlier detection via sampling,"
+        Advances in NIPS, pp. 467-475, 2013.
 
     Examples
     --------
@@ -62,10 +68,15 @@ def make_blobs(
     (10,)
     """
 
+    if not 0. < contamination <= 0.5:
+        raise ValueError(
+            f'contamination must be in (0.0, 0.5] but was {contamination}'
+        )
+
     rnd              = check_random_state(random_state)
 
     n_inliers        = int(np.round((1. - contamination) * n_samples))
-    X_inliers, _     = _make_blobs(
+    X_inlier, _      = _make_blobs(
         centers      = centers,
         center_box   = center_box,
         cluster_std  = cluster_std,
@@ -76,15 +87,16 @@ def make_blobs(
     )
 
     n_outliers       = n_samples - n_inliers
-    X_outliers       = rnd.uniform(
-        low          = np.min(X_inliers, axis=0),
-        high         = np.max(X_inliers, axis=0),
+    X_outlier        = rnd.uniform(
+        low          = np.min(X_inlier, axis=0),
+        high         = np.max(X_inlier, axis=0),
         size         = (n_outliers, n_features)
     )
 
-    X                = np.concatenate([X_outliers, X_inliers])
-    y                = np.ones(n_samples, dtype=np.int)
-    y[:n_outliers]   = -1
+    X                = np.concatenate([X_outlier, X_inlier])
+    y                = np.empty(n_samples, dtype=int)
+    y[:n_inliers]    = POS_LABEL
+    y[n_inliers:]    = NEG_LABEL
 
     if shuffle:
         X, y         = _shuffle(X, y, random_state=rnd)
