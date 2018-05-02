@@ -51,6 +51,15 @@ def make_blobs(
     .. [#kriegel11] Kriegel, H.-P., Kroger, P., Schubert E., and Zimek, A.,
         "Interpreting and unifying outlier scores,"
         In Proceedings of SDM, pp. 13-24, 2011.
+
+    Examples
+    --------
+    >>> from kenchi.datasets import make_blobs
+    >>> X, y = make_blobs(n_samples=10, n_features=2, contamination=0.1)
+    >>> X.shape
+    (10, 2)
+    >>> y.shape
+    (10,)
     """
 
     rnd              = check_random_state(random_state)
