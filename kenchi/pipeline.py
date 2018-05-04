@@ -59,6 +59,22 @@ class Pipeline(_Pipeline):
     def __iter__(self):
         return iter(self.named_steps)
 
+    @property
+    def data_max_(self):
+        return self._final_estimator.data_max_
+
+    @property
+    def data_min_(self):
+        return self._final_estimator.data_min_
+
+    @property
+    def data_volume_(self):
+        return self._final_estimator.data_volume_
+
+    @property
+    def n_features_(self):
+        return self._final_estimator.n_features_
+
     def _pre_transform(self, X):
         if X is None:
             return X
@@ -68,6 +84,25 @@ class Pipeline(_Pipeline):
                 X = transform.transform(X)
 
         return X
+
+    @if_delegate_has_method(delegate='_final_estimator')
+    def score_samples(self, X=None):
+        """Apply transforms, and compute the opposite of the anomaly score for
+        each sample with the final estimator.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features), default None
+            Data. If None, compute the opposite of the anomaly score for each
+            training sample.
+
+        Returns
+        -------
+        score_samples : array-like of shape (n_samples,)
+            Opposite of the anomaly score for each sample.
+        """
+
+        return -self.anomaly_score(X)
 
     @if_delegate_has_method(delegate='_final_estimator')
     def anomaly_score(self, X=None, normalize=False):

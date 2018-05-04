@@ -143,7 +143,7 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         self._check_params()
 
         X                   = self._check_array(X, estimator=self)
-        _, self._n_features = X.shape
+        _, self.n_features_ = X.shape
 
         self._fit(X)
 
@@ -249,7 +249,7 @@ class BaseOutlierDetector(BaseEstimator, ABC):
 
         if getattr(self, 'novelty', True):
             X             = self._check_array(
-                X, n_features=self._n_features, estimator=self
+                X, n_features=self.n_features_, estimator=self
             )
             anomaly_score = self._anomaly_score(X)
 

@@ -215,7 +215,7 @@ class GMM(BaseOutlierDetector):
 
         self._check_is_fitted()
 
-        X = self._check_array(X, n_features=self._n_features, estimator=self)
+        X = self._check_array(X, n_features=self.n_features_, estimator=self)
 
         return self._estimator.score(X)
 
@@ -290,8 +290,8 @@ class HBOS(BaseOutlierDetector):
         check_is_fitted(self, ['bin_edges_', 'hist_'])
 
     def _fit(self, X):
-        self.hist_      = np.empty(self._n_features, dtype=object)
-        self.bin_edges_ = np.empty(self._n_features, dtype=object)
+        self.hist_      = np.empty(self.n_features_, dtype=object)
+        self.bin_edges_ = np.empty(self.n_features_, dtype=object)
 
         for j, col in enumerate(X.T):
             self.hist_[j], self.bin_edges_[j] = np.histogram(
@@ -457,7 +457,7 @@ class KDE(BaseOutlierDetector):
 
         self._check_is_fitted()
 
-        X = self._check_array(X, n_features=self._n_features, estimator=self)
+        X = self._check_array(X, n_features=self.n_features_, estimator=self)
 
         return np.mean(self._estimator.score_samples(X))
 
@@ -658,7 +658,7 @@ class SparseStructureLearning(BaseOutlierDetector):
 
         self._check_is_fitted()
 
-        X = self._check_array(X, n_features=self._n_features, estimator=self)
+        X = self._check_array(X, n_features=self.n_features_, estimator=self)
 
         return 0.5 * np.log(
             2. * np.pi / np.diag(self.precision_)
@@ -684,7 +684,7 @@ class SparseStructureLearning(BaseOutlierDetector):
 
         self._check_is_fitted()
 
-        X = self._check_array(X, n_features=self._n_features, estimator=self)
+        X = self._check_array(X, n_features=self.n_features_, estimator=self)
 
         return self._estimator.score(X)
 
@@ -724,7 +724,7 @@ class SparseStructureLearning(BaseOutlierDetector):
         title       = (
             f'GGM ('
             f'n_clusters={n_clusters}, '
-            f'n_features={self._n_features}, '
+            f'n_features={self.n_features_}, '
             f'n_isolates={n_isolates}'
             f')'
         )

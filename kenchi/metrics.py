@@ -44,10 +44,10 @@ def mv_curve(det, X, n_uniform_samples=1000, random_state=None):
     def lebesgue_measure(offset, score_uniform_samples, data_volume):
         return np.mean(score_uniform_samples >= offset) * data_volume
 
-    if det._n_features > MAX_N_FEATURES:
+    if det.n_features_ > MAX_N_FEATURES:
         raise ValueError(
             f'X is expected to have {MAX_N_FEATURES} or less features '
-            f'but had {det._n_features} features'
+            f'but had {det.n_features_} features'
         )
 
     rnd                   = check_random_state(random_state)
@@ -55,7 +55,7 @@ def mv_curve(det, X, n_uniform_samples=1000, random_state=None):
     U                     = rnd.uniform(
         low               = det.data_min_,
         high              = det.data_max_,
-        size              = (n_uniform_samples, det._n_features)
+        size              = (n_uniform_samples, det.n_features_)
     )
 
     score_samples         = det.score_samples(X)
