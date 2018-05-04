@@ -46,9 +46,8 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         return np.prod(self.data_max_ - self.data_min_)
 
     @abstractmethod
-    def __init__(self, contamination=0.1, random_state=None):
+    def __init__(self, contamination=0.1):
         self.contamination = contamination
-        self.random_state  = random_state
 
     def _check_params(self):
         """Raise ValueError if parameters are not valid."""

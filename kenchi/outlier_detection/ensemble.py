@@ -96,15 +96,14 @@ class IForest(BaseOutlierDetector):
         self, bootstrap=False, contamination=0.1, max_features=1.0,
         max_samples='auto', n_estimators=100, n_jobs=1, random_state=None
     ):
-        super().__init__(
-            contamination=contamination, random_state=random_state
-        )
+        super().__init__(contamination=contamination)
 
         self.bootstrap    = bootstrap
         self.max_features = max_features
         self.max_samples  = max_samples
         self.n_estimators = n_estimators
         self.n_jobs       = n_jobs
+        self.random_state = random_state
 
     def _check_is_fitted(self):
         super()._check_is_fitted()

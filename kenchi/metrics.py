@@ -4,14 +4,14 @@ import numpy as np
 from sklearn.metrics import auc
 from sklearn.utils import check_random_state
 
-__all__        = ['negative_mv_auc_score', 'mv_curve']
+__all__ = ['negative_mv_auc_score', 'mv_curve']
 
 MAX_N_FEATURES = 8
 
 
 def negative_mv_auc_score(
-    detector, X=None, y=None, interval=(0.9, 0.999),
-    n_uniform_samples=10000
+    detector, X, y=None, interval=(0.9, 0.999),
+    n_uniform_samples=10000, random_state=None
 ):
     """Compute the opposite of the area under the Mass-Volume (MV) curve.
 
@@ -48,15 +48,18 @@ def negative_mv_auc_score(
         In ICML Anomaly Detection Workshop, 2016.
     """
 
-    mass, volume, _ = mv_curve(
-        detector, X, n_uniform_samples=n_uniform_samples
+    mass, volume, _       = mv_curve(
+        detector,
+        X,
+        n_uniform_samples = n_uniform_samples,
+        random_state      = random_state
     )
-    is_in_range     = (interval[0] <= mass) & (mass <= interval[1])
+    is_in_range           = (interval[0] <= mass) & (mass <= interval[1])
 
     return -auc(mass[is_in_range], volume[is_in_range], reorder=True)
 
 
-def mv_curve(detector, X=None, n_uniform_samples=10000):
+def mv_curve(detector, X=None, n_uniform_samples=10000, random_state=None):
     """Compute mass-volume pairs for different offsets.
 
     Parameters
@@ -70,6 +73,9 @@ def mv_curve(detector, X=None, n_uniform_samples=10000):
     n_uniform_samples : int, default 10000
         Number of samples which are drawn from the uniform distribution over
         the hypercube enclosing the data.
+
+    random_state : int or RandomState instance, default None
+        Seed of the pseudo random number generator.
 
     Returns
     -------
@@ -96,7 +102,7 @@ def mv_curve(detector, X=None, n_uniform_samples=10000):
             f'but had {detector._n_features} features'
         )
 
-    rnd                   = check_random_state(detector.random_state)
+    rnd                   = check_random_state(random_state)
     U                     = rnd.uniform(
         low               = detector.data_min_,
         high              = detector.data_max_,

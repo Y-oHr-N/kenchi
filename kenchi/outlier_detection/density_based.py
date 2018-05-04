@@ -39,9 +39,6 @@ class LOF(BaseOutlierDetector):
     p : int, default 2
         Power parameter for the Minkowski metric.
 
-    random_state : int or RandomState instance, default None
-        Seed of the pseudo random number generator.
-
     metric_params : dict, default None
         Additioal parameters passed to the requested metric.
 
@@ -109,11 +106,9 @@ class LOF(BaseOutlierDetector):
     def __init__(
         self, algorithm='auto', contamination=0.1, leaf_size=30,
         metric='minkowski', novelty=False, n_jobs=1, n_neighbors=20,
-        p=2, random_state=None, metric_params=None
+        p=2, metric_params=None
     ):
-        super().__init__(
-            contamination=contamination, random_state=random_state
-        )
+        super().__init__(contamination=contamination)
 
         self.algorithm     = algorithm
         self.leaf_size     = leaf_size
