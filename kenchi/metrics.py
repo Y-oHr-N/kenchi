@@ -58,8 +58,8 @@ def mv_curve(det, X, n_uniform_samples=1000, random_state=None):
         size              = (n_uniform_samples, det._n_features)
     )
 
-    score_samples         = -det.anomaly_score(X)
-    score_uniform_samples = -det.anomaly_score(U)
+    score_samples         = det.score_samples(X)
+    score_uniform_samples = det.score_samples(U)
 
     mass                  = np.linspace(0., 1.)
     offsets               = np.percentile(score_samples, 100. * (1. - mass))

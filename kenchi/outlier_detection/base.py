@@ -191,17 +191,34 @@ class BaseOutlierDetector(BaseEstimator, ABC):
 
         Returns
         -------
-        y_score : array-like of shape (n_samples,)
+        shiftted_score_samples : array-like of shape (n_samples,)
             Shifted opposite of the anomaly score for each sample. Negative
             scores represent outliers and positive scores represent inliers.
         """
 
-        anomaly_score = self.anomaly_score(X)
+        score_samples = self.score_samples(X)
 
         if threshold is None:
             threshold = self.threshold_
 
-        return threshold - anomaly_score
+        return score_samples + threshold
+
+    def score_samples(self, X=None):
+        """Compute the opposite of the anomaly score for each sample.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features), default None
+            Data. If None, compute the opposite of the anomaly score for each
+            training sample.
+
+        Returns
+        -------
+        score_samples : array-like of shape (n_samples,)
+            Opposite of the anomaly score for each sample.
+        """
+
+        return -self.anomaly_score(X)
 
     def anomaly_score(self, X=None, normalize=False):
         """Compute the anomaly score for each sample.
@@ -393,7 +410,7 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         """
 
         kwargs['y_true']  = y
-        kwargs['y_score'] = self.decision_function(X)
+        kwargs['y_score'] = self.score_samples(X)
 
         kwargs.setdefault('label', self.__class__.__name__)
 
