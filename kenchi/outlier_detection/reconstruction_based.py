@@ -184,6 +184,6 @@ class PCA(BaseOutlierDetector):
 
         self._check_is_fitted()
 
-        X = self._check_array(X, n_features=self._n_features, estimator=self)
+        X = self._check_array(X, n_features=self.n_features_, estimator=self)
 
         return self._estimator.score(X)
