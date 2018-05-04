@@ -4,59 +4,9 @@ import numpy as np
 from sklearn.metrics import auc
 from sklearn.utils import check_random_state
 
-__all__ = ['negative_mv_auc_score', 'mv_curve']
+__all__        = ['mv_curve', 'NegativeMVAUCScorer']
 
 MAX_N_FEATURES = 8
-
-
-def negative_mv_auc_score(
-    detector, X, y=None, interval=(0.9, 0.999),
-    n_uniform_samples=10000, random_state=None
-):
-    """Compute the opposite of the area under the Mass-Volume (MV) curve.
-
-    Parameters
-    ----------
-    detector : object
-        Detector.
-
-    X : array-like of shape (n_samples, n_features), default None
-        Data.
-
-    y : ignored
-
-    interval : tuple, default (0.9, 0.999)
-        Interval of probabilities.
-
-    n_uniform_samples : int, default 10000
-        Number of samples which are drawn from the uniform distribution over
-        the hypercube enclosing the data.
-
-    random_state : int or RandomState instance, default None
-        Seed of the pseudo random number generator.
-
-    Returns
-    -------
-    score : float
-        Opposite of the area under the MV curve.
-
-    References
-    ----------
-    .. [#goix16] Goix, N.,
-        "How to evaluate the quality of unsupervised anomaly detection
-        algorithms?,"
-        In ICML Anomaly Detection Workshop, 2016.
-    """
-
-    mass, volume, _       = mv_curve(
-        detector,
-        X,
-        n_uniform_samples = n_uniform_samples,
-        random_state      = random_state
-    )
-    is_in_range           = (interval[0] <= mass) & (mass <= interval[1])
-
-    return -auc(mass[is_in_range], volume[is_in_range], reorder=True)
 
 
 def mv_curve(detector, X=None, n_uniform_samples=10000, random_state=None):
@@ -118,3 +68,65 @@ def mv_curve(detector, X=None, n_uniform_samples=10000, random_state=None):
     )(offsets, score_uniform_samples, detector.data_volume_)
 
     return mass, volume, offsets
+
+
+class NegativeMVAUCScorer:
+    """Negative MV AUC scorer.
+
+    Parameters
+    ----------
+    interval : tuple, default (0.9, 0.999)
+        Interval of probabilities.
+
+    n_uniform_samples : int, default 1000
+        Number of samples which are drawn from the uniform distribution over
+        the hypercube enclosing the data.
+
+    random_state : int or RandomState instance, default None
+        Seed of the pseudo random number generator.
+
+    References
+    ----------
+    .. [#goix16] Goix, N.,
+        "How to evaluate the quality of unsupervised anomaly detection
+        algorithms?"
+        In ICML Anomaly Detection Workshop, 2016.
+    """
+
+    def __init__(
+        self, interval=(0.9, 0.999), n_uniform_samples=1000, random_state=None
+    ):
+        self.interval          = interval
+        self.n_uniform_samples = n_uniform_samples
+        self.random_state      = random_state
+
+    def __call__(self, det, X, y=None):
+        """Compute the opposite of the area under the Mass-Volume (MV) curve.
+
+        Parameters
+        ----------
+        det : object
+            Detector.
+
+        X : array-like of shape (n_samples, n_features)
+            Data.
+
+        y : ignored
+
+        Returns
+        -------
+        score : float
+            Opposite of the area under the MV curve.
+        """
+
+        mass, volume, _       = mv_curve(
+            det,
+            X,
+            n_uniform_samples = self.n_uniform_samples,
+            random_state      = self.random_state
+        )
+
+        is_in_range           = \
+            (self.interval[0] <= mass) & (mass <= self.interval[1])
+
+        return -auc(mass[is_in_range], volume[is_in_range], reorder=True)
