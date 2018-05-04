@@ -70,6 +70,25 @@ class Pipeline(_Pipeline):
         return X
 
     @if_delegate_has_method(delegate='_final_estimator')
+    def score_samples(self, X=None):
+        """Apply transforms, and compute the opposite of the anomaly score for
+        each sample with the final estimator.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features), default None
+            Data. If None, compute the opposite of the anomaly score for each
+            training sample.
+
+        Returns
+        -------
+        score_samples : array-like of shape (n_samples,)
+            Opposite of the anomaly score for each sample.
+        """
+
+        return -self.anomaly_score(X)
+
+    @if_delegate_has_method(delegate='_final_estimator')
     def anomaly_score(self, X=None, normalize=False):
         """Apply transforms, and compute the anomaly score for each sample with
         the final estimator.
