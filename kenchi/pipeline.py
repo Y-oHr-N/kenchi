@@ -59,6 +59,22 @@ class Pipeline(_Pipeline):
     def __iter__(self):
         return iter(self.named_steps)
 
+    @property
+    def data_max_(self):
+        return self._final_estimator.data_max_
+
+    @property
+    def data_min_(self):
+        return self._final_estimator.data_min_
+
+    @property
+    def data_volume_(self):
+        return self._final_estimator.data_volume_
+
+    @property
+    def n_features_(self):
+        return self._final_estimator.n_features_
+
     def _pre_transform(self, X):
         if X is None:
             return X
