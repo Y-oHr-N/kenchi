@@ -6,7 +6,7 @@ from sklearn.base import BaseEstimator
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
-from ..metrics import negative_mv_auc_score
+from ..metrics import NegativeMVAUCScorer
 from ..visualization import plot_anomaly_score, plot_roc_curve
 
 __all__ = ['is_outlier_detector', 'BaseOutlierDetector']
@@ -46,9 +46,8 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         return np.prod(self.data_max_ - self.data_min_)
 
     @abstractmethod
-    def __init__(self, contamination=0.1, random_state=None):
+    def __init__(self, contamination=0.1):
         self.contamination = contamination
-        self.random_state  = random_state
 
     def _check_params(self):
         """Raise ValueError if parameters are not valid."""
@@ -249,7 +248,7 @@ class BaseOutlierDetector(BaseEstimator, ABC):
 
     def score(
         self, X=None, y=None, interval=(0.9, 0.999),
-        n_uniform_samples=10000
+        n_uniform_samples=1000, random_state=None
     ):
         """Compute the opposite of the area under the Mass-Volume (MV) curve.
 
@@ -263,9 +262,12 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         interval : tuple, default (0.9, 0.999)
             Interval of probabilities.
 
-        n_uniform_samples : int, default 10000
+        n_uniform_samples : int, default 1000
             Number of samples which are drawn from the uniform distribution
             over the hypercube enclosing the data.
+
+        random_state : int or RandomState instance, default None
+            Seed of the pseudo random number generator.
 
         Returns
         -------
@@ -273,9 +275,13 @@ class BaseOutlierDetector(BaseEstimator, ABC):
             Opposite of the area under the MV curve.
         """
 
-        return negative_mv_auc_score(
-            self, X, interval=interval, n_uniform_samples=n_uniform_samples
+        scorer                = NegativeMVAUCScorer(
+            interval          = interval,
+            n_uniform_samples = n_uniform_samples,
+            random_state      = random_state
         )
+
+        return scorer(self, X)
 
     def plot_anomaly_score(self, X=None, normalize=False, **kwargs):
         """Plot the anomaly score for each sample.
