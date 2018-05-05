@@ -7,7 +7,7 @@ from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
 from ..metrics import NegativeMVAUCScorer
-from ..visualization import plot_anomaly_score, plot_roc_curve
+from ..plotting import plot_anomaly_score, plot_roc_curve
 
 __all__ = ['is_outlier_detector', 'BaseOutlierDetector']
 
