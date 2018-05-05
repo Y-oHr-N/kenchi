@@ -70,6 +70,19 @@ def plot_anomaly_score(
 
     Examples
     --------
+    >>> import matplotlib.pyplot as plt
+    >>> from kenchi.datasets import load_wdbc
+    >>> from kenchi.outlier_detection import MiniBatchKMeans
+    >>> from kenchi.plotting import plot_anomaly_score
+    >>> X, _ = load_wdbc(random_state=0, return_X_y=True)
+    >>> det = MiniBatchKMeans(random_state=0).fit(X)
+    >>> anomaly_score = det.anomaly_score(X, normalize=True)
+    >>> plot_anomaly_score(
+    ...     anomaly_score, threshold=det.threshold_, linestyle='', marker='.'
+    ... ) # doctest: +ELLIPSIS
+    <matplotlib.axes._subplots.AxesSubplot object at 0x...>
+    >>> plt.show()
+
     .. image:: images/plot_anomaly_score.png
     """
 
@@ -211,6 +224,17 @@ def plot_roc_curve(
 
     Examples
     --------
+    >>> import matplotlib.pyplot as plt
+    >>> from kenchi.datasets import load_wdbc
+    >>> from kenchi.outlier_detection import MiniBatchKMeans
+    >>> from kenchi.plotting import plot_roc_curve
+    >>> X, y = load_wdbc(random_state=0, return_X_y=True)
+    >>> det = MiniBatchKMeans(random_state=0).fit(X)
+    >>> score_samples = det.score_samples(X)
+    >>> plot_roc_curve(y, score_samples) # doctest: +ELLIPSIS
+    <matplotlib.axes._subplots.AxesSubplot object at 0x...>
+    >>> plt.show()
+
     .. image:: images/plot_roc_curve.png
     """
 
@@ -286,6 +310,16 @@ def plot_graphical_model(
 
     Examples
     --------
+    >>> import matplotlib.pyplot as plt
+    >>> import networkx as nx
+    >>> from kenchi.plotting import plot_graphical_model
+    >>> from sklearn.datasets import make_sparse_spd_matrix
+    >>> A = make_sparse_spd_matrix(dim=20, norm_diag=True, random_state=0)
+    >>> G = nx.from_numpy_matrix(A)
+    >>> plot_graphical_model(G, random_state=0) # doctest: +ELLIPSIS
+    <matplotlib.axes._subplots.AxesSubplot object at 0x...>
+    >>> plt.show()
+
     .. image:: images/plot_graphical_model.png
     """
 
@@ -357,6 +391,14 @@ def plot_partial_corrcoef(
 
     Examples
     --------
+    >>> import matplotlib.pyplot as plt
+    >>> from kenchi.plotting import plot_partial_corrcoef
+    >>> from sklearn.datasets import make_sparse_spd_matrix
+    >>> A = make_sparse_spd_matrix(dim=20, norm_diag=True, random_state=0)
+    >>> plot_partial_corrcoef(A) # doctest: +ELLIPSIS
+    <matplotlib.axes._subplots.AxesSubplot object at 0x...>
+    >>> plt.show()
+
     .. image:: images/plot_partial_corrcoef.png
     """
 

@@ -6,7 +6,7 @@ from sklearn.neighbors import KernelDensity
 from sklearn.utils.validation import check_is_fitted
 
 from .base import BaseOutlierDetector
-from ..visualization import plot_graphical_model, plot_partial_corrcoef
+from ..plotting import plot_graphical_model, plot_partial_corrcoef
 
 __all__ = ['GMM', 'HBOS', 'KDE', 'SparseStructureLearning']
 
