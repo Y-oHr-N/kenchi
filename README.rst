@@ -71,19 +71,20 @@ Examples
 
     import matplotlib.pyplot as plt
     import numpy as np
-    from kenchi.datasets import load_wdbc
+    from kenchi.datasets import load_pima
+    from kenchi.metrics import NegativeMVAUCScorer
     from kenchi.outlier_detection import *
     from kenchi.pipeline import make_pipeline
-    from scipy.stats import randint, uniform
+    from scipy.stats import randint
     from sklearn.model_selection import RandomizedSearchCV
     from sklearn.preprocessing import StandardScaler
 
     np.random.seed(0)
 
-    f, ax             = plt.subplots()
+    X, y              = load_pima(return_X_y=True)
+    _, n_features     = X.shape
 
     scaler            = StandardScaler()
-
     detectors         = [
         FastABOD(novelty=True, n_jobs=-1), MiniBatchKMeans(),
         LOF(novelty=True, n_jobs=-1),      KNN(novelty=True, n_jobs=-1),
@@ -92,29 +93,30 @@ Examples
     ]
 
     param_grids       = [
-        {'fastabod__n_neighbors':       randint(3, 21)},
+        {'fastabod__n_neighbors':       randint(3, 101)},
         {'minibatchkmeans__n_clusters': randint(1, 21)},
-        {'lof__n_neighbors':            randint(1, 21)},
-        {'knn__n_neighbors':            randint(1, 21)},
-        {'iforest__max_features':       uniform(0.05, 0.95)},
-        {'pca__n_components':           uniform(0.05, 0.95)},
-        {'kde__bandwidth':              10. ** np.arange(-2, 2, 0.05)}
+        {'lof__n_neighbors':            randint(1, 101)},
+        {'knn__n_neighbors':            randint(1, 101)},
+        {'iforest__max_features':       randint(1, n_features + 1)},
+        {'pca__n_components':           randint(1, n_features + 1)},
+        {'kde__bandwidth':              10. ** np.arange(-2, 2, 0.01)}
     ]
 
-    # Load the breast cancer wisconsin dataset
-    X, y              = load_wdbc()
+    scorer            = NegativeMVAUCScorer()
+
+    f, ax             = plt.subplots()
 
     for detector, param_grid in zip(detectors, param_grids):
-        # Fit the model
         pipeline      = make_pipeline(scaler, detector)
-        random_search = RandomizedSearchCV(pipeline, param_grid).fit(X)
+        random_search = RandomizedSearchCV(
+            pipeline, param_grid, scoring=scorer
+        ).fit(X)
 
-        # Plot the ROC curve
         random_search.best_estimator_.plot_roc_curve(X=None, y=y, ax=ax)
 
     plt.show()
 
-.. image:: https://raw.githubusercontent.com/Y-oHr-N/kenchi/master/docs/images/plot_roc_curve.png
+.. image:: https://raw.githubusercontent.com/Y-oHr-N/kenchi/master/docs/images/readme.png
 
 License
 -------
