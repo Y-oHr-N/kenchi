@@ -4,21 +4,22 @@ from kenchi import __version__
 
 
 with open('README.rst') as f:
-    readme           = f.read()
+    readme               = f.read()
 
 with open('requirements.txt') as f:
-    requires         = f.read().splitlines()
+    requires             = f.read().splitlines()
 
 setup(
-    name             = 'kenchi',
-    version          = __version__,
-    author           = 'Kon',
-    author_email     = 'kon.y.ohr.n@gmail.com',
-    url              = 'http://kenchi.readthedocs.io',
-    description      = 'A set of python modules for anomaly detection',
-    long_description = readme,
-    license          = 'new BSD',
-    packages         = find_packages(exclude=['tests']),
-    install_requires = requires,
-    test_suite       = 'kenchi.tests.suite'
+    name                 = 'kenchi',
+    version              = __version__,
+    author               = 'Kon',
+    author_email         = 'kon.y.ohr.n@gmail.com',
+    url                  = 'http://kenchi.readthedocs.io',
+    description          = 'A set of python modules for anomaly detection',
+    long_description     = readme,
+    license              = 'new BSD',
+    packages             = find_packages(exclude=['tests']),
+    include_package_data = True,
+    install_requires     = requires,
+    test_suite           = 'kenchi.tests.suite'
 )
