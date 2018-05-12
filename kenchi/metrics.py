@@ -7,7 +7,7 @@ __all__        = ['mv_curve', 'NegativeMVAUCScorer']
 MAX_N_FEATURES = 8
 
 
-def mv_curve(det, X_train, X_test, n_uniform_samples=1000, random_state=None):
+def mv_curve(det, X, U, data_volume):
     """Compute mass-volume pairs for different offsets.
 
     Parameters
@@ -15,18 +15,16 @@ def mv_curve(det, X_train, X_test, n_uniform_samples=1000, random_state=None):
     det : object
         Detector.
 
-    X_train : array-like of shape (n_samples, n_features)
-        Training data.
+    X : array-like of shape (n_samples, n_features)
+        Data.
 
-    X_test : array-like of shape (n_samples, n_features)
-        Test data.
+    U : array-like of shape (n_uniform_samples, n_features)
+        Samples which are drawn from the uniform distribution over the
+        hypercube enclosing the data.
 
-    n_uniform_samples : int, default 1000
-        Number of samples which are drawn from the uniform distribution over
-        the hypercube enclosing the data.
+    data_volume : float
+        Volume of the hypercube enclosing the data.
 
-    random_state : int or RandomState instance, default None
-        Seed of the pseudo random number generator.
 
     Returns
     -------
@@ -53,17 +51,7 @@ def mv_curve(det, X_train, X_test, n_uniform_samples=1000, random_state=None):
             f'but had {det.n_features_} features'
         )
 
-    rnd                   = check_random_state(random_state)
-
-    data_min              = np.min(X_train, axis=0)
-    data_max              = np.max(X_train, axis=0)
-    data_volume           = np.prod(data_max - data_min)
-
-    U                     = rnd.uniform(
-        low=data_min, high=data_max, size=(n_uniform_samples, det.n_features_)
-    )
-
-    score_samples         = det.score_samples(X_test)
+    score_samples         = det.score_samples(X)
     score_uniform_samples = det.score_samples(U)
 
     mass                  = np.linspace(0., 1.)
@@ -110,6 +98,16 @@ class NegativeMVAUCScorer:
         self.n_uniform_samples = n_uniform_samples
         self.random_state      = random_state
 
+        rnd                    = check_random_state(random_state)
+        _, n_features          = X.shape
+        data_max               = np.max(X, axis=0)
+        data_min               = np.min(X, axis=0)
+
+        self.data_volume       = np.prod(data_max - data_min)
+        self.U                 = rnd.uniform(
+            low=data_min, high=data_max, size=(n_uniform_samples, n_features)
+        )
+
     def __call__(self, det, X, y=None):
         """Compute the opposite of the area under the Mass-Volume (MV) curve.
 
@@ -129,15 +127,11 @@ class NegativeMVAUCScorer:
             Opposite of the area under the MV curve.
         """
 
-        mass, volume, _       = mv_curve(
-            det,
-            self.X,
-            X,
-            n_uniform_samples = self.n_uniform_samples,
-            random_state      = self.random_state
+        mass, volume, _  = mv_curve(
+            det, X, self.U, self.data_volume
         )
 
-        is_in_range           = \
+        is_in_range      = \
             (self.interval[0] <= mass) & (mass <= self.interval[1])
 
         return -auc(mass[is_in_range], volume[is_in_range], reorder=True)
