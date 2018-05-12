@@ -7,7 +7,7 @@ __all__        = ['mv_curve', 'NegativeMVAUCScorer']
 MAX_N_FEATURES = 8
 
 
-def mv_curve(det, X, U, data_volume):
+def mv_curve(det, X, U, data_volume, n_offsets=1000):
     """Compute mass-volume pairs for different offsets.
 
     Parameters
@@ -25,6 +25,8 @@ def mv_curve(det, X, U, data_volume):
     data_volume : float
         Volume of the hypercube enclosing the data.
 
+    n_offsets : int, default 1000
+        Number of offsets.
 
     Returns
     -------
@@ -54,7 +56,7 @@ def mv_curve(det, X, U, data_volume):
     score_samples         = det.score_samples(X)
     score_uniform_samples = det.score_samples(U)
 
-    mass                  = np.linspace(0., 1.)
+    mass                  = np.linspace(0., 1., n_offsets)
     offsets               = np.percentile(score_samples, 100. * (1. - mass))
     volume                = np.vectorize(
         lebesgue_measure, excluded=[1, 2]
@@ -74,6 +76,9 @@ class NegativeMVAUCScorer:
     interval : tuple, default (0.9, 0.999)
         Interval of probabilities.
 
+    n_offsets : int, default 1000
+        Number of offsets.
+
     n_uniform_samples : int, default 1000
         Number of samples which are drawn from the uniform distribution over
         the hypercube enclosing the data.
@@ -90,12 +95,13 @@ class NegativeMVAUCScorer:
     """
 
     def __init__(
-        self, X, interval=(0.9, 0.999), n_uniform_samples=1000,
-        random_state=None
+        self, X, interval=(0.9, 0.999), n_offsets=1000,
+        n_uniform_samples=1000, random_state=None
     ):
         self.X                 = X
         self.interval          = interval
         self.n_uniform_samples = n_uniform_samples
+        self.n_offsets         = n_offsets
         self.random_state      = random_state
 
         rnd                    = check_random_state(random_state)
@@ -128,7 +134,7 @@ class NegativeMVAUCScorer:
         """
 
         mass, volume, _  = mv_curve(
-            det, X, self.U, self.data_volume
+            det, X, self.U, self.data_volume, n_offsets=self.n_offsets
         )
 
         is_in_range      = \
