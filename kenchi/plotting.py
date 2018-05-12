@@ -4,10 +4,8 @@ from sklearn.metrics import auc, roc_curve
 from sklearn.utils.validation import check_array, check_symmetric, column_or_1d
 
 __all__ = [
-    'plot_anomaly_score',
-    'plot_roc_curve',
-    'plot_graphical_model',
-    'plot_partial_corrcoef'
+    'plot_anomaly_score', 'plot_graphical_model',
+    'plot_partial_corrcoef', 'plot_roc_curve'
 ]
 
 
@@ -104,18 +102,16 @@ def plot_anomaly_score(
         for ax_hist in ax.get_figure().get_axes():
             locator_hist = ax_hist.get_axes_locator()
 
-            if ax_hist == ax:
+            if ax_hist is ax:
                 continue
 
             if locator_hist is None:
                 continue
 
-            if locator_hist._axes_divider == locator._axes_divider:
+            if locator_hist._axes_divider is locator._axes_divider:
                 return ax_hist
 
     anomaly_score        = column_or_1d(anomaly_score)
-    n_samples,           = anomaly_score.shape
-    xlocs                = np.arange(n_samples)
 
     if ax is None:
         _, ax            = plt.subplots(figsize=figsize)
@@ -123,6 +119,7 @@ def plot_anomaly_score(
     ax.grid(True, linestyle=':')
 
     if xlim is None:
+        n_samples,       = anomaly_score.shape
         xlim             = (0., n_samples - 1.)
 
     ax.set_xlim(xlim)
@@ -141,7 +138,7 @@ def plot_anomaly_score(
     if ylabel is not None:
         ax.set_ylabel(ylabel)
 
-    line,                = ax.plot(xlocs, anomaly_score, **kwargs)
+    line,                = ax.plot(anomaly_score, **kwargs)
     color                = line.get_color()
 
     if threshold is not None:
@@ -173,7 +170,7 @@ def plot_anomaly_score(
         ax_hist.plot(kernel(ylocs), ylocs, color=color)
 
     if 'label' in kwargs:
-        ax.legend(loc='upper left')
+        ax.legend(loc='upper right')
 
     if filename is not None:
         ax.get_figure().savefig(filename)
