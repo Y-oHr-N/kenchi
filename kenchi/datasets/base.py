@@ -90,19 +90,19 @@ def load_pendigits(random_state=None, return_X_y=False, subset='kriegel11'):
 
     module_path              = os.path.dirname(__file__)
 
-    filename_tra             = os.path.join(
-        module_path, 'data', 'pendigits.tra.csv.gz'
+    filename_train           = os.path.join(
+        module_path, 'data', 'pendigits_train.csv.gz'
     )
-    data_tra                 = np.loadtxt(filename_tra, delimiter=',')
-    X_tra                    = data_tra[:, :-1]
-    y_tra                    = data_tra[:, -1]
+    data_train               = np.loadtxt(filename_train, delimiter=',')
+    X_train                  = data_train[:, :-1]
+    y_train                  = data_train[:, -1]
 
     if subset not in ['goldstein12-global', 'goldstein12-local', 'kriegel11']:
         raise ValueError(f'invalid subset: {subset}')
 
     if subset == 'goldstein12-global':
-        X                    = X_tra
-        y                    = y_tra
+        X                    = X_train
+        y                    = y_train
 
         n_outliers_per_class = 10
         boolarr              = np.array([y == i for i in np.unique(y)])
@@ -118,8 +118,8 @@ def load_pendigits(random_state=None, return_X_y=False, subset='kriegel11'):
                 s            = np.union1d(s, idx[:n_outliers_per_class])
 
     if subset == 'goldstein12-local':
-        X                    = X_tra
-        y                    = y_tra
+        X                    = X_train
+        y                    = y_train
 
         n_outliers           = 10
         is_outlier           = y == 4
@@ -129,15 +129,15 @@ def load_pendigits(random_state=None, return_X_y=False, subset='kriegel11'):
         s                    = np.union1d(idx_inlier, idx_outlier[:n_outliers])
 
     if subset == 'kriegel11':
-        filename_tes         = os.path.join(
-            module_path, 'data', 'pendigits.tes.csv.gz'
+        filename_test        = os.path.join(
+            module_path, 'data', 'pendigits_test.csv.gz'
         )
-        data_tes             = np.loadtxt(filename_tes, delimiter=',')
-        X_tes                = data_tes[:, :-1]
-        y_tes                = data_tes[:, -1]
+        data_test            = np.loadtxt(filename_test, delimiter=',')
+        X_test               = data_test[:, :-1]
+        y_test               = data_test[:, -1]
 
-        X                    = np.concatenate([X_tra, X_tes])
-        y                    = np.concatenate([y_tra, y_tes])
+        X                    = np.concatenate([X_train, X_test])
+        y                    = np.concatenate([y_train, y_test])
 
         n_outliers           = 20
         is_outlier           = y == 4
@@ -153,7 +153,7 @@ def load_pendigits(random_state=None, return_X_y=False, subset='kriegel11'):
     y[~is_outlier]           = POS_LABEL
     y[is_outlier]            = NEG_LABEL
 
-    # downsample outliers
+    # Downsample outliers
     X                        = X[s]
     y                        = y[s]
 
@@ -335,7 +335,7 @@ def load_wdbc(random_state=None, return_X_y=False, subset='kriegel11'):
         )
 
     if subset != 'sugiyama13':
-        # downsample outliers
+        # Downsample outliers
         X         = X[s]
         y         = y[s]
 
@@ -386,22 +386,22 @@ def load_wilt(return_X_y=False):
 
     module_path    = os.path.dirname(__file__)
 
-    filename_tra   = os.path.join(module_path, 'data', 'wilt.tra.csv.gz')
-    data_tra       = np.loadtxt(
-        filename_tra, delimiter=',', dtype=object, skiprows=1
+    filename_train = os.path.join(module_path, 'data', 'wilt_train.csv.gz')
+    data_train     = np.loadtxt(
+        filename_train, delimiter=',', dtype=object, skiprows=1
     )
-    X_tra          = data_tra[:, 1:]
-    y_tra          = data_tra[:, 0]
+    X_train        = data_train[:, 1:]
+    y_train        = data_train[:, 0]
 
-    filename_tes   = os.path.join(module_path, 'data', 'wilt.tes.csv.gz')
-    data_tes       = np.loadtxt(
-        filename_tes, delimiter=',', dtype=object, skiprows=1
+    filename_test  = os.path.join(module_path, 'data', 'wilt_test.csv.gz')
+    data_test      = np.loadtxt(
+        filename_test, delimiter=',', dtype=object, skiprows=1
     )
-    X_tes          = data_tes[:, 1:]
-    y_tes          = data_tes[:, 0]
+    X_test         = data_test[:, 1:]
+    y_test         = data_test[:, 0]
 
-    X              = np.concatenate([X_tra, X_tes])
-    y              = np.concatenate([y_tra, y_tes])
+    X              = np.concatenate([X_train, X_test])
+    y              = np.concatenate([y_train, y_test])
 
     is_outlier     = y == 'w'
     y[~is_outlier] = POS_LABEL
