@@ -290,6 +290,8 @@ class HBOS(BaseOutlierDetector):
         check_is_fitted(self, ['bin_edges_', 'hist_'])
 
     def _fit(self, X):
+        self.data_max_  = np.max(X, axis=0)
+        self.data_min_  = np.min(X, axis=0)
         self.hist_      = np.empty(self.n_features_, dtype=object)
         self.bin_edges_ = np.empty(self.n_features_, dtype=object)
 

@@ -7,7 +7,7 @@ __all__        = ['mv_curve', 'NegativeMVAUCScorer']
 MAX_N_FEATURES = 8
 
 
-def mv_curve(det, X, n_uniform_samples=1000, random_state=None):
+def mv_curve(det, X_train, X_test, n_uniform_samples=1000, random_state=None):
     """Compute mass-volume pairs for different offsets.
 
     Parameters
@@ -15,8 +15,11 @@ def mv_curve(det, X, n_uniform_samples=1000, random_state=None):
     det : object
         Detector.
 
-    X : array-like of shape (n_samples, n_features)
-        Data.
+    X_train : array-like of shape (n_samples, n_features)
+        Training data.
+
+    X_test : array-like of shape (n_samples, n_features)
+        Test data.
 
     n_uniform_samples : int, default 1000
         Number of samples which are drawn from the uniform distribution over
@@ -52,20 +55,22 @@ def mv_curve(det, X, n_uniform_samples=1000, random_state=None):
 
     rnd                   = check_random_state(random_state)
 
+    data_min              = np.min(X_train, axis=0)
+    data_max              = np.max(X_train, axis=0)
+    data_volume           = np.prod(data_max - data_min)
+
     U                     = rnd.uniform(
-        low               = det.data_min_,
-        high              = det.data_max_,
-        size              = (n_uniform_samples, det.n_features_)
+        low=data_min, high=data_max, size=(n_uniform_samples, det.n_features_)
     )
 
-    score_samples         = det.score_samples(X)
+    score_samples         = det.score_samples(X_test)
     score_uniform_samples = det.score_samples(U)
 
     mass                  = np.linspace(0., 1.)
     offsets               = np.percentile(score_samples, 100. * (1. - mass))
     volume                = np.vectorize(
         lebesgue_measure, excluded=[1, 2]
-    )(offsets, score_uniform_samples, det.data_volume_)
+    )(offsets, score_uniform_samples, data_volume)
 
     return mass, volume, offsets
 
@@ -75,6 +80,9 @@ class NegativeMVAUCScorer:
 
     Parameters
     ----------
+    X : array-like of shape (n_samples, n_features)
+        Training data.
+
     interval : tuple, default (0.9, 0.999)
         Interval of probabilities.
 
@@ -94,8 +102,10 @@ class NegativeMVAUCScorer:
     """
 
     def __init__(
-        self, interval=(0.9, 0.999), n_uniform_samples=1000, random_state=None
+        self, X, interval=(0.9, 0.999), n_uniform_samples=1000,
+        random_state=None
     ):
+        self.X                 = X
         self.interval          = interval
         self.n_uniform_samples = n_uniform_samples
         self.random_state      = random_state
@@ -121,6 +131,7 @@ class NegativeMVAUCScorer:
 
         mass, volume, _       = mv_curve(
             det,
+            self.X,
             X,
             n_uniform_samples = self.n_uniform_samples,
             random_state      = self.random_state
