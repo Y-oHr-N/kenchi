@@ -215,7 +215,7 @@ class GMM(BaseOutlierDetector):
 
         self._check_is_fitted()
 
-        X = self._check_array(X, n_features=self.n_features_, estimator=self)
+        X = self._check_array(X, estimator=self)
 
         return self._estimator.score(X)
 
@@ -457,7 +457,7 @@ class KDE(BaseOutlierDetector):
 
         self._check_is_fitted()
 
-        X = self._check_array(X, n_features=self.n_features_, estimator=self)
+        X = self._check_array(X, estimator=self)
 
         return np.mean(self._estimator.score_samples(X))
 
@@ -658,7 +658,7 @@ class SparseStructureLearning(BaseOutlierDetector):
 
         self._check_is_fitted()
 
-        X = self._check_array(X, n_features=self.n_features_, estimator=self)
+        X = self._check_array(X, estimator=self)
 
         return 0.5 * np.log(
             2. * np.pi / np.diag(self.precision_)
@@ -684,7 +684,7 @@ class SparseStructureLearning(BaseOutlierDetector):
 
         self._check_is_fitted()
 
-        X = self._check_array(X, n_features=self.n_features_, estimator=self)
+        X = self._check_array(X, estimator=self)
 
         return self._estimator.score(X)
 

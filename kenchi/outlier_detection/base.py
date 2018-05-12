@@ -58,16 +58,17 @@ class BaseOutlierDetector(BaseEstimator, ABC):
                 f'but was {self.contamination}'
             )
 
-    def _check_array(self, X, n_features=None, **kwargs):
+    def _check_array(self, X, **kwargs):
         """Raise ValueError if the array is not valid."""
 
-        X              = check_array(X, **kwargs)
-        _, _n_features = X.shape
+        X             = check_array(X, **kwargs)
+        _, n_features = X.shape
+        n_features_   = getattr(self, 'n_features_', n_features)
 
-        if n_features is not None and _n_features != n_features:
+        if n_features != n_features_:
             raise ValueError(
-                f'X is expected to have {n_features} features '
-                f'but had {_n_features} features'
+                f'X is expected to have {n_features_} features '
+                f'but had {n_features} features'
             )
 
         return X
@@ -248,9 +249,7 @@ class BaseOutlierDetector(BaseEstimator, ABC):
                 return anomaly_score
 
         if getattr(self, 'novelty', True):
-            X             = self._check_array(
-                X, n_features=self.n_features_, estimator=self
-            )
+            X             = self._check_array(X, estimator=self)
             anomaly_score = self._anomaly_score(X)
 
             if normalize:

@@ -161,6 +161,6 @@ class MiniBatchKMeans(BaseOutlierDetector):
 
         self._check_is_fitted()
 
-        X = self._check_array(X, n_features=self.n_features_, estimator=self)
+        X = self._check_array(X, estimator=self)
 
         return self._estimator.score(X)
