@@ -1,26 +1,23 @@
 import numpy as np
 from sklearn.metrics import auc
-from sklearn.utils import check_random_state
+from sklearn.utils import check_array, check_random_state, column_or_1d
 
-__all__        = ['mv_curve', 'NegativeMVAUCScorer']
-
-MAX_N_FEATURES = 8
+__all__ = ['mv_curve', 'NegativeMVAUCScorer']
 
 
-def mv_curve(det, X, U, data_volume, n_offsets=1000):
+def mv_curve(
+    score_samples, score_uniform_samples, data_volume, n_offsets=1000
+):
     """Compute mass-volume pairs for different offsets.
 
     Parameters
     ----------
-    det : object
-        Detector.
+    score_samples : array-like of shape (n_samples,)
+        Opposite of the anomaly score for each sample.
 
-    X : array-like of shape (n_samples, n_features)
-        Data.
-
-    U : array-like of shape (n_uniform_samples, n_features)
-        Samples which are drawn from the uniform distribution over the
-        hypercube enclosing the data.
+    score_uniform_samples : array-like of shape (n_uniform_samples,)
+        Opposite of the anomaly score for each sample which is drawn from the
+        uniform distribution over the hypercube enclosing the data.
 
     data_volume : float
         Volume of the hypercube enclosing the data.
@@ -47,14 +44,8 @@ def mv_curve(det, X, U, data_volume, n_offsets=1000):
     def lebesgue_measure(offset, score_uniform_samples, data_volume):
         return np.mean(score_uniform_samples >= offset) * data_volume
 
-    if det.n_features_ > MAX_N_FEATURES:
-        raise ValueError(
-            f'X is expected to have {MAX_N_FEATURES} or less features '
-            f'but had {det.n_features_} features'
-        )
-
-    score_samples         = det.score_samples(X)
-    score_uniform_samples = det.score_samples(U)
+    score_samples         = column_or_1d(score_samples)
+    score_uniform_samples = column_or_1d(score_uniform_samples)
 
     mass                  = np.linspace(0., 1., n_offsets)
     offsets               = np.percentile(score_samples, 100. * (1. - mass))
@@ -94,23 +85,23 @@ class NegativeMVAUCScorer:
         In ICML Anomaly Detection Workshop, 2016.
     """
 
+    max_n_features = 8
+
     def __init__(
         self, X, interval=(0.9, 0.999), n_offsets=1000,
         n_uniform_samples=1000, random_state=None
     ):
-        self.X                 = X
-        self.interval          = interval
-        self.n_uniform_samples = n_uniform_samples
-        self.n_offsets         = n_offsets
-        self.random_state      = random_state
+        self.interval    = interval
+        self.n_offsets   = n_offsets
 
-        rnd                    = check_random_state(random_state)
-        _, n_features          = X.shape
-        data_max               = np.max(X, axis=0)
-        data_min               = np.min(X, axis=0)
+        rnd              = check_random_state(random_state)
+        X                = self._check_array(X)
+        _, n_features    = X.shape
+        data_max         = np.max(X, axis=0)
+        data_min         = np.min(X, axis=0)
 
-        self.data_volume       = np.prod(data_max - data_min)
-        self.U                 = rnd.uniform(
+        self.data_volume = np.prod(data_max - data_min)
+        self.U           = rnd.uniform(
             low=data_min, high=data_max, size=(n_uniform_samples, n_features)
         )
 
@@ -133,11 +124,31 @@ class NegativeMVAUCScorer:
             Opposite of the area under the MV curve.
         """
 
-        mass, volume, _  = mv_curve(
-            det, X, self.U, self.data_volume, n_offsets=self.n_offsets
+        score_samples         = det.score_samples(X)
+        score_uniform_samples = det.score_samples(self.U)
+
+        mass, volume, _       = mv_curve(
+            score_samples,
+            score_uniform_samples,
+            self.data_volume,
+            n_offsets         = self.n_offsets
         )
 
-        is_in_range      = \
+        is_in_range           = \
             (self.interval[0] <= mass) & (mass <= self.interval[1])
 
         return -auc(mass[is_in_range], volume[is_in_range], reorder=True)
+
+    def _check_array(self, X, **kwargs):
+        """Raise ValueError if the array is not valid."""
+
+        X             = check_array(X, **kwargs)
+        _, n_features = X.shape
+
+        if n_features > self.max_n_features:
+            raise ValueError(
+                f'X is expected to have {self.max_n_features} or less '
+                f'features but had {n_features} features'
+            )
+
+        return X
