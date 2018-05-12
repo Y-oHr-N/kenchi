@@ -41,10 +41,6 @@ class BaseOutlierDetector(BaseEstimator, ABC):
 
     _estimator_type = 'outlier_detector'
 
-    @property
-    def data_volume_(self):
-        return np.prod(self.data_max_ - self.data_min_)
-
     @abstractmethod
     def __init__(self, contamination=0.1):
         self.contamination = contamination
@@ -148,11 +144,10 @@ class BaseOutlierDetector(BaseEstimator, ABC):
 
         self._fit(X)
 
-        self.data_min_      = np.min(X, axis=0)
-        self.data_max_      = np.max(X, axis=0)
         self.anomaly_score_ = self._anomaly_score(X)
         self.threshold_     = self._get_threshold()
         self._rv            = self._get_rv()
+        self.scorer_        = NegativeMVAUCScorer(X)
 
         return self
 
@@ -262,10 +257,7 @@ class BaseOutlierDetector(BaseEstimator, ABC):
             'novelty=True if you want to predict on new unseen data'
         )
 
-    def score(
-        self, X=None, y=None, interval=(0.9, 0.999),
-        n_uniform_samples=1000, random_state=None
-    ):
+    def score(self, X=None, y=None):
         """Compute the opposite of the area under the Mass-Volume (MV) curve.
 
         Parameters
@@ -275,29 +267,13 @@ class BaseOutlierDetector(BaseEstimator, ABC):
 
         y : ignored
 
-        interval : tuple, default (0.9, 0.999)
-            Interval of probabilities.
-
-        n_uniform_samples : int, default 1000
-            Number of samples which are drawn from the uniform distribution
-            over the hypercube enclosing the data.
-
-        random_state : int or RandomState instance, default None
-            Seed of the pseudo random number generator.
-
         Returns
         -------
         score : float
             Opposite of the area under the MV curve.
         """
 
-        scorer                = NegativeMVAUCScorer(
-            interval          = interval,
-            n_uniform_samples = n_uniform_samples,
-            random_state      = random_state
-        )
-
-        return scorer(self, X)
+        return self.scorer_(self, X)
 
     def plot_anomaly_score(self, X=None, normalize=False, **kwargs):
         """Plot the anomaly score for each sample.
