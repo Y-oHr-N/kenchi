@@ -1,3 +1,4 @@
+import doctest
 import unittest
 
 import matplotlib
@@ -5,19 +6,25 @@ import matplotlib.axes
 from sklearn.exceptions import NotFittedError
 from sklearn.preprocessing import StandardScaler
 
+from kenchi import pipeline
 from kenchi.datasets import make_blobs
 from kenchi.outlier_detection import SparseStructureLearning
-from kenchi.pipeline import Pipeline
 
 matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
 
 
+def load_tests(loader, tests, ignore):
+    tests.addTests(doctest.DocTestSuite(pipeline))
+
+    return tests
+
+
 class PipelineTest(unittest.TestCase):
     def setUp(self):
         self.X, self.y = make_blobs(centers=1, random_state=1)
-        self.sut       = Pipeline([
+        self.sut       = pipeline.Pipeline([
             ('standardize', StandardScaler()),
             ('detect',      SparseStructureLearning(assume_centered=True))
         ])
