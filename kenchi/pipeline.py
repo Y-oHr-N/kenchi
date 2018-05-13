@@ -59,22 +59,6 @@ class Pipeline(_Pipeline):
     def __iter__(self):
         return iter(self.named_steps)
 
-    @property
-    def data_max_(self):
-        return self._final_estimator.data_max_
-
-    @property
-    def data_min_(self):
-        return self._final_estimator.data_min_
-
-    @property
-    def data_volume_(self):
-        return self._final_estimator.data_volume_
-
-    @property
-    def n_features_(self):
-        return self._final_estimator.n_features_
-
     def _pre_transform(self, X):
         if X is None:
             return X
@@ -105,7 +89,7 @@ class Pipeline(_Pipeline):
         return -self.anomaly_score(X)
 
     @if_delegate_has_method(delegate='_final_estimator')
-    def anomaly_score(self, X=None, normalize=False):
+    def anomaly_score(self, X=None, **kwargs):
         """Apply transforms, and compute the anomaly score for each sample with
         the final estimator.
 
@@ -123,9 +107,9 @@ class Pipeline(_Pipeline):
             Anomaly score for each sample.
         """
 
-        return self._final_estimator.anomaly_score(
-            self._pre_transform(X), normalize=normalize
-        )
+        X = self._pre_transform(X)
+
+        return self._final_estimator.anomaly_score(X, **kwargs)
 
     @if_delegate_has_method(delegate='_final_estimator')
     def featurewise_anomaly_score(self, X):
@@ -143,12 +127,12 @@ class Pipeline(_Pipeline):
             Feature-wise anomaly scores for each sample.
         """
 
-        return self._final_estimator.featurewise_anomaly_score(
-            self._pre_transform(X)
-        )
+        X = self._pre_transform(X)
+
+        return self._final_estimator.featurewise_anomaly_score(X)
 
     @if_delegate_has_method(delegate='_final_estimator')
-    def plot_anomaly_score(self, X=None, normalize=False, **kwargs):
+    def plot_anomaly_score(self, X=None, **kwargs):
         """Apply transoforms, and plot the anomaly score for each sample with
         the final estimator.
 
@@ -202,9 +186,9 @@ class Pipeline(_Pipeline):
             Axes on which the plot was drawn.
         """
 
-        return self._final_estimator.plot_anomaly_score(
-            self._pre_transform(X), normalize=normalize, **kwargs
-        )
+        X = self._pre_transform(X)
+
+        return self._final_estimator.plot_anomaly_score(X, **kwargs)
 
     @if_delegate_has_method(delegate='_final_estimator')
     def plot_roc_curve(self, X, y, **kwargs):
@@ -246,9 +230,9 @@ class Pipeline(_Pipeline):
             Axes on which the plot was drawn.
         """
 
-        return self._final_estimator.plot_roc_curve(
-            self._pre_transform(X), y, **kwargs
-        )
+        X = self._pre_transform(X)
+
+        return self._final_estimator.plot_roc_curve(X, y, **kwargs)
 
     @property
     def plot_graphical_model(self):
