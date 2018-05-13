@@ -18,6 +18,15 @@ def make_pipeline(*steps):
     Returns
     -------
     p : Pipeline
+
+    Examples
+    --------
+    >>> from kenchi.outlier_detection import MiniBatchKMeans
+    >>> from kenchi.pipeline import make_pipeline
+    >>> from sklearn.preprocessing import StandardScaler
+    >>> scaler = StandardScaler()
+    >>> det = MiniBatchKMeans()
+    >>> pipeline = make_pipeline(scaler, det)
     """
 
     return Pipeline(_name_estimators(steps))
@@ -48,6 +57,22 @@ class Pipeline(_Pipeline):
     named_steps : dict
         Read-only attribute to access any step parameter by user given name.
         Keys are step names and values are steps parameters.
+
+    Examples
+    --------
+    >>> import numpy as np
+    >>> from kenchi.outlier_detection import MiniBatchKMeans
+    >>> from kenchi.pipeline import Pipeline
+    >>> from sklearn.preprocessing import StandardScaler
+    >>> X = np.array([
+    ...     [0., 0.], [1., 1.], [2., 0.], [3., -1.], [4., 0.],
+    ...     [5., 1.], [6., 0.], [7., -1.], [8., 0.], [1000., 1.]
+    ... ])
+    >>> det = MiniBatchKMeans(n_clusters=1, random_state=0)
+    >>> scaler = StandardScaler()
+    >>> pipeline = Pipeline([('scaler', scaler), ('det', det)])
+    >>> pipeline.fit_predict(X)
+    array([ 1,  1,  1,  1,  1,  1,  1,  1,  1, -1])
     """
 
     def __len__(self):
