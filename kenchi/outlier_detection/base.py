@@ -7,6 +7,7 @@ from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
 from ..plotting import plot_anomaly_score, plot_roc_curve
+from ..utils import check_contamination
 
 __all__ = ['is_outlier_detector', 'BaseOutlierDetector']
 
@@ -47,11 +48,7 @@ class BaseOutlierDetector(BaseEstimator, ABC):
     def _check_params(self):
         """Raise ValueError if parameters are not valid."""
 
-        if not 0. < self.contamination <= 0.5:
-            raise ValueError(
-                f'contamination must be in (0.0, 0.5] '
-                f'but was {self.contamination}'
-            )
+        check_contamination(self.contamination)
 
     def _check_array(self, X, **kwargs):
         """Raise ValueError if the array is not valid."""

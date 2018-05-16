@@ -3,6 +3,7 @@ from sklearn.datasets import make_blobs as _make_blobs
 from sklearn.utils import check_random_state, shuffle as _shuffle
 
 from .base import NEG_LABEL, POS_LABEL
+from ..utils import check_contamination
 
 __all__ = ['make_blobs']
 
@@ -68,10 +69,7 @@ def make_blobs(
     (10,)
     """
 
-    if not 0. < contamination <= 0.5:
-        raise ValueError(
-            f'contamination must be in (0.0, 0.5] but was {contamination}'
-        )
+    check_contamination(contamination)
 
     rnd              = check_random_state(random_state)
 
