@@ -2,17 +2,12 @@ import doctest
 import unittest
 
 import matplotlib
-import matplotlib.axes
-import numpy as np
-from sklearn.exceptions import NotFittedError
-from sklearn.utils.estimator_checks import check_estimator
-
-from kenchi.datasets import make_blobs
-from kenchi.outlier_detection import ensemble
 
 matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
+from kenchi.outlier_detection import ensemble
+from kenchi.tests.common_tests import OutlierDetectorTestMixin
 
 
 def load_tests(loader, tests, ignore):
@@ -21,40 +16,12 @@ def load_tests(loader, tests, ignore):
     return tests
 
 
-class IForestTest(unittest.TestCase):
+class IForestTest(unittest.TestCase, OutlierDetectorTestMixin):
     def setUp(self):
-        self.X, self.y = make_blobs(random_state=0)
-        self.sut       = ensemble.IForest(random_state=0)
-        _, self.ax     = plt.subplots()
+        self.X_train, self.X_test, self.y_train, self.y_test = \
+            self.prepare_data()
+
+        self.sut = ensemble.IForest(random_state=0)
 
     def tearDown(self):
         plt.close()
-
-    def test_check_estimator(self):
-        self.assertIsNone(check_estimator(self.sut))
-
-    def test_fit(self):
-        self.assertIsInstance(self.sut.fit(self.X), ensemble.IForest)
-
-    def test_fit_predict(self):
-        self.assertIsInstance(self.sut.fit_predict(self.X), np.ndarray)
-
-    def test_anomaly_score_notfitted(self):
-        with self.assertRaises(NotFittedError):
-            self.sut.anomaly_score(self.X)
-
-    def test_predict_notfitted(self):
-        with self.assertRaises(NotFittedError):
-            self.sut.predict(self.X)
-
-    def test_plot_anomaly_score(self):
-        self.assertIsInstance(
-            self.sut.fit(self.X).plot_anomaly_score(ax=self.ax),
-            matplotlib.axes.Axes
-        )
-
-    def test_plot_roc_curve(self):
-        self.assertIsInstance(
-            self.sut.fit(self.X).plot_roc_curve(self.X, self.y, ax=self.ax),
-            matplotlib.axes.Axes
-        )
