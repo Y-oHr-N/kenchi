@@ -158,11 +158,13 @@ def load_pendigits(random_state=None, return_X_y=False, subset='kriegel11'):
     y                        = y[s]
 
     y                        = y.astype(int)
+    _, n_features            = X.shape
+    feature_names            = np.arange(n_features)
 
     if return_X_y:
         return X, y
 
-    return Bunch(data=X, target=y)
+    return Bunch(data=X, target=y, feature_names=feature_names)
 
 
 def load_pima(return_X_y=False):
@@ -224,11 +226,15 @@ def load_pima(return_X_y=False):
     y[is_outlier]  = NEG_LABEL
 
     y              = y.astype(int)
+    feature_names  = np.array([
+        'Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness',
+        'Insulin', 'BMI', 'DiabetesPedigreeFunction', 'Age',
+    ])
 
     if return_X_y:
         return X, y
 
-    return Bunch(data=X, target=y)
+    return Bunch(data=X, target=y, feature_names=feature_names)
 
 
 def load_wdbc(random_state=None, return_X_y=False, subset='kriegel11'):
@@ -313,7 +319,10 @@ def load_wdbc(random_state=None, return_X_y=False, subset='kriegel11'):
     (569, 30)
     """
 
-    X, y          = load_breast_cancer(return_X_y=True)
+    wdbc          = load_breast_cancer()
+    X             = wdbc.data
+    y             = wdbc.target
+    feature_names = wdbc.feature_names
 
     n_outliers    = 10
     is_outlier    = y == 0
@@ -342,7 +351,7 @@ def load_wdbc(random_state=None, return_X_y=False, subset='kriegel11'):
     if return_X_y:
         return X, y
 
-    return Bunch(data=X, target=y)
+    return Bunch(data=X, target=y, feature_names=feature_names)
 
 
 def load_wilt(return_X_y=False):
@@ -409,8 +418,12 @@ def load_wilt(return_X_y=False):
 
     X              = X.astype(float)
     y              = y.astype(int)
+    feature_names  = np.array([
+        'GLCM_pan', 'Mean_Green', 'Mean_Red', 'Mean_NIR',
+        'SD_pan'
+    ])
 
     if return_X_y:
         return X, y
 
-    return Bunch(data=X, target=y)
+    return Bunch(data=X, target=y, feature_names=feature_names)
