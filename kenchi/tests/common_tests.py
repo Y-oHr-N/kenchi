@@ -4,6 +4,7 @@ from matplotlib.axes import Axes
 from kenchi.datasets import make_blobs
 from sklearn.base import BaseEstimator
 from sklearn.exceptions import NotFittedError
+from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import train_test_split
 from sklearn.utils.estimator_checks import check_estimator
 
@@ -83,6 +84,17 @@ class OutlierDetectorTestMixin:
         anomaly_score = self.sut.anomaly_score(self.X_test)
 
         self.assertEqual(self.y_test.shape, anomaly_score.shape)
+
+    def test_roc_auc_score(self):
+        if hasattr(self.sut, 'novelty'):
+            self.sut.set_params(novelty=True)
+
+        self.sut.fit(self.X_train)
+
+        score_samples = self.sut.score_samples(self.X_test)
+        score         = roc_auc_score(self.y_test, score_samples)
+
+        self.assertGreaterEqual(score, 0.5)
 
     def test_plot_anomaly_score(self):
         if hasattr(self.sut, 'novelty'):
