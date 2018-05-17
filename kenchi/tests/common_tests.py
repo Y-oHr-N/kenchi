@@ -1,10 +1,10 @@
 import unittest
 
-import numpy as np
 from matplotlib.axes import Axes
 from kenchi.datasets import make_blobs
 from sklearn.base import BaseEstimator
 from sklearn.exceptions import NotFittedError
+from sklearn.model_selection import train_test_split
 from sklearn.utils.estimator_checks import check_estimator
 
 
@@ -22,26 +22,15 @@ class ModelTestMixin:
 
 class OutlierDetectorTestMixin:
     def prepare_data(self):
-        n_features        = 2
-        centers           = np.zeros((1, n_features))
-
-        X_train, y_train  = make_blobs(
-            centers       = centers,
-            contamination = 0.01,
-            n_features    = n_features,
+        X, y              = make_blobs(
+            centers       = 1,
+            contamination = 0.1,
+            n_features    = 2,
             n_samples     = 100,
             random_state  = 0
         )
 
-        X_test, y_test    = make_blobs(
-            centers       = centers,
-            contamination = 0.1,
-            n_features    = n_features,
-            n_samples     = 100,
-            random_state  = 1
-        )
-
-        return X_train, X_test, y_train, y_test
+        return train_test_split(X, y, random_state=0)
 
     @unittest.skip('this test fail in scikit-larn 0.19.1')
     def test_check_estimator(self):
