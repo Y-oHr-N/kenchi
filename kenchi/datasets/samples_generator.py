@@ -84,14 +84,17 @@ def make_blobs(
         shuffle      = False
     )
 
+    data_max         = np.max(X_inlier, axis=0)
+    data_min         = np.min(X_inlier, axis=0)
+
     n_outliers       = n_samples - n_inliers
     X_outlier        = rnd.uniform(
-        low          = np.min(X_inlier, axis=0),
-        high         = np.max(X_inlier, axis=0),
+        low          = np.minimum(center_box[0], data_min),
+        high         = np.maximum(center_box[1], data_max),
         size         = (n_outliers, n_features)
     )
 
-    X                = np.concatenate([X_outlier, X_inlier])
+    X                = np.concatenate([X_inlier, X_outlier])
     y                = np.empty(n_samples, dtype=int)
     y[:n_inliers]    = POS_LABEL
     y[n_inliers:]    = NEG_LABEL
