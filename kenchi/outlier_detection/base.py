@@ -3,6 +3,7 @@ from abc import abstractmethod, ABC
 import numpy as np
 from scipy.stats import norm
 from sklearn.base import BaseEstimator
+from sklearn.externals.joblib import dump
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
@@ -251,6 +252,25 @@ class BaseOutlierDetector(BaseEstimator, ABC):
             'anomaly_score is not available when novelty=False, use '
             'novelty=True if you want to predict on new unseen data'
         )
+
+    def to_pickle(self, filename, **kwargs):
+        """Persist an outlier detector object.
+
+        Parameters
+        ----------
+        filename : str or pathlib.Path
+            Path of the file in which it is to be stored.
+
+        kwargs : dict
+            Other keywords passed to ``sklearn.externals.joblib.dump``.
+
+        Returns
+        -------
+        filenames : list
+            List of file names in which the data is stored.
+        """
+
+        return dump(self, filename, **kwargs)
 
     def plot_anomaly_score(self, X=None, normalize=False, **kwargs):
         """Plot the anomaly score for each sample.
