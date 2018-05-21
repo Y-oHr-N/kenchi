@@ -34,7 +34,7 @@ class PCA(BaseOutlierDetector):
         svd_solver == 'arpack'.
 
     whiten : bool, default False
-        When True the `components_` vectors are multiplied by the square root
+        If True, the ``components_`` vectors are multiplied by the square root
         of n_samples and then divided by the singular values to ensure
         uncorrelated outputs with unit component-wise variances.
 
@@ -82,9 +82,9 @@ class PCA(BaseOutlierDetector):
     --------
     >>> import numpy as np
     >>> from kenchi.outlier_detection import PCA
-    >>> X   = np.array([
-    ...     [0, 0], [1, 1], [2, 0], [3, -1], [4, 0],
-    ...     [5, 1], [6, 0], [7, -1], [8, 0], [1000, 1]
+    >>> X = np.array([
+    ...     [0., 0.], [1., 1.], [2., 0.], [3., -1.], [4., 0.],
+    ...     [5., 1.], [6., 0.], [7., -1.], [8., 0.], [1000., 1.]
     ... ])
     >>> det = PCA()
     >>> det.fit_predict(X)

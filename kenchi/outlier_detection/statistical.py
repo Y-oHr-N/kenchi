@@ -53,7 +53,7 @@ class GMM(BaseOutlierDetector):
 
     warm_start : bool, default False
         If True, the solution of the last fitting is used as initialization for
-        the next call of `fit`.
+        the next call of ``fit``.
 
     weights_init : array-like of shape (n_components,), default None
         User-provided initial weights.
@@ -76,7 +76,7 @@ class GMM(BaseOutlierDetector):
         Threshold.
 
     converged_ : bool
-        True when convergence was reached in `fit`, False otherwise.
+        True when convergence was reached in ``fit``, False otherwise.
 
     covariances_ : array-like
         Covariance of each mixture component.
@@ -104,9 +104,9 @@ class GMM(BaseOutlierDetector):
     --------
     >>> import numpy as np
     >>> from kenchi.outlier_detection import GMM
-    >>> X   = np.array([
-    ...     [0, 0], [1, 1], [2, 0], [3, -1], [4, 0],
-    ...     [5, 1], [6, 0], [7, -1], [8, 0], [1000, 1]
+    >>> X = np.array([
+    ...     [0., 0.], [1., 1.], [2., 0.], [3., -1.], [4., 0.],
+    ...     [5., 1.], [6., 0.], [7., -1.], [8., 0.], [1000., 1.]
     ... ])
     >>> det = GMM(random_state=0)
     >>> det.fit_predict(X)
@@ -269,9 +269,9 @@ class HBOS(BaseOutlierDetector):
     --------
     >>> import numpy as np
     >>> from kenchi.outlier_detection import HBOS
-    >>> X   = np.array([
-    ...     [0, 0], [1, 1], [2, 0], [3, -1], [4, 0],
-    ...     [5, 1], [6, 0], [7, -1], [8, 0], [1000, 1]
+    >>> X = np.array([
+    ...     [0., 0.], [1., 1.], [2., 0.], [3., -1.], [4., 0.],
+    ...     [5., 1.], [6., 0.], [7., -1.], [8., 0.], [1000., 1.]
     ... ])
     >>> det = HBOS()
     >>> det.fit_predict(X)
@@ -388,9 +388,9 @@ class KDE(BaseOutlierDetector):
     --------
     >>> import numpy as np
     >>> from kenchi.outlier_detection import KDE
-    >>> X   = np.array([
-    ...     [0, 0], [1, 1], [2, 0], [3, -1], [4, 0],
-    ...     [5, 1], [6, 0], [7, -1], [8, 0], [1000, 1]
+    >>> X = np.array([
+    ...     [0., 0.], [1., 1.], [2., 0.], [3., -1.], [4., 0.],
+    ...     [5., 1.], [6., 0.], [7., -1.], [8., 0.], [1000., 1.]
     ... ])
     >>> det = KDE()
     >>> det.fit_predict(X)
@@ -494,7 +494,8 @@ class SparseStructureLearning(BaseOutlierDetector):
         Tolerance to declare convergence.
 
     apcluster_params : dict, default None
-        Additional parameters passed to `sklearn.cluster.affinity_propagation`.
+        Additional parameters passed to
+        ``sklearn.cluster.affinity_propagation``.
 
     Attributes
     ----------
@@ -547,9 +548,9 @@ class SparseStructureLearning(BaseOutlierDetector):
     --------
     >>> import numpy as np
     >>> from kenchi.outlier_detection import SparseStructureLearning
-    >>> X   = np.array([
-    ...     [0, 0], [1, 1], [2, 0], [3, -1], [4, 0],
-    ...     [5, 1], [6, 0], [7, -1], [8, 0], [1000, 1]
+    >>> X = np.array([
+    ...     [0., 0.], [1., 1.], [2., 0.], [3., -1.], [4., 0.],
+    ...     [5., 1.], [6., 0.], [7., -1.], [8., 0.], [1000., 1.]
     ... ])
     >>> det = SparseStructureLearning()
     >>> det.fit_predict(X)
@@ -711,7 +712,7 @@ class SparseStructureLearning(BaseOutlierDetector):
             Axes title. To disable, pass None.
 
         **kwargs : dict
-            Other keywords passed to `nx.draw_networkx`.
+            Other keywords passed to ``nx.draw_networkx``.
 
         Returns
         -------
@@ -758,7 +759,7 @@ class SparseStructureLearning(BaseOutlierDetector):
             Axes title. To disable, pass None.
 
         **kwargs : dict
-            Other keywords passed to `ax.pcolormesh`.
+            Other keywords passed to ``ax.pcolormesh``.
 
         Returns
         -------

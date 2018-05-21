@@ -288,16 +288,16 @@ class BaseOutlierDetector(BaseEstimator, ABC):
             X axis title label. To disable, pass None.
 
         xlim : tuple, default None
-            Tuple passed to `ax.xlim`.
+            Tuple passed to ``ax.xlim``.
 
         ylabel : string, default 'Anomaly score'
             Y axis title label. To disable, pass None.
 
         ylim : tuple, default None
-            Tuple passed to `ax.ylim`.
+            Tuple passed to ``ax.ylim``.
 
         **kwargs : dict
-            Other keywords passed to `ax.plot`.
+            Other keywords passed to ``ax.plot``.
 
         Returns
         -------
@@ -353,7 +353,7 @@ class BaseOutlierDetector(BaseEstimator, ABC):
             Y axis title label. To disable, pass None.
 
         **kwargs : dict
-            Other keywords passed to `ax.plot`.
+            Other keywords passed to ``ax.plot``.
 
         Returns
         -------

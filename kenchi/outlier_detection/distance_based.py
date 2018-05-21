@@ -65,7 +65,7 @@ class KNN(BaseOutlierDetector):
         Threshold.
 
     n_neighbors_ : int
-        Actual number of neighbors used for `kneighbors` queries.
+        Actual number of neighbors used for ``kneighbors`` queries.
 
     X_ : array-like of shape (n_samples, n_features)
         Training data.
@@ -84,9 +84,9 @@ class KNN(BaseOutlierDetector):
     --------
     >>> import numpy as np
     >>> from kenchi.outlier_detection import KNN
-    >>> X   = np.array([
-    ...     [0, 0], [1, 1], [2, 0], [3, -1], [4, 0],
-    ...     [5, 1], [6, 0], [7, -1], [8, 0], [1000, 1]
+    >>> X = np.array([
+    ...     [0., 0.], [1., 1.], [2., 0.], [3., -1.], [4., 0.],
+    ...     [5., 1.], [6., 0.], [7., -1.], [8., 0.], [1000., 1.]
     ... ])
     >>> det = KNN(n_neighbors=3)
     >>> det.fit_predict(X)
@@ -205,9 +205,9 @@ class OneTimeSampling(BaseOutlierDetector):
     --------
     >>> import numpy as np
     >>> from kenchi.outlier_detection import OneTimeSampling
-    >>> X   = np.array([
-    ...     [0, 0], [1, 1], [2, 0], [3, -1], [4, 0],
-    ...     [5, 1], [6, 0], [7, -1], [8, 0], [1000, 1]
+    >>> X = np.array([
+    ...     [0., 0.], [1., 1.], [2., 0.], [3., -1.], [4., 0.],
+    ...     [5., 1.], [6., 0.], [7., -1.], [8., 0.], [1000., 1.]
     ... ])
     >>> det = OneTimeSampling(n_subsamples=3, random_state=0)
     >>> det.fit_predict(X)

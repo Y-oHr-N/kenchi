@@ -194,16 +194,16 @@ class Pipeline(_Pipeline):
             X axis title label. To disable, pass None.
 
         xlim : tuple, default None
-            Tuple passed to `ax.xlim`.
+            Tuple passed to ``ax.xlim``.
 
         ylabel : string, default 'Anomaly score'
             Y axis title label. To disable, pass None.
 
         ylim : tuple, default None
-            Tuple passed to `ax.ylim`.
+            Tuple passed to ``ax.ylim``.
 
         **kwargs : dict
-            Other keywords passed to `ax.plot`.
+            Other keywords passed to ``ax.plot``.
 
         Returns
         -------
@@ -247,7 +247,7 @@ class Pipeline(_Pipeline):
             Y axis title label. To disable, pass None.
 
         **kwargs : dict
-            Other keywords passed to `ax.plot`.
+            Other keywords passed to ``ax.plot``.
 
         Returns
         -------
@@ -282,7 +282,7 @@ class Pipeline(_Pipeline):
             Axes title. To disable, pass None.
 
         **kwargs : dict
-            Other keywords passed to `nx.draw_networkx`.
+            Other keywords passed to ``nx.draw_networkx``.
 
         Returns
         -------
@@ -315,7 +315,7 @@ class Pipeline(_Pipeline):
             Axes title. To disable, pass None.
 
         **kwargs : dict
-            Other keywords passed to `ax.pcolormesh`.
+            Other keywords passed to ``ax.pcolormesh``.
 
         Returns
         -------
