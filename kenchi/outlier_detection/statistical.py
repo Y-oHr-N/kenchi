@@ -115,35 +115,35 @@ class GMM(BaseOutlierDetector):
 
     @property
     def converged_(self):
-        return self._estimator.converged_
+        return self.estimator_.converged_
 
     @property
     def covariances_(self):
-        return self._estimator.covariances_
+        return self.estimator_.covariances_
 
     @property
     def lower_bound_(self):
-        return self._estimator.lower_bound_
+        return self.estimator_.lower_bound_
 
     @property
     def means_(self):
-        return self._estimator.means_
+        return self.estimator_.means_
 
     @property
     def n_iter_(self):
-        return self._estimator.n_iter_
+        return self.estimator_.n_iter_
 
     @property
     def precisions_(self):
-        return self._estimator.precisions_
+        return self.estimator_.precisions_
 
     @property
     def precisions_cholesky_(self):
-        return self._estimator.precisions_cholesky_
+        return self.estimator_.precisions_cholesky_
 
     @property
     def weights_(self):
-        return self._estimator.weights_
+        return self.estimator_.weights_
 
     def __init__(
         self, contamination=0.1, covariance_type='full', init_params='kmeans',
@@ -177,7 +177,7 @@ class GMM(BaseOutlierDetector):
         )
 
     def _fit(self, X):
-        self._estimator     = GaussianMixture(
+        self.estimator_     = GaussianMixture(
             covariance_type = self.covariance_type,
             init_params     = self.init_params,
             max_iter        = self.max_iter,
@@ -195,7 +195,7 @@ class GMM(BaseOutlierDetector):
         return self
 
     def _anomaly_score(self, X):
-        return -self._estimator.score_samples(X)
+        return -self.estimator_.score_samples(X)
 
     def score(self, X, y=None):
         """Compute the mean log-likelihood of the given data.
@@ -217,7 +217,7 @@ class GMM(BaseOutlierDetector):
 
         X = self._check_array(X, estimator=self)
 
-        return self._estimator.score(X)
+        return self.estimator_.score(X)
 
 
 class HBOS(BaseOutlierDetector):
@@ -399,7 +399,7 @@ class KDE(BaseOutlierDetector):
 
     @property
     def X_(self):
-        return self._estimator.tree_.data
+        return self.estimator_.tree_.data
 
     def __init__(
         self, algorithm='auto', atol=0., bandwidth=1.,
@@ -424,7 +424,7 @@ class KDE(BaseOutlierDetector):
         check_is_fitted(self, 'X_')
 
     def _fit(self, X):
-        self._estimator   = KernelDensity(
+        self.estimator_   = KernelDensity(
             algorithm     = self.algorithm,
             atol          = self.atol,
             bandwidth     = self.bandwidth,
@@ -439,7 +439,7 @@ class KDE(BaseOutlierDetector):
         return self
 
     def _anomaly_score(self, X):
-        return -self._estimator.score_samples(X)
+        return -self.estimator_.score_samples(X)
 
     def score(self, X, y=None):
         """Compute the mean log-likelihood of the given data.
@@ -461,7 +461,7 @@ class KDE(BaseOutlierDetector):
 
         X = self._check_array(X, estimator=self)
 
-        return np.mean(self._estimator.score_samples(X))
+        return np.mean(self.estimator_.score_samples(X))
 
 
 class SparseStructureLearning(BaseOutlierDetector):
@@ -566,7 +566,7 @@ class SparseStructureLearning(BaseOutlierDetector):
 
     @property
     def covariance_(self):
-        return self._estimator.covariance_
+        return self.estimator_.covariance_
 
     @property
     def graphical_model_(self):
@@ -582,11 +582,11 @@ class SparseStructureLearning(BaseOutlierDetector):
 
     @property
     def location_(self):
-        return self._estimator.location_
+        return self.estimator_.location_
 
     @property
     def n_iter_(self):
-        return self._estimator.n_iter_
+        return self.estimator_.n_iter_
 
     @property
     def partial_corrcoef_(self):
@@ -599,7 +599,7 @@ class SparseStructureLearning(BaseOutlierDetector):
 
     @property
     def precision_(self):
-        return self._estimator.precision_
+        return self.estimator_.precision_
 
     def __init__(
         self, alpha=0.01, assume_centered=False, contamination=0.1,
@@ -627,7 +627,7 @@ class SparseStructureLearning(BaseOutlierDetector):
         )
 
     def _fit(self, X):
-        self._estimator     = GraphLasso(
+        self.estimator_     = GraphLasso(
             alpha           = self.alpha,
             assume_centered = self.assume_centered,
             enet_tol        = self.enet_tol,
@@ -643,7 +643,7 @@ class SparseStructureLearning(BaseOutlierDetector):
         return self
 
     def _anomaly_score(self, X):
-        return self._estimator.mahalanobis(X)
+        return self.estimator_.mahalanobis(X)
 
     def featurewise_anomaly_score(self, X):
         """Compute the feature-wise anomaly scores for each sample.
@@ -689,7 +689,7 @@ class SparseStructureLearning(BaseOutlierDetector):
 
         X = self._check_array(X, estimator=self)
 
-        return self._estimator.score(X)
+        return self.estimator_.score(X)
 
     def plot_graphical_model(self, **kwargs):
         """Plot the Gaussian Graphical Model (GGM).
