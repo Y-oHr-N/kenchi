@@ -330,10 +330,6 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         kwargs.setdefault('label', self.__class__.__name__)
 
         if normalize:
-            kwargs['threshold'] = np.maximum(
-                0., 2. * self._rv.cdf(self.threshold_) - 1.
-            )
-
             kwargs.setdefault('ylim', (0., 1.05))
 
         else:
