@@ -55,6 +55,18 @@ class OutlierDetectorTestMixin:
 
         self.assertEqual(self.y_test.shape, y_pred.shape)
 
+    def test_predict_proba(self):
+        if hasattr(self.sut, 'novelty'):
+            self.sut.set_params(novelty=True)
+
+        self.sut.fit(self.X_train)
+
+        n_samples, _ = self.X_test.shape
+        n_classes    = 2
+        y_score      = self.sut.predict_proba(self.X_test)
+
+        self.assertEqual((n_samples, n_classes), y_score.shape)
+
     def test_decision_function(self):
         if hasattr(self.sut, 'novelty'):
             self.sut.set_params(novelty=True)
@@ -118,6 +130,9 @@ class OutlierDetectorTestMixin:
 
     def test_predict_notffied(self):
         self.assertRaises(NotFittedError, self.sut.predict, self.X_test)
+
+    def test_predict__proba_notffied(self):
+        self.assertRaises(NotFittedError, self.sut.predict_proba, self.X_test)
 
     def test_decision_function_notffied(self):
         self.assertRaises(
