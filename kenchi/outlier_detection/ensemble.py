@@ -40,15 +40,6 @@ class IForest(BaseOutlierDetector):
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
 
-    data_max_ : array-like of shape (n_features,)
-        Per feature maximum seen in the data.
-
-    data_min_ : array-like of shape (n_features,)
-        Per feature minimum seen in the data.
-
-    data_volume_ : float
-        Volume of the hypercube enclosing the data.
-
     threshold_ : float
         Threshold.
 
@@ -82,15 +73,15 @@ class IForest(BaseOutlierDetector):
 
     @property
     def estimators_(self):
-        return self._estimator.estimators_
+        return self.estimator_.estimators_
 
     @property
     def estimators_samples_(self):
-        return self._estimator.estimators_samples_
+        return self.estimator_.estimators_samples_
 
     @property
     def max_samples_(self):
-        return self._estimator.max_samples_
+        return self.estimator_.max_samples_
 
     def __init__(
         self, bootstrap=False, contamination=0.1, max_features=1.0,
@@ -113,7 +104,7 @@ class IForest(BaseOutlierDetector):
         )
 
     def _fit(self, X):
-        self._estimator  = IsolationForest(
+        self.estimator_  = IsolationForest(
             bootstrap    = self.bootstrap,
             max_features = self.max_features,
             max_samples  = self.max_samples,
@@ -125,4 +116,4 @@ class IForest(BaseOutlierDetector):
         return self
 
     def _anomaly_score(self, X):
-        return 0.5 - self._estimator.decision_function(X)
+        return 0.5 - self.estimator_.decision_function(X)

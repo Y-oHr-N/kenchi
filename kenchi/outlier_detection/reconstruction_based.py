@@ -43,15 +43,6 @@ class PCA(BaseOutlierDetector):
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
 
-    data_max_ : array-like of shape (n_features,)
-        Per feature maximum seen in the data.
-
-    data_min_ : array-like of shape (n_features,)
-        Per feature minimum seen in the data.
-
-    data_volume_ : float
-        Volume of the hypercube enclosing the data.
-
     threshold_ : float
         Threshold.
 
@@ -93,31 +84,31 @@ class PCA(BaseOutlierDetector):
 
     @property
     def components_(self):
-        return self._estimator.components_
+        return self.estimator_.components_
 
     @property
     def explained_variance_(self):
-        return self._estimator.explained_variance_
+        return self.estimator_.explained_variance_
 
     @property
     def explained_variance_ratio_(self):
-        return self._estimator.explained_variance_ratio_
+        return self.estimator_.explained_variance_ratio_
 
     @property
     def mean_(self):
-        return self._estimator.mean_
+        return self.estimator_.mean_
 
     @property
     def noise_variance_(self):
-        return self._estimator.noise_variance_
+        return self.estimator_.noise_variance_
 
     @property
     def n_components_(self):
-        return self._estimator.n_components_
+        return self.estimator_.n_components_
 
     @property
     def singular_values_(self):
-        return self._estimator.singular_values_
+        return self.estimator_.singular_values_
 
     def __init__(
         self, contamination=0.1, iterated_power='auto', n_components=None,
@@ -145,7 +136,7 @@ class PCA(BaseOutlierDetector):
         )
 
     def _fit(self, X):
-        self._estimator    = _PCA(
+        self.estimator_    = _PCA(
             iterated_power = self.iterated_power,
             n_components   = self.n_components,
             random_state   = self.random_state,
@@ -164,7 +155,7 @@ class PCA(BaseOutlierDetector):
         data back to its original space.
         """
 
-        return self._estimator.inverse_transform(self._estimator.transform(X))
+        return self.estimator_.inverse_transform(self.estimator_.transform(X))
 
     def score(self, X, y=None):
         """Compute the mean log-likelihood of the given data.
@@ -186,4 +177,4 @@ class PCA(BaseOutlierDetector):
 
         X = self._check_array(X, estimator=self)
 
-        return self._estimator.score(X)
+        return self.estimator_.score(X)

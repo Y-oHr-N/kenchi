@@ -52,15 +52,6 @@ class KNN(BaseOutlierDetector):
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
 
-    data_max_ : array-like of shape (n_features,)
-        Per feature maximum seen in the data.
-
-    data_min_ : array-like of shape (n_features,)
-        Per feature minimum seen in the data.
-
-    data_volume_ : float
-        Volume of the hypercube enclosing the data.
-
     threshold_ : float
         Threshold.
 
@@ -95,7 +86,7 @@ class KNN(BaseOutlierDetector):
 
     @property
     def X_(self):
-        return self._estimator._fit_X
+        return self.estimator_._fit_X
 
     def __init__(
         self, aggregate=False, algorithm='auto', contamination=0.1,
@@ -124,7 +115,7 @@ class KNN(BaseOutlierDetector):
         self.n_neighbors_ = np.maximum(
             1, np.minimum(self.n_neighbors, n_samples - 1)
         )
-        self._estimator   = NearestNeighbors(
+        self.estimator_   = NearestNeighbors(
             algorithm     = self.algorithm,
             leaf_size     = self.leaf_size,
             metric        = self.metric,
@@ -138,9 +129,9 @@ class KNN(BaseOutlierDetector):
 
     def _anomaly_score(self, X):
         if X is self.X_:
-            dist, _ = self._estimator.kneighbors()
+            dist, _ = self.estimator_.kneighbors()
         else:
-            dist, _ = self._estimator.kneighbors(X)
+            dist, _ = self.estimator_.kneighbors(X)
 
         if self.aggregate:
             return np.sum(dist, axis=1)
@@ -176,15 +167,6 @@ class OneTimeSampling(BaseOutlierDetector):
     ----------
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
-
-    data_max_ : array-like of shape (n_features,)
-        Per feature maximum seen in the data.
-
-    data_min_ : array-like of shape (n_features,)
-        Per feature minimum seen in the data.
-
-    data_volume_ : float
-        Volume of the hypercube enclosing the data.
 
     threshold_ : float
         Threshold.

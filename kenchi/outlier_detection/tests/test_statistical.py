@@ -51,15 +51,15 @@ class HBOSTest(unittest.TestCase, OutlierDetectorTestMixin):
         plt.close()
 
     @unittest.skip('this test fail in scikit-larn 0.19.1')
-    def test_roc_auc_score():
+    def test_roc_auc_score(self):
         pass
 
     @unittest.skip('this test fail in scikit-larn 0.19.1')
-    def test_plot_anomaly_score():
+    def test_plot_anomaly_score(self):
         pass
 
     @unittest.skip('this test fail in scikit-larn 0.19.1')
-    def test_plot_roc_curve():
+    def test_plot_roc_curve(self):
         pass
 
 

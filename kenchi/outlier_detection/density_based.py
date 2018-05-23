@@ -47,15 +47,6 @@ class LOF(BaseOutlierDetector):
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
 
-    data_max_ : array-like of shape (n_features,)
-        Per feature maximum seen in the data.
-
-    data_min_ : array-like of shape (n_features,)
-        Per feature minimum seen in the data.
-
-    data_volume_ : float
-        Volume of the hypercube enclosing the data.
-
     threshold_ : float
         Threshold.
 
@@ -93,15 +84,15 @@ class LOF(BaseOutlierDetector):
 
     @property
     def negative_outlier_factor_(self):
-        return self._estimator.negative_outlier_factor_
+        return self.estimator_.negative_outlier_factor_
 
     @property
     def n_neighbors_(self):
-        return self._estimator.n_neighbors_
+        return self.estimator_.n_neighbors_
 
     @property
     def X_(self):
-        return self._estimator._fit_X
+        return self.estimator_._fit_X
 
     def __init__(
         self, algorithm='auto', contamination=0.1, leaf_size=30,
@@ -127,7 +118,7 @@ class LOF(BaseOutlierDetector):
         )
 
     def _fit(self, X):
-        self._estimator   = LocalOutlierFactor(
+        self.estimator_   = LocalOutlierFactor(
             algorithm     = self.algorithm,
             leaf_size     = self.leaf_size,
             metric        = self.metric,
@@ -153,4 +144,4 @@ class LOF(BaseOutlierDetector):
         if X is self.X_:
             return -self.negative_outlier_factor_
         else:
-            return -self._estimator._decision_function(X)
+            return -self.estimator_._decision_function(X)
