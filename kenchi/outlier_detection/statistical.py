@@ -591,8 +591,8 @@ class SparseStructureLearning(BaseOutlierDetector):
 
         check_is_fitted(
             self, [
-                'covariance_', 'graphical_model_', 'labels_', 'location_',
-                'isolates_', 'n_iter_', 'partial_corrcoef_', 'precision_'
+                'covariance_', 'labels_', 'location_', 'n_iter_',
+                'partial_corrcoef_', 'precision_'
             ]
         )
 
