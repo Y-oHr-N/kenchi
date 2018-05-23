@@ -10,7 +10,10 @@ from sklearn.utils.validation import check_is_fitted
 from ..plotting import plot_anomaly_score, plot_roc_curve
 from ..utils import check_contamination
 
-__all__ = ['is_outlier_detector', 'BaseOutlierDetector']
+__all__   = ['is_outlier_detector', 'BaseOutlierDetector']
+
+NEG_LABEL = -1
+POS_LABEL = 1
 
 
 def is_outlier_detector(estimator):
@@ -142,7 +145,7 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         self._fit(X)
 
         self.anomaly_score_ = self._anomaly_score(X)
-        self.classes_       = np.array([-1, 1])
+        self.classes_       = np.array([NEG_LABEL, POS_LABEL])
         self.threshold_     = self._get_threshold()
         self._rv            = self._get_rv()
 
@@ -167,7 +170,9 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         """
 
         return np.where(
-            self.decision_function(X, threshold=threshold) >= 0., 1, -1
+            self.decision_function(X, threshold=threshold) >= 0.,
+            POS_LABEL,
+            NEG_LABEL
         )
 
     def predict_proba(self, X=None):
