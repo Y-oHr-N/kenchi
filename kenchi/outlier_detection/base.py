@@ -140,12 +140,12 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         self._check_params()
 
         X                   = self._check_array(X, estimator=self)
-        _, self.n_features_ = X.shape
 
         self._fit(X)
 
         self.anomaly_score_ = self._anomaly_score(X)
         self.classes_       = np.array([NEG_LABEL, POS_LABEL])
+        _, self.n_features_ = X.shape
         self.threshold_     = self._get_threshold()
         self._rv            = self._get_rv()
 
