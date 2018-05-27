@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 from kenchi import pipeline
 from kenchi.outlier_detection import SparseStructureLearning
 from kenchi.tests.common_tests import OutlierDetectorTestMixin
-from matplotlib.axes import Axes
 from sklearn.exceptions import NotFittedError
 from sklearn.preprocessing import StandardScaler
 
@@ -45,14 +44,14 @@ class PipelineTest(unittest.TestCase, OutlierDetectorTestMixin):
 
         ax = self.sut.plot_graphical_model()
 
-        self.assertIsInstance(ax, Axes)
+        self.assertTrue(ax.has_data())
 
     def test_plot_partial_corrcoef(self):
         self.sut.fit(self.X_train)
 
         ax = self.sut.plot_partial_corrcoef()
 
-        self.assertIsInstance(ax, Axes)
+        self.assertTrue(ax.has_data())
 
     def test_featurewise_anomaly_score_notfitted(self):
         self.assertRaises(

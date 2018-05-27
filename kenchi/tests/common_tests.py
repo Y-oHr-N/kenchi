@@ -1,6 +1,5 @@
 import unittest
 
-from matplotlib.axes import Axes
 from kenchi.datasets import make_blobs
 from sklearn.base import BaseEstimator
 from sklearn.exceptions import NotFittedError
@@ -116,7 +115,7 @@ class OutlierDetectorTestMixin:
 
         ax = self.sut.plot_anomaly_score(self.X_test)
 
-        self.assertIsInstance(ax, Axes)
+        self.assertTrue(ax.has_data())
 
     def test_plot_roc_curve(self):
         if hasattr(self.sut, 'novelty'):
@@ -126,7 +125,7 @@ class OutlierDetectorTestMixin:
 
         ax = self.sut.plot_roc_curve(self.X_test, self.y_test)
 
-        self.assertIsInstance(ax, Axes)
+        self.assertTrue(ax.has_data())
 
     def test_predict_notffied(self):
         self.assertRaises(NotFittedError, self.sut.predict, self.X_test)
