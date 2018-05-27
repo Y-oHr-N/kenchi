@@ -6,6 +6,7 @@ from sklearn.exceptions import NotFittedError
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import train_test_split
 from sklearn.utils.estimator_checks import check_estimator
+from sklearn.utils.testing import if_matplotlib
 
 
 class ModelTestMixin:
@@ -107,7 +108,10 @@ class OutlierDetectorTestMixin:
 
         self.assertGreaterEqual(score, 0.5)
 
+    @if_matplotlib
     def test_plot_anomaly_score(self):
+        import matplotlib.pyplot as plt
+
         if hasattr(self.sut, 'novelty'):
             self.sut.set_params(novelty=True)
 
@@ -115,15 +119,22 @@ class OutlierDetectorTestMixin:
 
         ax = self.sut.plot_anomaly_score(self.X_test)
 
+        plt.close('all')
+
         self.assertTrue(ax.has_data())
 
+    @if_matplotlib
     def test_plot_roc_curve(self):
+        import matplotlib.pyplot as plt
+
         if hasattr(self.sut, 'novelty'):
             self.sut.set_params(novelty=True)
 
         self.sut.fit(self.X_train)
 
         ax = self.sut.plot_roc_curve(self.X_test, self.y_test)
+
+        plt.close('all')
 
         self.assertTrue(ax.has_data())
 
@@ -144,11 +155,13 @@ class OutlierDetectorTestMixin:
     def test_anomaly_score_notfitted(self):
         self.assertRaises(NotFittedError, self.sut.anomaly_score, self.X_test)
 
+    @if_matplotlib
     def test_plot_anomaly_score_notfitted(self):
         self.assertRaises(
             NotFittedError, self.sut.plot_anomaly_score, self.X_test
         )
 
+    @if_matplotlib
     def test_plot_roc_curve_notfitted(self):
         self.assertRaises(
             NotFittedError, self.sut.plot_roc_curve, self.X_test, self.y_test

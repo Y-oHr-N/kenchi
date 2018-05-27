@@ -1,11 +1,6 @@
 import doctest
 import unittest
 
-import matplotlib
-
-matplotlib.use('Agg')
-
-import matplotlib.pyplot as plt
 from kenchi.outlier_detection import distance_based
 from kenchi.tests.common_tests import OutlierDetectorTestMixin
 
@@ -23,9 +18,6 @@ class KNNTest(unittest.TestCase, OutlierDetectorTestMixin):
 
         self.sut = distance_based.KNN(n_neighbors=3)
 
-    def tearDown(self):
-        plt.close()
-
 
 class OneTimeSamplingTest(unittest.TestCase, OutlierDetectorTestMixin):
     def setUp(self):
@@ -35,6 +27,3 @@ class OneTimeSamplingTest(unittest.TestCase, OutlierDetectorTestMixin):
         self.sut = distance_based.OneTimeSampling(
             n_subsamples=3, random_state=0
         )
-
-    def tearDown(self):
-        plt.close()

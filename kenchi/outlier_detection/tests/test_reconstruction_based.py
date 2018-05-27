@@ -1,11 +1,6 @@
 import doctest
 import unittest
 
-import matplotlib
-
-matplotlib.use('Agg')
-
-import matplotlib.pyplot as plt
 from kenchi.outlier_detection import reconstruction_based
 from kenchi.tests.common_tests import ModelTestMixin, OutlierDetectorTestMixin
 
@@ -22,6 +17,3 @@ class PCATest(unittest.TestCase, ModelTestMixin, OutlierDetectorTestMixin):
             self.prepare_data()
 
         self.sut = reconstruction_based.PCA()
-
-    def tearDown(self):
-        plt.close()
