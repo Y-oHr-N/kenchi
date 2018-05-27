@@ -30,7 +30,7 @@ class PipelineTest(unittest.TestCase, OutlierDetectorTestMixin):
 
         anomaly_score = self.sut.featurewise_anomaly_score(self.X_test)
 
-        self.assertEqual(self.X_test.shape, anomaly_score.shape)
+        self.assertEqual(anomaly_score.shape, self.X_test.shape)
 
     @if_matplotlib
     def test_plot_graphical_model(self):

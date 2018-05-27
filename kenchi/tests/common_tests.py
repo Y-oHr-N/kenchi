@@ -40,7 +40,7 @@ class OutlierDetectorTestMixin:
     def test_fit_predict(self):
         y_pred = self.sut.fit_predict(self.X_train)
 
-        self.assertEqual(self.y_train.shape, y_pred.shape)
+        self.assertEqual(y_pred.shape, self.y_train.shape)
 
     def test_fit(self):
         self.assertIsInstance(self.sut.fit(self.X_train), BaseEstimator)
@@ -53,7 +53,7 @@ class OutlierDetectorTestMixin:
 
         y_pred = self.sut.predict(self.X_test)
 
-        self.assertEqual(self.y_test.shape, y_pred.shape)
+        self.assertEqual(y_pred.shape, self.y_test.shape)
 
     def test_predict_proba(self):
         if hasattr(self.sut, 'novelty'):
@@ -65,7 +65,7 @@ class OutlierDetectorTestMixin:
         n_classes    = 2
         y_score      = self.sut.predict_proba(self.X_test)
 
-        self.assertEqual((n_samples, n_classes), y_score.shape)
+        self.assertEqual(y_score.shape, (n_samples, n_classes))
 
     def test_decision_function(self):
         if hasattr(self.sut, 'novelty'):
@@ -75,7 +75,7 @@ class OutlierDetectorTestMixin:
 
         y_score = self.sut.decision_function(self.X_test)
 
-        self.assertEqual(self.y_test.shape, y_score.shape)
+        self.assertEqual(y_score.shape, self.y_test.shape)
 
     def test_score_samples(self):
         if hasattr(self.sut, 'novelty'):
@@ -85,7 +85,7 @@ class OutlierDetectorTestMixin:
 
         score_samples = self.sut.score_samples(self.X_test)
 
-        self.assertEqual(self.y_test.shape, score_samples.shape)
+        self.assertEqual(score_samples.shape, self.y_test.shape)
 
     def test_anomaly_score(self):
         if hasattr(self.sut, 'novelty'):
@@ -95,7 +95,7 @@ class OutlierDetectorTestMixin:
 
         anomaly_score = self.sut.anomaly_score(self.X_test)
 
-        self.assertEqual(self.y_test.shape, anomaly_score.shape)
+        self.assertEqual(anomaly_score.shape, self.y_test.shape)
 
     def test_roc_auc_score(self):
         if hasattr(self.sut, 'novelty'):
