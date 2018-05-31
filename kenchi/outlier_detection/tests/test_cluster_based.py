@@ -1,11 +1,6 @@
 import doctest
 import unittest
 
-import matplotlib
-
-matplotlib.use('Agg')
-
-import matplotlib.pyplot as plt
 from kenchi.outlier_detection import clustering_based
 from kenchi.tests.common_tests import ModelTestMixin, OutlierDetectorTestMixin
 
@@ -24,6 +19,3 @@ class MiniBatchKMeansTest(
             self.prepare_data()
 
         self.sut = clustering_based.MiniBatchKMeans(random_state=0)
-
-    def tearDown(self):
-        plt.close()

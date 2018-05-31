@@ -278,10 +278,12 @@ class HBOS(BaseOutlierDetector):
         check_is_fitted(self, ['bin_edges_', 'hist_'])
 
     def _fit(self, X):
+        _, n_features   = X.shape
+
         self.data_max_  = np.max(X, axis=0)
         self.data_min_  = np.min(X, axis=0)
-        self.hist_      = np.empty(self.n_features_, dtype=object)
-        self.bin_edges_ = np.empty(self.n_features_, dtype=object)
+        self.hist_      = np.empty(n_features, dtype=object)
+        self.bin_edges_ = np.empty(n_features, dtype=object)
 
         for j, col in enumerate(X.T):
             self.hist_[j], self.bin_edges_[j] = np.histogram(
@@ -591,8 +593,8 @@ class SparseStructureLearning(BaseOutlierDetector):
 
         check_is_fitted(
             self, [
-                'covariance_', 'graphical_model_', 'labels_', 'location_',
-                'isolates_', 'n_iter_', 'partial_corrcoef_', 'precision_'
+                'covariance_', 'labels_', 'location_', 'n_iter_',
+                'partial_corrcoef_', 'precision_'
             ]
         )
 

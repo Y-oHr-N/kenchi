@@ -1,11 +1,6 @@
 import doctest
 import unittest
 
-import matplotlib
-
-matplotlib.use('Agg')
-
-import matplotlib.pyplot as plt
 from kenchi.outlier_detection import angle_based
 from kenchi.tests.common_tests import OutlierDetectorTestMixin
 
@@ -22,6 +17,3 @@ class FastABODTest(unittest.TestCase, OutlierDetectorTestMixin):
             self.prepare_data()
 
         self.sut = angle_based.FastABOD(n_neighbors=3)
-
-    def tearDown(self):
-        plt.close()
