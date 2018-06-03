@@ -131,6 +131,9 @@ class OCSVM(BaseOutlierDetector):
             self, ['dual_coef_', 'intercept_', 'support_', 'support_vectors_']
         )
 
+    def _get_threshold(self):
+        return self.intercept_[0]
+
     def _fit(self, X):
         self.estimator_  = OneClassSVM(
             cache_size   = self.cache_size,
