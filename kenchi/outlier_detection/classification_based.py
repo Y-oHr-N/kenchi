@@ -93,7 +93,7 @@ class OCSVM(BaseOutlierDetector):
 
     @property
     def dual_coef_(self):
-        return self.estimator_.dual_coef_
+        return self.estimator_.dual_coef_ / self.nu_l_
 
     @property
     def support_(self):
@@ -105,7 +105,7 @@ class OCSVM(BaseOutlierDetector):
 
     @property
     def intercept_(self):
-        return self.estimator_.intercept_
+        return self.estimator_.intercept_ / self.nu_l_
 
     def __init__(
         self, cache_size=200, coef0=0., contamination=0.1,
@@ -149,6 +149,9 @@ class OCSVM(BaseOutlierDetector):
             random_state = self.random_state
         ).fit(X)
 
+        l,               = self.support_.shape
+        self.nu_l_       = self.nu * l
+
         Q                = pairwise_kernels(self.support_vectors_, metric=self.kernel)
         c2               = self.dual_coef_ @ Q @ self.dual_coef_.T
         self.R2_         = c2 + 2. * self.intercept_ + 1.
@@ -157,4 +160,4 @@ class OCSVM(BaseOutlierDetector):
 
     def _anomaly_score(self, X):
         return self._get_threshold() \
-            - 2. * self.estimator_.decision_function(X).flat[:]
+            - 2. / self.nu_l_ * self.estimator_.decision_function(X).flat[:]
