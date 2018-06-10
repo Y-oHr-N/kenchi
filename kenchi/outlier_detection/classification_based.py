@@ -1,3 +1,4 @@
+from sklearn.metrics.pairwise import pairwise_kernels
 from sklearn.svm import OneClassSVM
 from sklearn.utils.validation import check_is_fitted
 
@@ -132,7 +133,7 @@ class OCSVM(BaseOutlierDetector):
         )
 
     def _get_threshold(self):
-        return self.intercept_[0]
+        return self.R2_[0]
 
     def _fit(self, X):
         self.estimator_  = OneClassSVM(
@@ -148,8 +149,12 @@ class OCSVM(BaseOutlierDetector):
             random_state = self.random_state
         ).fit(X)
 
+        Q                = pairwise_kernels(self.support_vectors_, metric=self.kernel)
+        c2               = self.dual_coef_ @ Q @ self.dual_coef_.T
+        self.R2_         = c2 + 2. * self.intercept_ + 1.
+
         return self
 
     def _anomaly_score(self, X):
-        return self.estimator_.intercept_ \
-            - self.estimator_.decision_function(X).flat[:]
+        return self._get_threshold() \
+            - 2. * self.estimator_.decision_function(X).flat[:]
