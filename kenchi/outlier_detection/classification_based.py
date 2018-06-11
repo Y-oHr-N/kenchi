@@ -1,4 +1,5 @@
-from sklearn.metrics.pairwise import pairwise_kernels
+import numpy as np
+from sklearn.gaussian_process.kernels import PairwiseKernel
 from sklearn.svm import OneClassSVM
 from sklearn.utils.validation import check_is_fitted
 
@@ -133,7 +134,7 @@ class OCSVM(BaseOutlierDetector):
         )
 
     def _get_threshold(self):
-        return self.R2_[0]
+        return self.R2_
 
     def _fit(self, X):
         self.estimator_  = OneClassSVM(
@@ -152,12 +153,23 @@ class OCSVM(BaseOutlierDetector):
         l,               = self.support_.shape
         self.nu_l_       = self.nu * l
 
-        Q                = pairwise_kernels(self.support_vectors_, metric=self.kernel)
-        c2               = self.dual_coef_ @ Q @ self.dual_coef_.T
-        self.R2_         = c2 + 2. * self.intercept_ + 1.
+        mettric_params   = {'coef0': self.coef0, 'degree': self.degree}
+        self.K_          = PairwiseKernel(
+            gamma        = self.estimator_._gamma,
+            metric       = self.kernel,
+            pairwise_kernels_kwargs = mettric_params
+        )
+
+        Q                = self.K_(self.support_vectors_)
+        i                = np.where(self.dual_coef_ < 1. / self.nu_l_)[1][0]
+        self.Q_ii_       = Q[i, i]
+
+        c2               = (self.dual_coef_ @ Q @ self.dual_coef_.T)[0, 0]
+        self.R2_         = c2 + 2. * self.intercept_[0] + self.Q_ii_
 
         return self
 
     def _anomaly_score(self, X):
-        return self._get_threshold() \
-            - 2. / self.nu_l_ * self.estimator_.decision_function(X).flat[:]
+        return self.R2_ \
+            - 2. / self.nu_l_ * self.estimator_.decision_function(X).flat[:] \
+            - self.Q_ii_ + self.K_.diag(X)
