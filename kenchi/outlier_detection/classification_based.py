@@ -18,9 +18,6 @@ class OCSVM(BaseOutlierDetector):
         Independent term in kernel function. It is only significant in 'poly'
         and 'sigmoid'.
 
-    contamination : float, default 0.1
-        Proportion of outliers in the data set. Used to define the threshold.
-
     degree : int, default 3
         Degree of the polynomial kernel function ('poly'). Ignored by all other
         kernels.
@@ -109,11 +106,11 @@ class OCSVM(BaseOutlierDetector):
         return self.estimator_.intercept_ / self.nu_l_
 
     def __init__(
-        self, cache_size=200, coef0=0., contamination=0.1,
-        degree=3, gamma='auto', kernel='rbf', max_iter=-1,
-        nu=0.5, shrinking=True, tol=0.001, random_state=None
+        self, cache_size=200, coef0=0., degree=3,
+        gamma='auto', kernel='rbf', max_iter=-1, nu=0.5,
+        shrinking=True, tol=0.001, random_state=None
     ):
-        super().__init__(contamination=contamination)
+        super().__init__()
 
         self.cache_size   = cache_size
         self.coef0        = coef0
