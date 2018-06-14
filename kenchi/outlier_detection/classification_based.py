@@ -61,7 +61,7 @@ class OCSVM(BaseOutlierDetector):
     ...     [0., 0.], [1., 1.], [2., 0.], [3., -1.], [4., 0.],
     ...     [5., 1.], [6., 0.], [7., -1.], [8., 0.], [1000., 1.]
     ... ])
-    >>> det = OCSVM(random_state=0)
+    >>> det = OCSVM(gamma=1e-03, nu=0.25, random_state=0)
     >>> det.fit_predict(X)
     array([ 1,  1,  1,  1,  1,  1,  1,  1,  1, -1])
     """
