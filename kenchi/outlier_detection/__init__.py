@@ -1,4 +1,5 @@
 from .angle_based import * # noqa
+from .classification_based import * # noqa
 from .clustering_based import * # noqa
 from .density_based import * # noqa
 from .distance_based import * # noqa
