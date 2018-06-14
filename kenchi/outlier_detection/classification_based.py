@@ -1,5 +1,4 @@
-import numpy as np
-from sklearn.gaussian_process.kernels import PairwiseKernel
+from sklearn.metrics.pairwise import rbf_kernel
 from sklearn.svm import OneClassSVM
 from sklearn.utils.validation import check_is_fitted
 
@@ -7,28 +6,16 @@ from .base import BaseOutlierDetector
 
 
 class OCSVM(BaseOutlierDetector):
-    """One Class Support Vector Machines.
+    """One Class Support Vector Machines (only RBF kernel).
 
     Parameters
     ----------
     cache_size : float, default 200
         Specify the size of the kernel cache (in MB).
 
-    coef0 : float, default 0.0
-        Independent term in kernel function. It is only significant in 'poly'
-        and 'sigmoid'.
-
-    degree : int, default 3
-        Degree of the polynomial kernel function ('poly'). Ignored by all other
-        kernels.
-
     gamma : float, default 'auto'
-        Kernel coefficient for 'rbf', 'poly' and 'sigmoid'. If gamma is 'auto',
-        1 / n_features will be used instead.
-
-    kernel : callable or str, default 'rbf'
-        Kernel to use. Valid kernels are
-        ['linear'|'poly'|'rbf'|'sigmoid'|'precomputed'].
+        Kernel coefficient. If gamma is 'auto', 1 / n_features will be used
+        instead.
 
     max_iter : int, optional default -1
         Maximum number of iterations.
@@ -63,12 +50,6 @@ class OCSVM(BaseOutlierDetector):
     dual_coef_ : array-like of shape (1, n_SV)
         Coefficients of the support vectors in the decision function.
 
-    coef_ : array-like of shape (1, n_features)
-        Weights assigned to the features (coefficients in the primal
-        problem). This is only available in the case of a linear kernel.
-        `coef_` is readonly property derived from `dual_coef_` and
-        `support_vectors_`
-
     intercept_ : array-like of shape (1,)
         Constant in the decision function.
 
@@ -84,10 +65,6 @@ class OCSVM(BaseOutlierDetector):
     >>> det.fit_predict(X)
     array([ 1,  1,  1,  1,  1,  1,  1,  1,  1, -1])
     """
-
-    @property
-    def coef_(self):
-        return self.estimator_.coef_
 
     @property
     def dual_coef_(self):
@@ -106,17 +83,13 @@ class OCSVM(BaseOutlierDetector):
         return self.estimator_.intercept_ / self.nu_l_
 
     def __init__(
-        self, cache_size=200, coef0=0., degree=3,
-        gamma='auto', kernel='rbf', max_iter=-1, nu=0.5,
-        shrinking=True, tol=0.001, random_state=None
+        self, cache_size=200, gamma='auto', max_iter=-1,
+        nu=0.5, shrinking=True, tol=0.001, random_state=None
     ):
         super().__init__()
 
         self.cache_size   = cache_size
-        self.coef0        = coef0
-        self.degree       = degree
         self.gamma        = gamma
-        self.kernel       = kernel
         self.max_iter     = max_iter
         self.nu           = nu
         self.shrinking    = shrinking
@@ -136,10 +109,7 @@ class OCSVM(BaseOutlierDetector):
     def _fit(self, X):
         self.estimator_  = OneClassSVM(
             cache_size   = self.cache_size,
-            coef0        = self.coef0,
-            degree       = self.degree,
             gamma        = self.gamma,
-            kernel       = self.kernel,
             max_iter     = self.max_iter,
             nu           = self.nu,
             shrinking    = self.shrinking,
@@ -150,23 +120,14 @@ class OCSVM(BaseOutlierDetector):
         l,               = self.support_.shape
         self.nu_l_       = self.nu * l
 
-        mettric_params   = {'coef0': self.coef0, 'degree': self.degree}
-        self.K_          = PairwiseKernel(
-            gamma        = self.estimator_._gamma,
-            metric       = self.kernel,
-            pairwise_kernels_kwargs = mettric_params
+        Q                = rbf_kernel(
+            self.support_vectors_, gamma=self.estimator_._gamma
         )
-
-        Q                = self.K_(self.support_vectors_)
-        i                = np.where(self.dual_coef_ < 1. / self.nu_l_)[1][0]
-        self.Q_ii_       = Q[i, i]
-
         c2               = (self.dual_coef_ @ Q @ self.dual_coef_.T)[0, 0]
-        self.R2_         = c2 + 2. * self.intercept_[0] + self.Q_ii_
+        self.R2_         = c2 + 2. * self.intercept_[0] + 1.
 
         return self
 
     def _anomaly_score(self, X):
         return self.R2_ \
-            - 2. / self.nu_l_ * self.estimator_.decision_function(X).flat[:] \
-            - self.Q_ii_ + self.K_.diag(X)
+            - 2. / self.nu_l_ * self.estimator_.decision_function(X).flat[:]
