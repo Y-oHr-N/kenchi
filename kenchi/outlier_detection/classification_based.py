@@ -4,6 +4,8 @@ from sklearn.utils.validation import check_is_fitted
 
 from .base import BaseOutlierDetector
 
+__all__ = ['OCSVM']
+
 
 class OCSVM(BaseOutlierDetector):
     """One Class Support Vector Machines (only RBF kernel).
