@@ -79,7 +79,7 @@ def plot_anomaly_score(
     ...     anomaly_score, threshold=det.threshold_, linestyle='', marker='.'
     ... ) # doctest: +ELLIPSIS
     <matplotlib.axes._subplots.AxesSubplot object at 0x...>
-    >>> plt.show()
+    >>> plt.show() # doctest: +SKIP
 
     .. figure:: images/plot_anomaly_score.png
     """
@@ -230,7 +230,7 @@ def plot_roc_curve(
     >>> score_samples = det.score_samples(X)
     >>> plot_roc_curve(y, score_samples) # doctest: +ELLIPSIS
     <matplotlib.axes._subplots.AxesSubplot object at 0x...>
-    >>> plt.show()
+    >>> plt.show() # doctest: +SKIP
 
     .. figure:: images/plot_roc_curve.png
     """
@@ -315,7 +315,7 @@ def plot_graphical_model(
     >>> G = nx.from_numpy_matrix(A)
     >>> plot_graphical_model(G, random_state=0) # doctest: +ELLIPSIS
     <matplotlib.axes._subplots.AxesSubplot object at 0x...>
-    >>> plt.show()
+    >>> plt.show() # doctest: +SKIP
 
     .. figure:: images/plot_graphical_model.png
     """
@@ -394,7 +394,7 @@ def plot_partial_corrcoef(
     >>> A = make_sparse_spd_matrix(dim=20, norm_diag=True, random_state=0)
     >>> plot_partial_corrcoef(A) # doctest: +ELLIPSIS
     <matplotlib.axes._subplots.AxesSubplot object at 0x...>
-    >>> plt.show()
+    >>> plt.show() # doctest: +SKIP
 
     .. figure:: images/plot_partial_corrcoef.png
     """
