@@ -78,7 +78,9 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         """Get the threshold according to the derived anomaly scores."""
 
         return np.percentile(
-            self.anomaly_score_, 100. * (1. - self.contamination)
+            self.anomaly_score_,
+            100. * (1. - self.contamination),
+            interpolation = 'lower'
         )
 
     def _get_rv(self):
