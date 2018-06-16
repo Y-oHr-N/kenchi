@@ -117,9 +117,13 @@ class LOF(BaseOutlierDetector):
             self, ['negative_outlier_factor_', 'n_neighbors_', 'X_']
         )
 
+    def _get_threshold(self):
+        return - self.estimator_.threshold_ - 1.
+
     def _fit(self, X):
         self.estimator_   = LocalOutlierFactor(
             algorithm     = self.algorithm,
+            contamination = self.contamination,
             leaf_size     = self.leaf_size,
             metric        = self.metric,
             n_jobs        = self.n_jobs,

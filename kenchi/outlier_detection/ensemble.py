@@ -103,14 +103,18 @@ class IForest(BaseOutlierDetector):
             self, ['estimators_', 'estimators_samples_', 'max_samples_']
         )
 
+    def _get_threshold(self):
+        return 0.5 - self.estimator_.threshold_
+
     def _fit(self, X):
-        self.estimator_  = IsolationForest(
-            bootstrap    = self.bootstrap,
-            max_features = self.max_features,
-            max_samples  = self.max_samples,
-            n_estimators = self.n_estimators,
-            n_jobs       = self.n_jobs,
-            random_state = self.random_state
+        self.estimator_   = IsolationForest(
+            bootstrap     = self.bootstrap,
+            contamination = self.contamination,
+            max_features  = self.max_features,
+            max_samples   = self.max_samples,
+            n_estimators  = self.n_estimators,
+            n_jobs        = self.n_jobs,
+            random_state  = self.random_state
         ).fit(X)
 
         return self
