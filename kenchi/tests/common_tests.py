@@ -38,13 +38,13 @@ class OutlierDetectorTestMixin:
     def test_check_estimator(self):
         self.assertIsNone(check_estimator(self.sut))
 
+    def test_fit(self):
+        self.assertIsInstance(self.sut.fit(self.X_train), BaseEstimator)
+
     def test_fit_predict(self):
         y_pred = self.sut.fit_predict(self.X_train)
 
         self.assertEqual(y_pred.shape, self.y_train.shape)
-
-    def test_fit(self):
-        self.assertIsInstance(self.sut.fit(self.X_train), BaseEstimator)
 
     def test_predict(self):
         if hasattr(self.sut, 'novelty'):

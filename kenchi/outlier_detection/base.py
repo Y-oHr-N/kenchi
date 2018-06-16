@@ -98,31 +98,6 @@ class BaseOutlierDetector(BaseEstimator, ABC):
     def _anomaly_score(self, X):
         pass
 
-    def fit_predict(self, X, y=None):
-        """Fit the model according to the given training data and predict if a
-        particular training sample is an outlier or not.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Training Data.
-
-        y : ignored
-
-        Returns
-        -------
-        y_pred : array-like of shape (n_samples,)
-            Return -1 for outliers and +1 for inliers.
-        """
-
-        if getattr(self, 'novelty', False):
-            raise ValueError(
-                'fit_predict is not available when novelty=True, use '
-                'novelty=False if you want to predict on the training data'
-            )
-
-        return self.fit(X).predict()
-
     def fit(self, X, y=None):
         """Fit the model according to the given training data.
 
@@ -152,6 +127,31 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         self._rv            = self._get_rv()
 
         return self
+
+    def fit_predict(self, X, y=None):
+        """Fit the model according to the given training data and predict if a
+        particular training sample is an outlier or not.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Training Data.
+
+        y : ignored
+
+        Returns
+        -------
+        y_pred : array-like of shape (n_samples,)
+            Return -1 for outliers and +1 for inliers.
+        """
+
+        if getattr(self, 'novelty', False):
+            raise ValueError(
+                'fit_predict is not available when novelty=True, use '
+                'novelty=False if you want to predict on the training data'
+            )
+
+        return self.fit(X).predict()
 
     def predict(self, X=None, threshold=None):
         """Predict if a particular sample is an outlier or not.
