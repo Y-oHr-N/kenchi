@@ -143,7 +143,7 @@ class FastABOD(BaseOutlierDetector):
         abof = self._abof(X)
 
         if regularize:
-            return -np.log(abof / self._anomaly_score_min)
+            return np.maximum(0., -np.log(abof / self._anomaly_score_min))
         else:
             return abof
 

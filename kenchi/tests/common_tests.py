@@ -1,5 +1,6 @@
 import unittest
 
+import numpy as np
 from kenchi.datasets import make_blobs
 from sklearn.base import BaseEstimator
 from sklearn.exceptions import NotFittedError
@@ -86,6 +87,7 @@ class OutlierDetectorTestMixin:
         score_samples = self.sut.score_samples(self.X_test)
 
         self.assertEqual(score_samples.shape, self.y_test.shape)
+        self.assertLessEqual(np.max(score_samples), 0.)
 
     def test_anomaly_score(self):
         if hasattr(self.sut, 'novelty'):
@@ -96,6 +98,7 @@ class OutlierDetectorTestMixin:
         anomaly_score = self.sut.anomaly_score(self.X_test)
 
         self.assertEqual(anomaly_score.shape, self.y_test.shape)
+        self.assertGreaterEqual(np.min(anomaly_score), 0.)
 
     def test_roc_auc_score(self):
         if hasattr(self.sut, 'novelty'):
@@ -141,7 +144,7 @@ class OutlierDetectorTestMixin:
     def test_predict_notffied(self):
         self.assertRaises(NotFittedError, self.sut.predict, self.X_test)
 
-    def test_predict__proba_notffied(self):
+    def test_predict_proba_notffied(self):
         self.assertRaises(NotFittedError, self.sut.predict_proba, self.X_test)
 
     def test_decision_function_notffied(self):

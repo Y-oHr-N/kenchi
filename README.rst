@@ -53,6 +53,7 @@ Algorithms
 ----------
 
 #. FastABOD [#kriegel08]_
+#. OCSVM [#scholkopf01]_
 #. MiniBatchKMeans
 #. LOF [#breunig00]_
 #. KNN [#angiulli02]_, [#ramaswamy00]_
@@ -82,10 +83,10 @@ Examples
     scaler = StandardScaler()
 
     detectors = [
-        FastABOD(novelty=True, n_jobs=-1), MiniBatchKMeans(),
-        LOF(novelty=True, n_jobs=-1), KNN(novelty=True, n_jobs=-1),
-        IForest(n_jobs=-1), PCA(),
-        KDE()
+        FastABOD(novelty=True, n_jobs=-1), OCSVM(),
+        MiniBatchKMeans(), LOF(novelty=True, n_jobs=-1),
+        KNN(novelty=True, n_jobs=-1), IForest(n_jobs=-1),
+        PCA(), KDE()
     ]
 
     # Load the Pima Indians diabetes dataset.
@@ -157,6 +158,10 @@ References
 .. [#ramaswamy00] Ramaswamy, S., Rastogi, R., and Shim, K.,
     `"Efficient algorithms for mining outliers from large data sets," <https://doi.org/10.1145/335191.335437>`_
     In Proceedings of SIGMOD, pp. 427-438, 2000.
+
+.. [#scholkopf01] Scholkopf, B., Platt, J. C., Shawe-Taylor, J. C., Smola, A. J., and Williamson, R. C.,
+    `"Estimating the Support of a High-Dimensional Distribution," <https://doi.org/10.1162/089976601750264965>`_
+    Neural Computation, 13(7), pp. 1443-1471, 2001.
 
 .. [#sugiyama13] Sugiyama, M., and Borgwardt, K.,
     "Rapid distance-based outlier detection via sampling,"
