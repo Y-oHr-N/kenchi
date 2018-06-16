@@ -1,10 +1,6 @@
 import doctest
 import unittest
 
-import matplotlib
-
-matplotlib.use('Agg')
-
 import matplotlib.pyplot as plt
 import numpy as np
 from kenchi.outlier_detection import classification_based
