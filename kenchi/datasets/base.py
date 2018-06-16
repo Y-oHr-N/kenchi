@@ -49,7 +49,7 @@ def load_pendigits(random_state=None, return_X_y=False, subset='kriegel11'):
         Seed of the pseudo random number generator.
 
     return_X_y : bool, default False
-        If True, return `(data, target)` instead of a Bunch object.
+        If True, return ``(data, target)`` instead of a Bunch object.
 
     subset : str, default 'kriegel11'
         Specify the structure. Valid options are
@@ -181,7 +181,7 @@ def load_pima(return_X_y=False):
     Parameters
     ----------
     return_X_y : bool, default False
-        If True, return `(data, target)` instead of a Bunch object.
+        If True, return ``(data, target)`` instead of a Bunch object.
 
     Returns
     -------
@@ -276,7 +276,7 @@ def load_wdbc(random_state=None, return_X_y=False, subset='kriegel11'):
         Seed of the pseudo random number generator.
 
     return_X_y : bool, default False
-        If True, return `(data, target)` instead of a Bunch object.
+        If True, return ``(data, target)`` instead of a Bunch object.
 
     subset : str, default 'kriegel11'
         Specify the structure. Valid options are
@@ -368,7 +368,7 @@ def load_wilt(return_X_y=False):
     Parameters
     ----------
     return_X_y : bool, default False
-        If True, return `(data, target)` instead of a Bunch object.
+        If True, return ``(data, target)`` instead of a Bunch object.
 
     Returns
     -------

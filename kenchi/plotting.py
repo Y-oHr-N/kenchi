@@ -50,16 +50,16 @@ def plot_anomaly_score(
         X axis title label. To disable, pass None.
 
     xlim : tuple, default None
-        Tuple passed to `ax.xlim`.
+        Tuple passed to ``ax.xlim``.
 
     ylabel : string, default 'Anomaly score'
         Y axis title label. To disable, pass None.
 
     ylim : tuple, default None
-        Tuple passed to `ax.ylim`.
+        Tuple passed to ``ax.ylim``.
 
     **kwargs : dict
-        Other keywords passed to `ax.plot`.
+        Other keywords passed to ``ax.plot``.
 
     Returns
     -------
@@ -81,7 +81,7 @@ def plot_anomaly_score(
     <matplotlib.axes._subplots.AxesSubplot object at 0x...>
     >>> plt.show()
 
-    .. image:: images/plot_anomaly_score.png
+    .. figure:: images/plot_anomaly_score.png
     """
 
     import matplotlib.pyplot as plt
@@ -212,7 +212,7 @@ def plot_roc_curve(
         Y axis title label. To disable, pass None.
 
     **kwargs : dict
-        Other keywords passed to `ax.plot`.
+        Other keywords passed to ``ax.plot``.
 
     Returns
     -------
@@ -232,7 +232,7 @@ def plot_roc_curve(
     <matplotlib.axes._subplots.AxesSubplot object at 0x...>
     >>> plt.show()
 
-    .. image:: images/plot_roc_curve.png
+    .. figure:: images/plot_roc_curve.png
     """
 
     import matplotlib.pyplot as plt
@@ -298,7 +298,7 @@ def plot_graphical_model(
         Axes title. To disable, pass None.
 
     **kwargs : dict
-        Other keywords passed to `nx.draw_networkx`.
+        Other keywords passed to ``nx.draw_networkx``.
 
     Returns
     -------
@@ -317,7 +317,7 @@ def plot_graphical_model(
     <matplotlib.axes._subplots.AxesSubplot object at 0x...>
     >>> plt.show()
 
-    .. image:: images/plot_graphical_model.png
+    .. figure:: images/plot_graphical_model.png
     """
 
     import matplotlib.pyplot as plt
@@ -379,7 +379,7 @@ def plot_partial_corrcoef(
         Axes title. To disable, pass None.
 
     **kwargs : dict
-        Other keywords passed to `ax.pcolormesh`.
+        Other keywords passed to ``ax.pcolormesh``.
 
     Returns
     -------
@@ -396,7 +396,7 @@ def plot_partial_corrcoef(
     <matplotlib.axes._subplots.AxesSubplot object at 0x...>
     >>> plt.show()
 
-    .. image:: images/plot_partial_corrcoef.png
+    .. figure:: images/plot_partial_corrcoef.png
     """
 
     import matplotlib.pyplot as plt

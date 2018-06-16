@@ -3,13 +3,17 @@ from abc import abstractmethod, ABC
 import numpy as np
 from scipy.stats import norm
 from sklearn.base import BaseEstimator
+from sklearn.externals.joblib import dump
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
 from ..plotting import plot_anomaly_score, plot_roc_curve
 from ..utils import check_contamination
 
-__all__ = ['is_outlier_detector', 'BaseOutlierDetector']
+__all__   = ['is_outlier_detector', 'BaseOutlierDetector']
+
+NEG_LABEL = -1
+POS_LABEL = 1
 
 
 def is_outlier_detector(estimator):
@@ -68,7 +72,7 @@ class BaseOutlierDetector(BaseEstimator, ABC):
     def _check_is_fitted(self):
         """Raise NotFittedError if the estimator is not fitted."""
 
-        check_is_fitted(self, ['anomaly_score_', 'threshold_'])
+        check_is_fitted(self, ['anomaly_score_', 'classes_', 'threshold_'])
 
     def _get_threshold(self):
         """Get the threshold according to the derived anomaly scores."""
@@ -136,11 +140,12 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         self._check_params()
 
         X                   = self._check_array(X, estimator=self)
-        _, self.n_features_ = X.shape
 
         self._fit(X)
 
         self.anomaly_score_ = self._anomaly_score(X)
+        self.classes_       = np.array([NEG_LABEL, POS_LABEL])
+        _, self.n_features_ = X.shape
         self.threshold_     = self._get_threshold()
         self._rv            = self._get_rv()
 
@@ -165,8 +170,31 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         """
 
         return np.where(
-            self.decision_function(X, threshold=threshold) >= 0., 1, -1
+            self.decision_function(X, threshold=threshold) >= 0.,
+            POS_LABEL,
+            NEG_LABEL
         )
+
+    def predict_proba(self, X=None):
+        """Predict class probabilities for each sample.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features), default None
+            Data. If None, predict if a particular training sample is an
+            outlier or not.
+
+        Returns
+        -------
+        y_score : array-like of shape (n_samples, n_classes)
+            Class probabilities.
+        """
+
+        anomaly_score = self.anomaly_score(X, normalize=True)
+
+        return np.concatenate([
+            anomaly_score[:, np.newaxis], 1. - anomaly_score[:, np.newaxis]
+        ], axis=1)
 
     def decision_function(self, X=None, threshold=None):
         """Compute the decision function of the given samples.
@@ -252,6 +280,25 @@ class BaseOutlierDetector(BaseEstimator, ABC):
             'novelty=True if you want to predict on new unseen data'
         )
 
+    def to_pickle(self, filename, **kwargs):
+        """Persist an outlier detector object.
+
+        Parameters
+        ----------
+        filename : str or pathlib.Path
+            Path of the file in which it is to be stored.
+
+        kwargs : dict
+            Other keywords passed to ``sklearn.externals.joblib.dump``.
+
+        Returns
+        -------
+        filenames : list
+            List of file names in which the data is stored.
+        """
+
+        return dump(self, filename, **kwargs)
+
     def plot_anomaly_score(self, X=None, normalize=False, **kwargs):
         """Plot the anomaly score for each sample.
 
@@ -288,16 +335,16 @@ class BaseOutlierDetector(BaseEstimator, ABC):
             X axis title label. To disable, pass None.
 
         xlim : tuple, default None
-            Tuple passed to `ax.xlim`.
+            Tuple passed to ``ax.xlim``.
 
         ylabel : string, default 'Anomaly score'
             Y axis title label. To disable, pass None.
 
         ylim : tuple, default None
-            Tuple passed to `ax.ylim`.
+            Tuple passed to ``ax.ylim``.
 
         **kwargs : dict
-            Other keywords passed to `ax.plot`.
+            Other keywords passed to ``ax.plot``.
 
         Returns
         -------
@@ -310,10 +357,6 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         kwargs.setdefault('label', self.__class__.__name__)
 
         if normalize:
-            kwargs['threshold'] = np.maximum(
-                0., 2. * self._rv.cdf(self.threshold_) - 1.
-            )
-
             kwargs.setdefault('ylim', (0., 1.05))
 
         else:
@@ -353,7 +396,7 @@ class BaseOutlierDetector(BaseEstimator, ABC):
             Y axis title label. To disable, pass None.
 
         **kwargs : dict
-            Other keywords passed to `ax.plot`.
+            Other keywords passed to ``ax.plot``.
 
         Returns
         -------

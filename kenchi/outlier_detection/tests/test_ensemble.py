@@ -1,11 +1,7 @@
 import doctest
 import unittest
 
-import matplotlib
-
-matplotlib.use('Agg')
-
-import matplotlib.pyplot as plt
+import numpy as np
 from kenchi.outlier_detection import ensemble
 from kenchi.tests.common_tests import OutlierDetectorTestMixin
 
@@ -23,5 +19,10 @@ class IForestTest(unittest.TestCase, OutlierDetectorTestMixin):
 
         self.sut = ensemble.IForest(random_state=0)
 
-    def tearDown(self):
-        plt.close()
+    def test_predict(self):
+        super().test_predict()
+
+        y_pred_sut       = self.sut.predict(self.X_test)
+        y_pred_estimator = self.sut.estimator_.predict(self.X_test)
+
+        np.testing.assert_equal(y_pred_sut, y_pred_estimator)

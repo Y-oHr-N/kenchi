@@ -49,20 +49,11 @@ class FastABOD(BaseOutlierDetector):
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
 
-    data_max_ : array-like of shape (n_features,)
-        Per feature maximum seen in the data.
-
-    data_min_ : array-like of shape (n_features,)
-        Per feature minimum seen in the data.
-
-    data_volume_ : float
-        Volume of the hypercube enclosing the data.
-
     threshold_ : float
         Threshold.
 
     n_neighbors_ : int
-        Actual number of neighbors used for `kneighbors` queries.
+        Actual number of neighbors used for ``kneighbors`` queries.
 
     X_ : array-like of shape (n_samples, n_features)
         Training data.
@@ -81,9 +72,9 @@ class FastABOD(BaseOutlierDetector):
     --------
     >>> import numpy as np
     >>> from kenchi.outlier_detection import FastABOD
-    >>> X   = np.array([
-    ...     [0, 0], [1, 1], [2, 0], [3, -1], [4, 0],
-    ...     [5, 1], [6, 0], [7, -1], [8, 0], [1000, 1]
+    >>> X = np.array([
+    ...     [0., 0.], [1., 1.], [2., 0.], [3., -1.], [4., 0.],
+    ...     [5., 1.], [6., 0.], [7., -1.], [8., 0.], [1000., 1.]
     ... ])
     >>> det = FastABOD(n_neighbors=3)
     >>> det.fit_predict(X)
@@ -92,7 +83,7 @@ class FastABOD(BaseOutlierDetector):
 
     @property
     def X_(self):
-        return self._estimator._fit_X
+        return self.estimator_._fit_X
 
     def __init__(
         self, algorithm='auto', contamination=0.1, leaf_size=30,
@@ -133,7 +124,7 @@ class FastABOD(BaseOutlierDetector):
     def _fit(self, X):
         n_samples, _            = X.shape
         self.n_neighbors_       = np.minimum(self.n_neighbors, n_samples - 1)
-        self._estimator         = NearestNeighbors(
+        self.estimator_         = NearestNeighbors(
             algorithm           = self.algorithm,
             leaf_size           = self.leaf_size,
             metric              = self.metric,
@@ -152,7 +143,7 @@ class FastABOD(BaseOutlierDetector):
         abof = self._abof(X)
 
         if regularize:
-            return -np.log(abof / self._anomaly_score_min)
+            return np.maximum(0., -np.log(abof / self._anomaly_score_min))
         else:
             return abof
 
@@ -160,9 +151,9 @@ class FastABOD(BaseOutlierDetector):
         """Compute the Angle-Based Outlier Factor (ABOF) for each sample."""
 
         if X is self.X_:
-            neigh_ind = self._estimator.kneighbors(return_distance=False)
+            neigh_ind = self.estimator_.kneighbors(return_distance=False)
         else:
-            neigh_ind = self._estimator.kneighbors(X, return_distance=False)
+            neigh_ind = self.estimator_.kneighbors(X, return_distance=False)
 
         return np.var([
             [

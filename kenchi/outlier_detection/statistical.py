@@ -53,7 +53,7 @@ class GMM(BaseOutlierDetector):
 
     warm_start : bool, default False
         If True, the solution of the last fitting is used as initialization for
-        the next call of `fit`.
+        the next call of ``fit``.
 
     weights_init : array-like of shape (n_components,), default None
         User-provided initial weights.
@@ -63,20 +63,11 @@ class GMM(BaseOutlierDetector):
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
 
-    data_max_ : array-like of shape (n_features,)
-        Per feature maximum seen in the data.
-
-    data_min_ : array-like of shape (n_features,)
-        Per feature minimum seen in the data.
-
-    data_volume_ : float
-        Volume of the hypercube enclosing the data.
-
     threshold_ : float
         Threshold.
 
     converged_ : bool
-        True when convergence was reached in `fit`, False otherwise.
+        True when convergence was reached in ``fit``, False otherwise.
 
     covariances_ : array-like
         Covariance of each mixture component.
@@ -104,9 +95,9 @@ class GMM(BaseOutlierDetector):
     --------
     >>> import numpy as np
     >>> from kenchi.outlier_detection import GMM
-    >>> X   = np.array([
-    ...     [0, 0], [1, 1], [2, 0], [3, -1], [4, 0],
-    ...     [5, 1], [6, 0], [7, -1], [8, 0], [1000, 1]
+    >>> X = np.array([
+    ...     [0., 0.], [1., 1.], [2., 0.], [3., -1.], [4., 0.],
+    ...     [5., 1.], [6., 0.], [7., -1.], [8., 0.], [1000., 1.]
     ... ])
     >>> det = GMM(random_state=0)
     >>> det.fit_predict(X)
@@ -115,35 +106,35 @@ class GMM(BaseOutlierDetector):
 
     @property
     def converged_(self):
-        return self._estimator.converged_
+        return self.estimator_.converged_
 
     @property
     def covariances_(self):
-        return self._estimator.covariances_
+        return self.estimator_.covariances_
 
     @property
     def lower_bound_(self):
-        return self._estimator.lower_bound_
+        return self.estimator_.lower_bound_
 
     @property
     def means_(self):
-        return self._estimator.means_
+        return self.estimator_.means_
 
     @property
     def n_iter_(self):
-        return self._estimator.n_iter_
+        return self.estimator_.n_iter_
 
     @property
     def precisions_(self):
-        return self._estimator.precisions_
+        return self.estimator_.precisions_
 
     @property
     def precisions_cholesky_(self):
-        return self._estimator.precisions_cholesky_
+        return self.estimator_.precisions_cholesky_
 
     @property
     def weights_(self):
-        return self._estimator.weights_
+        return self.estimator_.weights_
 
     def __init__(
         self, contamination=0.1, covariance_type='full', init_params='kmeans',
@@ -177,7 +168,7 @@ class GMM(BaseOutlierDetector):
         )
 
     def _fit(self, X):
-        self._estimator     = GaussianMixture(
+        self.estimator_     = GaussianMixture(
             covariance_type = self.covariance_type,
             init_params     = self.init_params,
             max_iter        = self.max_iter,
@@ -195,7 +186,7 @@ class GMM(BaseOutlierDetector):
         return self
 
     def _anomaly_score(self, X):
-        return -self._estimator.score_samples(X)
+        return -self.estimator_.score_samples(X)
 
     def score(self, X, y=None):
         """Compute the mean log-likelihood of the given data.
@@ -217,7 +208,7 @@ class GMM(BaseOutlierDetector):
 
         X = self._check_array(X, estimator=self)
 
-        return self._estimator.score(X)
+        return self.estimator_.score(X)
 
 
 class HBOS(BaseOutlierDetector):
@@ -246,9 +237,6 @@ class HBOS(BaseOutlierDetector):
     data_min_ : array-like of shape (n_features,)
         Per feature minimum seen in the data.
 
-    data_volume_ : float
-        Volume of the hypercube enclosing the data.
-
     threshold_ : float
         Threshold.
 
@@ -269,9 +257,9 @@ class HBOS(BaseOutlierDetector):
     --------
     >>> import numpy as np
     >>> from kenchi.outlier_detection import HBOS
-    >>> X   = np.array([
-    ...     [0, 0], [1, 1], [2, 0], [3, -1], [4, 0],
-    ...     [5, 1], [6, 0], [7, -1], [8, 0], [1000, 1]
+    >>> X = np.array([
+    ...     [0., 0.], [1., 1.], [2., 0.], [3., -1.], [4., 0.],
+    ...     [5., 1.], [6., 0.], [7., -1.], [8., 0.], [1000., 1.]
     ... ])
     >>> det = HBOS()
     >>> det.fit_predict(X)
@@ -290,10 +278,12 @@ class HBOS(BaseOutlierDetector):
         check_is_fitted(self, ['bin_edges_', 'hist_'])
 
     def _fit(self, X):
+        _, n_features   = X.shape
+
         self.data_max_  = np.max(X, axis=0)
         self.data_min_  = np.min(X, axis=0)
-        self.hist_      = np.empty(self.n_features_, dtype=object)
-        self.bin_edges_ = np.empty(self.n_features_, dtype=object)
+        self.hist_      = np.empty(n_features, dtype=object)
+        self.bin_edges_ = np.empty(n_features, dtype=object)
 
         for j, col in enumerate(X.T):
             self.hist_[j], self.bin_edges_[j] = np.histogram(
@@ -369,15 +359,6 @@ class KDE(BaseOutlierDetector):
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
 
-    data_max_ : array-like of shape (n_features,)
-        Per feature maximum seen in the data.
-
-    data_min_ : array-like of shape (n_features,)
-        Per feature minimum seen in the data.
-
-    data_volume_ : float
-        Volume of the hypercube enclosing the data.
-
     threshold_ : float
         Threshold.
 
@@ -388,9 +369,9 @@ class KDE(BaseOutlierDetector):
     --------
     >>> import numpy as np
     >>> from kenchi.outlier_detection import KDE
-    >>> X   = np.array([
-    ...     [0, 0], [1, 1], [2, 0], [3, -1], [4, 0],
-    ...     [5, 1], [6, 0], [7, -1], [8, 0], [1000, 1]
+    >>> X = np.array([
+    ...     [0., 0.], [1., 1.], [2., 0.], [3., -1.], [4., 0.],
+    ...     [5., 1.], [6., 0.], [7., -1.], [8., 0.], [1000., 1.]
     ... ])
     >>> det = KDE()
     >>> det.fit_predict(X)
@@ -399,7 +380,7 @@ class KDE(BaseOutlierDetector):
 
     @property
     def X_(self):
-        return self._estimator.tree_.data
+        return self.estimator_.tree_.data
 
     def __init__(
         self, algorithm='auto', atol=0., bandwidth=1.,
@@ -424,7 +405,7 @@ class KDE(BaseOutlierDetector):
         check_is_fitted(self, 'X_')
 
     def _fit(self, X):
-        self._estimator   = KernelDensity(
+        self.estimator_   = KernelDensity(
             algorithm     = self.algorithm,
             atol          = self.atol,
             bandwidth     = self.bandwidth,
@@ -439,7 +420,7 @@ class KDE(BaseOutlierDetector):
         return self
 
     def _anomaly_score(self, X):
-        return -self._estimator.score_samples(X)
+        return -self.estimator_.score_samples(X)
 
     def score(self, X, y=None):
         """Compute the mean log-likelihood of the given data.
@@ -461,7 +442,7 @@ class KDE(BaseOutlierDetector):
 
         X = self._check_array(X, estimator=self)
 
-        return np.mean(self._estimator.score_samples(X))
+        return np.mean(self.estimator_.score_samples(X))
 
 
 class SparseStructureLearning(BaseOutlierDetector):
@@ -494,21 +475,13 @@ class SparseStructureLearning(BaseOutlierDetector):
         Tolerance to declare convergence.
 
     apcluster_params : dict, default None
-        Additional parameters passed to `sklearn.cluster.affinity_propagation`.
+        Additional parameters passed to
+        ``sklearn.cluster.affinity_propagation``.
 
     Attributes
     ----------
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
-
-    data_max_ : array-like of shape (n_features,)
-        Per feature maximum seen in the data.
-
-    data_min_ : array-like of shape (n_features,)
-        Per feature minimum seen in the data.
-
-    data_volume_ : float
-        Volume of the hypercube enclosing the data.
 
     threshold_ : float
         Threshold.
@@ -547,9 +520,9 @@ class SparseStructureLearning(BaseOutlierDetector):
     --------
     >>> import numpy as np
     >>> from kenchi.outlier_detection import SparseStructureLearning
-    >>> X   = np.array([
-    ...     [0, 0], [1, 1], [2, 0], [3, -1], [4, 0],
-    ...     [5, 1], [6, 0], [7, -1], [8, 0], [1000, 1]
+    >>> X = np.array([
+    ...     [0., 0.], [1., 1.], [2., 0.], [3., -1.], [4., 0.],
+    ...     [5., 1.], [6., 0.], [7., -1.], [8., 0.], [1000., 1.]
     ... ])
     >>> det = SparseStructureLearning()
     >>> det.fit_predict(X)
@@ -565,7 +538,7 @@ class SparseStructureLearning(BaseOutlierDetector):
 
     @property
     def covariance_(self):
-        return self._estimator.covariance_
+        return self.estimator_.covariance_
 
     @property
     def graphical_model_(self):
@@ -581,11 +554,11 @@ class SparseStructureLearning(BaseOutlierDetector):
 
     @property
     def location_(self):
-        return self._estimator.location_
+        return self.estimator_.location_
 
     @property
     def n_iter_(self):
-        return self._estimator.n_iter_
+        return self.estimator_.n_iter_
 
     @property
     def partial_corrcoef_(self):
@@ -598,7 +571,7 @@ class SparseStructureLearning(BaseOutlierDetector):
 
     @property
     def precision_(self):
-        return self._estimator.precision_
+        return self.estimator_.precision_
 
     def __init__(
         self, alpha=0.01, assume_centered=False, contamination=0.1,
@@ -620,13 +593,13 @@ class SparseStructureLearning(BaseOutlierDetector):
 
         check_is_fitted(
             self, [
-                'covariance_', 'graphical_model_', 'labels_', 'location_',
-                'isolates_', 'n_iter_', 'partial_corrcoef_', 'precision_'
+                'covariance_', 'labels_', 'location_', 'n_iter_',
+                'partial_corrcoef_', 'precision_'
             ]
         )
 
     def _fit(self, X):
-        self._estimator     = GraphLasso(
+        self.estimator_     = GraphLasso(
             alpha           = self.alpha,
             assume_centered = self.assume_centered,
             enet_tol        = self.enet_tol,
@@ -642,7 +615,7 @@ class SparseStructureLearning(BaseOutlierDetector):
         return self
 
     def _anomaly_score(self, X):
-        return self._estimator.mahalanobis(X)
+        return self.estimator_.mahalanobis(X)
 
     def featurewise_anomaly_score(self, X):
         """Compute the feature-wise anomaly scores for each sample.
@@ -688,7 +661,7 @@ class SparseStructureLearning(BaseOutlierDetector):
 
         X = self._check_array(X, estimator=self)
 
-        return self._estimator.score(X)
+        return self.estimator_.score(X)
 
     def plot_graphical_model(self, **kwargs):
         """Plot the Gaussian Graphical Model (GGM).
@@ -711,7 +684,7 @@ class SparseStructureLearning(BaseOutlierDetector):
             Axes title. To disable, pass None.
 
         **kwargs : dict
-            Other keywords passed to `nx.draw_networkx`.
+            Other keywords passed to ``nx.draw_networkx``.
 
         Returns
         -------
@@ -758,7 +731,7 @@ class SparseStructureLearning(BaseOutlierDetector):
             Axes title. To disable, pass None.
 
         **kwargs : dict
-            Other keywords passed to `ax.pcolormesh`.
+            Other keywords passed to ``ax.pcolormesh``.
 
         Returns
         -------

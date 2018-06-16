@@ -53,6 +53,7 @@ Algorithms
 ----------
 
 #. FastABOD [#kriegel08]_
+#. OCSVM [#scholkopf01]_
 #. MiniBatchKMeans
 #. LOF [#breunig00]_
 #. KNN [#angiulli02]_, [#ramaswamy00]_
@@ -72,51 +73,41 @@ Examples
     import matplotlib.pyplot as plt
     import numpy as np
     from kenchi.datasets import load_pima
-    from kenchi.metrics import NegativeMVAUCScorer
     from kenchi.outlier_detection import *
     from kenchi.pipeline import make_pipeline
-    from scipy.stats import randint
-    from sklearn.model_selection import RandomizedSearchCV
+    from sklearn.model_selection import train_test_split
     from sklearn.preprocessing import StandardScaler
 
     np.random.seed(0)
 
-    X, y              = load_pima(return_X_y=True)
-    _, n_features     = X.shape
+    scaler = StandardScaler()
 
-    scaler            = StandardScaler()
-    detectors         = [
-        FastABOD(novelty=True, n_jobs=-1), MiniBatchKMeans(),
-        LOF(novelty=True, n_jobs=-1),      KNN(novelty=True, n_jobs=-1),
-        IForest(n_jobs=-1),                PCA(),
-        KDE()
+    detectors = [
+        FastABOD(novelty=True, n_jobs=-1), OCSVM(),
+        MiniBatchKMeans(), LOF(novelty=True, n_jobs=-1),
+        KNN(novelty=True, n_jobs=-1), IForest(n_jobs=-1),
+        PCA(), KDE()
     ]
 
-    param_grids       = [
-        {'fastabod__n_neighbors':       randint(3, 101)},
-        {'minibatchkmeans__n_clusters': randint(1, 21)},
-        {'lof__n_neighbors':            randint(1, 101)},
-        {'knn__n_neighbors':            randint(1, 101)},
-        {'iforest__max_features':       randint(1, n_features + 1)},
-        {'pca__n_components':           randint(1, n_features + 1)},
-        {'kde__bandwidth':              10. ** np.arange(-2, 2, 0.01)}
-    ]
+    # Load the Pima Indians diabetes dataset.
+    X, y = load_pima(return_X_y=True)
+    X_train, X_test, _, y_test = train_test_split(X, y)
 
-    scorer            = NegativeMVAUCScorer()
+    # Get the current Axes instance
+    ax = plt.gca()
 
-    f, ax             = plt.subplots()
+    for det in detectors:
+        # Fit the model according to the given training data
+        pipeline = make_pipeline(scaler, det).fit(X_train)
 
-    for detector, param_grid in zip(detectors, param_grids):
-        pipeline      = make_pipeline(scaler, detector)
-        random_search = RandomizedSearchCV(
-            pipeline, param_grid, scoring=scorer
-        ).fit(X)
+        # Plot the Receiver Operating Characteristic (ROC) curve
+        pipeline.plot_roc_curve(X_test, y_test, ax=ax)
 
-        random_search.best_estimator_.plot_roc_curve(X=None, y=y, ax=ax)
-
+    # Display the figure
     plt.show()
 
-.. image:: https://raw.githubusercontent.com/Y-oHr-N/kenchi/master/docs/images/readme.png
+.. figure:: https://raw.githubusercontent.com/Y-oHr-N/kenchi/master/docs/images/readme.png
+    :align: center
 
 License
 -------
@@ -141,7 +132,7 @@ References
     2017.
 
 .. [#goix16] Goix, N.,
-    "How to evaluate the quality of unsupervised anomaly detection algorithms?"
+    `"How to evaluate the quality of unsupervised anomaly detection algorithms?" <https://arxiv.org/abs/1607.01152>`_
     In ICML Anomaly Detection Workshop, 2016.
 
 .. [#goldstein12] Goldstein, M., and Dengel, A.,
@@ -167,6 +158,10 @@ References
 .. [#ramaswamy00] Ramaswamy, S., Rastogi, R., and Shim, K.,
     `"Efficient algorithms for mining outliers from large data sets," <https://doi.org/10.1145/335191.335437>`_
     In Proceedings of SIGMOD, pp. 427-438, 2000.
+
+.. [#scholkopf01] Scholkopf, B., Platt, J. C., Shawe-Taylor, J. C., Smola, A. J., and Williamson, R. C.,
+    `"Estimating the Support of a High-Dimensional Distribution," <https://doi.org/10.1162/089976601750264965>`_
+    Neural Computation, 13(7), pp. 1443-1471, 2001.
 
 .. [#sugiyama13] Sugiyama, M., and Borgwardt, K.,
     "Rapid distance-based outlier detection via sampling,"

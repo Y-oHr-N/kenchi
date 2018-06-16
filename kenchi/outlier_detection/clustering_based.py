@@ -54,15 +54,6 @@ class MiniBatchKMeans(BaseOutlierDetector):
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
 
-    data_max_ : array-like of shape (n_features,)
-        Per feature maximum seen in the data.
-
-    data_min_ : array-like of shape (n_features,)
-        Per feature minimum seen in the data.
-
-    data_volume_ : float
-        Volume of the hypercube enclosing the data.
-
     threshold_ : float
         Threshold.
 
@@ -79,9 +70,9 @@ class MiniBatchKMeans(BaseOutlierDetector):
     --------
     >>> import numpy as np
     >>> from kenchi.outlier_detection import MiniBatchKMeans
-    >>> X   = np.array([
-    ...     [0, 0], [1, 1], [2, 0], [3, -1], [4, 0],
-    ...     [5, 1], [6, 0], [7, -1], [8, 0], [1000, 1]
+    >>> X = np.array([
+    ...     [0., 0.], [1., 1.], [2., 0.], [3., -1.], [4., 0.],
+    ...     [5., 1.], [6., 0.], [7., -1.], [8., 0.], [1000., 1.]
     ... ])
     >>> det = MiniBatchKMeans(n_clusters=1, random_state=0)
     >>> det.fit_predict(X)
@@ -90,15 +81,15 @@ class MiniBatchKMeans(BaseOutlierDetector):
 
     @property
     def cluster_centers_(self):
-        return self._estimator.cluster_centers_
+        return self.estimator_.cluster_centers_
 
     @property
     def inertia_(self):
-        return self._estimator.inertia_
+        return self.estimator_.inertia_
 
     @property
     def labels_(self):
-        return self._estimator.labels_
+        return self.estimator_.labels_
 
     def __init__(
         self, batch_size=100, contamination=0.1, init='k-means++',
@@ -124,7 +115,7 @@ class MiniBatchKMeans(BaseOutlierDetector):
         check_is_fitted(self, ['cluster_centers_', 'inertia_', 'labels_'])
 
     def _fit(self, X):
-        self._estimator        = _MiniBatchKMeans(
+        self.estimator_        = _MiniBatchKMeans(
             batch_size         = self.batch_size,
             init               = self.init,
             init_size          = self.init_size,
@@ -140,7 +131,7 @@ class MiniBatchKMeans(BaseOutlierDetector):
         return self
 
     def _anomaly_score(self, X):
-        return np.min(self._estimator.transform(X), axis=1)
+        return np.min(self.estimator_.transform(X), axis=1)
 
     def score(self, X, y=None):
         """Compute the opposite value of the given data on the K-means
@@ -163,4 +154,4 @@ class MiniBatchKMeans(BaseOutlierDetector):
 
         X = self._check_array(X, estimator=self)
 
-        return self._estimator.score(X)
+        return self.estimator_.score(X)

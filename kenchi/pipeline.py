@@ -1,3 +1,4 @@
+from sklearn.externals.joblib import dump
 from sklearn.pipeline import _name_estimators, Pipeline as _Pipeline
 from sklearn.utils.metaestimators import if_delegate_has_method
 
@@ -156,6 +157,25 @@ class Pipeline(_Pipeline):
 
         return self._final_estimator.featurewise_anomaly_score(X)
 
+    def to_pickle(self, filename, **kwargs):
+        """Persist a pipeline object.
+
+        Parameters
+        ----------
+        filename : str or pathlib.Path
+            Path of the file in which it is to be stored.
+
+        kwargs : dict
+            Other keywords passed to ``sklearn.externals.joblib.dump``.
+
+        Returns
+        -------
+        filenames : list
+            List of file names in which the data is stored.
+        """
+
+        return dump(self, filename, **kwargs)
+
     @if_delegate_has_method(delegate='_final_estimator')
     def plot_anomaly_score(self, X=None, **kwargs):
         """Apply transoforms, and plot the anomaly score for each sample with
@@ -194,16 +214,16 @@ class Pipeline(_Pipeline):
             X axis title label. To disable, pass None.
 
         xlim : tuple, default None
-            Tuple passed to `ax.xlim`.
+            Tuple passed to ``ax.xlim``.
 
         ylabel : string, default 'Anomaly score'
             Y axis title label. To disable, pass None.
 
         ylim : tuple, default None
-            Tuple passed to `ax.ylim`.
+            Tuple passed to ``ax.ylim``.
 
         **kwargs : dict
-            Other keywords passed to `ax.plot`.
+            Other keywords passed to ``ax.plot``.
 
         Returns
         -------
@@ -247,7 +267,7 @@ class Pipeline(_Pipeline):
             Y axis title label. To disable, pass None.
 
         **kwargs : dict
-            Other keywords passed to `ax.plot`.
+            Other keywords passed to ``ax.plot``.
 
         Returns
         -------
@@ -282,7 +302,7 @@ class Pipeline(_Pipeline):
             Axes title. To disable, pass None.
 
         **kwargs : dict
-            Other keywords passed to `nx.draw_networkx`.
+            Other keywords passed to ``nx.draw_networkx``.
 
         Returns
         -------
@@ -315,7 +335,7 @@ class Pipeline(_Pipeline):
             Axes title. To disable, pass None.
 
         **kwargs : dict
-            Other keywords passed to `ax.pcolormesh`.
+            Other keywords passed to ``ax.pcolormesh``.
 
         Returns
         -------
