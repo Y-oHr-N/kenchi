@@ -6,6 +6,7 @@ import matplotlib
 matplotlib.use('Agg')
 
 import matplotlib.pyplot as plt
+import numpy as np
 from kenchi.outlier_detection import classification_based
 from kenchi.tests.common_tests import OutlierDetectorTestMixin
 
@@ -25,3 +26,11 @@ class OCSVMTest(unittest.TestCase, OutlierDetectorTestMixin):
 
     def tearDown(self):
         plt.close()
+
+    def test_predict(self):
+        super().test_predict()
+
+        y_pred_sut       = self.sut.predict(self.X_test)
+        y_pred_estimator = self.sut.estimator_.predict(self.X_test)
+
+        np.testing.assert_equal(y_pred_sut, y_pred_estimator)
