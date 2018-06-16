@@ -141,7 +141,7 @@ class OutlierDetectorTestMixin:
     def test_predict_notffied(self):
         self.assertRaises(NotFittedError, self.sut.predict, self.X_test)
 
-    def test_predict__proba_notffied(self):
+    def test_predict_proba_notffied(self):
         self.assertRaises(NotFittedError, self.sut.predict_proba, self.X_test)
 
     def test_decision_function_notffied(self):
