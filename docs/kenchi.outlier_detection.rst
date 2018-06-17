@@ -1,5 +1,5 @@
-kenchi\.outlier\_detection package
-==================================
+kenchi.outlier\_detection package
+=================================
 
 Submodules
 ----------
@@ -8,6 +8,7 @@ Submodules
 
    kenchi.outlier_detection.angle_based
    kenchi.outlier_detection.base
+   kenchi.outlier_detection.classification_based
    kenchi.outlier_detection.clustering_based
    kenchi.outlier_detection.density_based
    kenchi.outlier_detection.distance_based
