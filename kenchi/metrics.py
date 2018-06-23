@@ -13,10 +13,10 @@ def lee_liu_score(y_true, y_pred, contamination=None):
     Parameters
     ----------
     y_true : array-like of shape (n_samples,)
-        Ground truth (correct) labels.
+        True labels.
 
     y_pred : array-like of shape (n_samples,)
-        Predicted labels as returned by a detector.
+        Predicted labels.
 
     contamination : float, default None
         Proportion of outliers in the data set.
@@ -28,7 +28,7 @@ def lee_liu_score(y_true, y_pred, contamination=None):
 
     References
     ----------
-    .. [lee03] Lee, W. S, and Liu, B.,
+    .. [#lee03] Lee, W. S, and Liu, B.,
         "Learning with positive and unlabeled examples using weighted Logistic
         Regression,"
         In Proceedings of ICML, pp. 448-455, 2003.

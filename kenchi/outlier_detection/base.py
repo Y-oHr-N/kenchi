@@ -292,7 +292,7 @@ class BaseOutlierDetector(BaseEstimator, ABC):
             Data. If None, compute the Lee-Liu metric for each training sample.
 
         y : array-like of shape (n_samples,), default None
-            Labels.
+            Labels. If None, assume that all samples are positive.
 
         Returns
         -------
