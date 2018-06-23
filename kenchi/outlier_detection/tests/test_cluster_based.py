@@ -2,7 +2,7 @@ import doctest
 import unittest
 
 from kenchi.outlier_detection import clustering_based
-from kenchi.tests.common_tests import ModelTestMixin, OutlierDetectorTestMixin
+from kenchi.tests.common_tests import OutlierDetectorTestMixin
 
 
 def load_tests(loader, tests, ignore):
@@ -11,9 +11,7 @@ def load_tests(loader, tests, ignore):
     return tests
 
 
-class MiniBatchKMeansTest(
-    unittest.TestCase, ModelTestMixin, OutlierDetectorTestMixin
-):
+class MiniBatchKMeansTest(unittest.TestCase, OutlierDetectorTestMixin):
     def setUp(self):
         self.X_train, self.X_test, self.y_train, self.y_test = \
             self.prepare_data()
