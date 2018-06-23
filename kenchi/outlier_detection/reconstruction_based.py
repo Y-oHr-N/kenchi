@@ -156,25 +156,3 @@ class PCA(BaseOutlierDetector):
         """
 
         return self.estimator_.inverse_transform(self.estimator_.transform(X))
-
-    def score(self, X, y=None):
-        """Compute the mean log-likelihood of the given data.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Data.
-
-        y : ignored
-
-        Returns
-        -------
-        score : float
-            Mean log-likelihood of the given data.
-        """
-
-        self._check_is_fitted()
-
-        X = self._check_array(X, estimator=self)
-
-        return self.estimator_.score(X)
