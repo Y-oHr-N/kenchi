@@ -151,6 +151,10 @@ References
     `"Angle-based outlier detection in high-dimensional data," <https://doi.org/10.1145/1401890.1401946>`_
     In Proceedings of SIGKDD, pp. 444-452, 2008.
 
+.. [#lee03] Lee, W. S, and Liu, B.,
+    "Learning with positive and unlabeled examples using weighted Logistic Regression,"
+    In Proceedings of ICML, pp. 448-455, 2003.
+
 .. [#liu08] Liu, F. T., Ting, K. M., and Zhou, Z.-H.,
     `"Isolation forest," <https://doi.org/10.1145/2133360.2133363>`_
     In Proceedings of ICDM, pp. 413-422, 2008.
