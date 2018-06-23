@@ -19,6 +19,9 @@
 .. image:: https://readthedocs.org/projects/kenchi/badge/?version=latest
     :target: http://kenchi.readthedocs.io/en/latest/?badge=latest
 
+.. image:: https://mybinder.org/badge.svg
+   :target: https://mybinder.org/v2/gh/Y-oHr-N/kenchi/master
+
 kenchi
 ======
 
