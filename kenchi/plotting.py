@@ -170,7 +170,7 @@ def plot_anomaly_score(
         ax_hist.plot(kernel(ylocs), ylocs, color=color)
 
     if 'label' in kwargs:
-        ax.legend(loc='upper right')
+        ax.legend(loc='upper left')
 
     if filename is not None:
         ax.get_figure().savefig(filename)
