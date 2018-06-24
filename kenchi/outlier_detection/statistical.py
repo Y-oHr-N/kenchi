@@ -188,28 +188,6 @@ class GMM(BaseOutlierDetector):
     def _anomaly_score(self, X):
         return -self.estimator_.score_samples(X)
 
-    def score(self, X, y=None):
-        """Compute the mean log-likelihood of the given data.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Data.
-
-        y : ignored.
-
-        Returns
-        -------
-        score : float
-            Mean log-likelihood of the given data.
-        """
-
-        self._check_is_fitted()
-
-        X = self._check_array(X, estimator=self)
-
-        return self.estimator_.score(X)
-
 
 class HBOS(BaseOutlierDetector):
     """Histogram-based outlier detector.
@@ -422,28 +400,6 @@ class KDE(BaseOutlierDetector):
     def _anomaly_score(self, X):
         return -self.estimator_.score_samples(X)
 
-    def score(self, X, y=None):
-        """Compute the mean log-likelihood of the given data.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Data.
-
-        y : ignored
-
-        Returns
-        -------
-        score : float
-            Mean log-likelihood of the given data.
-        """
-
-        self._check_is_fitted()
-
-        X = self._check_array(X, estimator=self)
-
-        return np.mean(self.estimator_.score_samples(X))
-
 
 class SparseStructureLearning(BaseOutlierDetector):
     """Outlier detector using sparse structure learning.
@@ -640,28 +596,6 @@ class SparseStructureLearning(BaseOutlierDetector):
         ) + 0.5 / np.diag(
             self.precision_
         ) * ((X - self.location_) @ self.precision_) ** 2
-
-    def score(self, X, y=None):
-        """Compute the mean log-likelihood of the given data.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Data.
-
-        y : ignored
-
-        Returns
-        -------
-        score : float
-            Mean log-likelihood of the given data.
-        """
-
-        self._check_is_fitted()
-
-        X = self._check_array(X, estimator=self)
-
-        return self.estimator_.score(X)
 
     def plot_graphical_model(self, **kwargs):
         """Plot the Gaussian Graphical Model (GGM).

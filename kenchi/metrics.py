@@ -1,8 +1,50 @@
 import numpy as np
-from sklearn.metrics import auc
+from sklearn.metrics import auc, recall_score
 from sklearn.utils import check_array, check_random_state, column_or_1d
 
-__all__ = ['mv_curve', 'NegativeMVAUCScorer']
+from .utils import check_contamination
+
+__all__ = ['lee_liu_score', 'mv_curve', 'NegativeMVAUCScorer']
+
+
+def lee_liu_score(y_true, y_pred, contamination=None):
+    """Compute the Lee-Liu metric.
+
+    Parameters
+    ----------
+    y_true : array-like of shape (n_samples,)
+        True labels.
+
+    y_pred : array-like of shape (n_samples,)
+        Predicted labels.
+
+    contamination : float, default None
+        Proportion of outliers in the data set.
+
+    Returns
+    -------
+    score : float
+        Lee-Liu metric.
+
+    References
+    ----------
+    .. [#lee03] Lee, W. S, and Liu, B.,
+        "Learning with positive and unlabeled examples using weighted Logistic
+        Regression,"
+        In Proceedings of ICML, pp. 448-455, 2003.
+    """
+
+    r                 = recall_score(y_true, y_pred)
+
+    if contamination is None:
+        is_outlier    = y_pred == -1
+        n_samples,    = is_outlier.shape
+        n_outliers    = np.sum(is_outlier)
+        contamination = n_outliers / n_samples
+    else:
+        check_contamination(contamination)
+
+    return r ** 2 / (1. - contamination)
 
 
 def mv_curve(
