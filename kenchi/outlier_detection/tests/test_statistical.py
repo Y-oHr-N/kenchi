@@ -2,7 +2,7 @@ import doctest
 import unittest
 
 from kenchi.outlier_detection import statistical
-from kenchi.tests.common_tests import ModelTestMixin, OutlierDetectorTestMixin
+from kenchi.tests.common_tests import OutlierDetectorTestMixin
 from sklearn.exceptions import NotFittedError
 from sklearn.utils.testing import if_matplotlib
 
@@ -13,7 +13,7 @@ def load_tests(loader, tests, ignore):
     return tests
 
 
-class GMMTest(unittest.TestCase, ModelTestMixin, OutlierDetectorTestMixin):
+class GMMTest(unittest.TestCase, OutlierDetectorTestMixin):
     def setUp(self):
         self.X_train, self.X_test, self.y_train, self.y_test = \
             self.prepare_data()
@@ -21,7 +21,7 @@ class GMMTest(unittest.TestCase, ModelTestMixin, OutlierDetectorTestMixin):
         self.sut = statistical.GMM(random_state=0)
 
 
-class KDETest(unittest.TestCase, ModelTestMixin, OutlierDetectorTestMixin):
+class KDETest(unittest.TestCase, OutlierDetectorTestMixin):
     def setUp(self):
         self.X_train, self.X_test, self.y_train, self.y_test = \
             self.prepare_data()
@@ -49,9 +49,7 @@ class HBOSTest(unittest.TestCase, OutlierDetectorTestMixin):
         pass
 
 
-class SparseStructureLearningTest(
-    unittest.TestCase, ModelTestMixin, OutlierDetectorTestMixin
-):
+class SparseStructureLearningTest(unittest.TestCase, OutlierDetectorTestMixin):
     def setUp(self):
         self.X_train, self.X_test, self.y_train, self.y_test = \
             self.prepare_data()

@@ -7,6 +7,7 @@ from sklearn.externals.joblib import dump
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
+from ..metrics import lee_liu_score
 from ..plotting import plot_anomaly_score, plot_roc_curve
 from ..utils import check_contamination
 
@@ -78,7 +79,9 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         """Get the threshold according to the derived anomaly scores."""
 
         return np.percentile(
-            self.anomaly_score_, 100. * (1. - self.contamination)
+            self.anomaly_score_,
+            100. * (1. - self.contamination),
+            interpolation = 'lower'
         )
 
     def _get_rv(self):
@@ -95,31 +98,6 @@ class BaseOutlierDetector(BaseEstimator, ABC):
     @abstractmethod
     def _anomaly_score(self, X):
         pass
-
-    def fit_predict(self, X, y=None):
-        """Fit the model according to the given training data and predict if a
-        particular training sample is an outlier or not.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Training Data.
-
-        y : ignored
-
-        Returns
-        -------
-        y_pred : array-like of shape (n_samples,)
-            Return -1 for outliers and +1 for inliers.
-        """
-
-        if getattr(self, 'novelty', False):
-            raise ValueError(
-                'fit_predict is not available when novelty=True, use '
-                'novelty=False if you want to predict on the training data'
-            )
-
-        return self.fit(X).predict()
 
     def fit(self, X, y=None):
         """Fit the model according to the given training data.
@@ -150,6 +128,31 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         self._rv            = self._get_rv()
 
         return self
+
+    def fit_predict(self, X, y=None):
+        """Fit the model according to the given training data and predict if a
+        particular training sample is an outlier or not.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features)
+            Training Data.
+
+        y : ignored
+
+        Returns
+        -------
+        y_pred : array-like of shape (n_samples,)
+            Return -1 for outliers and +1 for inliers.
+        """
+
+        if getattr(self, 'novelty', False):
+            raise ValueError(
+                'fit_predict is not available when novelty=True, use '
+                'novelty=False if you want to predict on the training data'
+            )
+
+        return self.fit(X).predict()
 
     def predict(self, X=None, threshold=None):
         """Predict if a particular sample is an outlier or not.
@@ -279,6 +282,30 @@ class BaseOutlierDetector(BaseEstimator, ABC):
             'anomaly_score is not available when novelty=False, use '
             'novelty=True if you want to predict on new unseen data'
         )
+
+    def score(self, X=None, y=None):
+        """Compute the Lee-Liu metric.
+
+        Parameters
+        ----------
+        X : array-like of shape (n_samples, n_features), default None
+            Data. If None, compute the Lee-Liu metric for each training sample.
+
+        y : array-like of shape (n_samples,), default None
+            Labels. If None, assume that all samples are positive.
+
+        Returns
+        -------
+        score : float
+            Lee-Liu metric.
+        """
+
+        y_pred = self.predict(X)
+
+        if y is None:
+            y  = np.ones_like(y_pred)
+
+        return lee_liu_score(y, y_pred)
 
     def to_pickle(self, filename, **kwargs):
         """Persist an outlier detector object.

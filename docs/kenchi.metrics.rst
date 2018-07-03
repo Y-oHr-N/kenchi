@@ -1,4 +1,4 @@
-.. automodule:: kenchi.outlier_detection.ensemble
+.. automodule:: kenchi.metrics
     :members:
     :undoc-members:
     :show-inheritance:

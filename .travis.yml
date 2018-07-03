@@ -9,6 +9,9 @@ branches:
   only:
     - master
 
+notifications:
+  email: false
+
 install:
   - pip install coveralls
   - pip install -r requirements.txt

@@ -132,26 +132,3 @@ class MiniBatchKMeans(BaseOutlierDetector):
 
     def _anomaly_score(self, X):
         return np.min(self.estimator_.transform(X), axis=1)
-
-    def score(self, X, y=None):
-        """Compute the opposite value of the given data on the K-means
-        objective.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features)
-            Data.
-
-        y : ignored
-
-        Returns
-        -------
-        score : float
-            Opposite value of the given data on the K-means objective.
-        """
-
-        self._check_is_fitted()
-
-        X = self._check_array(X, estimator=self)
-
-        return self.estimator_.score(X)

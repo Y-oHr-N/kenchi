@@ -19,6 +19,9 @@
 .. image:: https://readthedocs.org/projects/kenchi/badge/?version=latest
     :target: http://kenchi.readthedocs.io/en/latest/?badge=latest
 
+.. image:: https://mybinder.org/badge.svg
+   :target: https://mybinder.org/v2/gh/Y-oHr-N/kenchi/master
+
 kenchi
 ======
 
@@ -150,6 +153,10 @@ References
 .. [#kriegel08] Kriegel, H.-P., Schubert, M., and Zimek, A.,
     `"Angle-based outlier detection in high-dimensional data," <https://doi.org/10.1145/1401890.1401946>`_
     In Proceedings of SIGKDD, pp. 444-452, 2008.
+
+.. [#lee03] Lee, W. S, and Liu, B.,
+    "Learning with positive and unlabeled examples using weighted Logistic Regression,"
+    In Proceedings of ICML, pp. 448-455, 2003.
 
 .. [#liu08] Liu, F. T., Ting, K. M., and Zhou, Z.-H.,
     `"Isolation forest," <https://doi.org/10.1145/2133360.2133363>`_

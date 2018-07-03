@@ -1,5 +1,5 @@
-kenchi\.datasets package
-========================
+kenchi.datasets package
+=======================
 
 Submodules
 ----------
@@ -7,7 +7,7 @@ Submodules
 .. toctree::
 
    kenchi.datasets.base
-   kenchi.datasets.sample_generator
+   kenchi.datasets.samples_generator
 
 Module contents
 ---------------

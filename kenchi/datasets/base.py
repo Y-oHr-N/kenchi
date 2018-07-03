@@ -4,10 +4,11 @@ import numpy as np
 from sklearn.datasets import load_breast_cancer
 from sklearn.utils import check_random_state, Bunch
 
-__all__   = ['load_pendigits', 'load_pima', 'load_wdbc', 'load_wilt']
+__all__     = ['load_pendigits', 'load_pima', 'load_wdbc', 'load_wilt']
 
-NEG_LABEL = -1
-POS_LABEL = 1
+MODULE_PATH = os.path.dirname(__file__)
+NEG_LABEL   = -1
+POS_LABEL   = 1
 
 
 def load_pendigits(random_state=None, return_X_y=False, subset='kriegel11'):
@@ -88,10 +89,8 @@ def load_pendigits(random_state=None, return_X_y=False, subset='kriegel11'):
     (6724, 16)
     """
 
-    module_path              = os.path.dirname(__file__)
-
     filename_train           = os.path.join(
-        module_path, 'data', 'pendigits_train.csv.gz'
+        MODULE_PATH, 'data', 'pendigits_train.csv.gz'
     )
     data_train               = np.loadtxt(filename_train, delimiter=',')
     X_train                  = data_train[:, :-1]
@@ -130,7 +129,7 @@ def load_pendigits(random_state=None, return_X_y=False, subset='kriegel11'):
 
     if subset == 'kriegel11':
         filename_test        = os.path.join(
-            module_path, 'data', 'pendigits_test.csv.gz'
+            MODULE_PATH, 'data', 'pendigits_test.csv.gz'
         )
         data_test            = np.loadtxt(filename_test, delimiter=',')
         X_test               = data_test[:, :-1]
@@ -214,9 +213,7 @@ def load_pima(return_X_y=False):
     (768, 8)
     """
 
-    module_path    = os.path.dirname(__file__)
-
-    filename       = os.path.join(module_path, 'data', 'pima.csv.gz')
+    filename       = os.path.join(MODULE_PATH, 'data', 'pima.csv.gz')
     data           = np.loadtxt(filename, delimiter=',', skiprows=1)
     X              = data[:, :-1]
     y              = data[:, -1]
@@ -393,16 +390,14 @@ def load_wilt(return_X_y=False):
     (4839, 5)
     """
 
-    module_path    = os.path.dirname(__file__)
-
-    filename_train = os.path.join(module_path, 'data', 'wilt_train.csv.gz')
+    filename_train = os.path.join(MODULE_PATH, 'data', 'wilt_train.csv.gz')
     data_train     = np.loadtxt(
         filename_train, delimiter=',', dtype=object, skiprows=1
     )
     X_train        = data_train[:, 1:]
     y_train        = data_train[:, 0]
 
-    filename_test  = os.path.join(module_path, 'data', 'wilt_test.csv.gz')
+    filename_test  = os.path.join(MODULE_PATH, 'data', 'wilt_test.csv.gz')
     data_test      = np.loadtxt(
         filename_test, delimiter=',', dtype=object, skiprows=1
     )

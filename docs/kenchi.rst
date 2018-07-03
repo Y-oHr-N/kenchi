@@ -14,8 +14,10 @@ Submodules
 
 .. toctree::
 
+   kenchi.metrics
    kenchi.pipeline
-   kenchi.visualization
+   kenchi.plotting
+   kenchi.utils
 
 Module contents
 ---------------
