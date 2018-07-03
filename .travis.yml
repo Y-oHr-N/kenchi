@@ -13,6 +13,7 @@ notifications:
   email: false
 
 install:
+  - pip install --upgrade pip setuptools
   - pip install coveralls
   - pip install -r requirements.txt
 
