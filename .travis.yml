@@ -1,10 +1,3 @@
-sudo: false
-
-language: python
-
-python:
-  - 3.6
-
 branches:
   only:
     - master
@@ -12,10 +5,28 @@ branches:
 notifications:
   email: false
 
+language: python
+
+matrix:
+  include:
+    - os: linux
+      sudo: false
+      python: 3.6
+#     - os: linux
+#       sudo: false
+#       python: 3.7-dev
+#     - os: osx
+#       sudo: false
+#       python: 3.6
+#     - os: osx
+#       sudo: false
+#       python: 3.7-dev
+
 install:
   - pip install --upgrade pip setuptools
   - pip install coveralls
   - pip install -r requirements.txt
+  - pip install .
 
 script:
   - coverage run --source=kenchi setup.py test
