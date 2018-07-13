@@ -31,8 +31,6 @@ Dependencies
 ------------
 
 -  Python (>=3.6)
--  `matplotlib <https://matplotlib.org>`_ (>=2.1.1)
--  `networkx <https://networkx.github.io/>`_ (>=2.0)
 -  `numpy <http://www.numpy.org/>`_ (>=1.14.0)
 -  `scikit-learn <http://scikit-learn.org/>`_ (>=0.19.1)
 -  `scipy <https://www.scipy.org/scipylib/>`_ (>=1.0.0)
