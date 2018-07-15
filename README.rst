@@ -1,28 +1,28 @@
-.. image:: https://travis-ci.org/Y-oHr-N/kenchi.svg?branch=master
-    :target: https://travis-ci.org/Y-oHr-N/kenchi
+.. image:: https://travis-ci.org/HazureChi/Kenchi.svg?branch=master
+    :target: https://travis-ci.org/HazureChi/Kenchi
 
-.. image:: https://ci.appveyor.com/api/projects/status/5cjkl0jrxo7gmug0/branch/master?svg=true
-    :target: https://ci.appveyor.com/project/Y-oHr-N/kenchi/branch/master
+.. image:: https://ci.appveyor.com/api/projects/status/fo0ofm15ff1fskvs/branch/master?svg=true
+    :target: https://ci.appveyor.com/project/Y-oHr-N/Kenchi/branch/master
 
-.. image:: https://coveralls.io/repos/github/Y-oHr-N/kenchi/badge.svg?branch=master
-    :target: https://coveralls.io/github/Y-oHr-N/kenchi?branch=master
+.. image:: https://coveralls.io/repos/github/HazureChi/Kenchi/badge.svg?branch=master
+    :target: https://coveralls.io/github/HazureChi/Kenchi?branch=master
 
-.. image:: https://codeclimate.com/github/Y-oHr-N/kenchi/badges/gpa.svg
-    :target: https://codeclimate.com/github/Y-oHr-N/kenchi
+.. image:: https://codeclimate.com/github/HazureChi/Kenchi/badges/gpa.svg
+    :target: https://codeclimate.com/github/HazureChi/Kenchi
 
 .. image:: https://badge.fury.io/py/kenchi.svg
     :target: https://badge.fury.io/py/kenchi
 
-.. image:: https://anaconda.org/Y_oHr_N/kenchi/badges/version.svg
-    :target: https://anaconda.org/Y_oHr_N/kenchi
+.. image:: https://anaconda.org/Y_oHr_N/Kenchi/badges/version.svg
+    :target: https://anaconda.org/Y_oHr_N/Kenchi
 
 .. image:: https://readthedocs.org/projects/kenchi/badge/?version=latest
-    :target: http://kenchi.readthedocs.io/en/latest/?badge=latest
+    :target: http://kenchi.rtfd.io/en/latest/?badge=latest
 
 .. image:: https://mybinder.org/badge.svg
-   :target: https://mybinder.org/v2/gh/Y-oHr-N/kenchi/master?urlpath=lab
+   :target: https://mybinder.org/v2/gh/HazureChi/Kenchi/master?urlpath=lab
 
-kenchi
+Kenchi
 ======
 
 This is a set of python modules for anomaly detection.
@@ -107,7 +107,7 @@ Examples
     # Display the figure
     plt.show()
 
-.. figure:: https://raw.githubusercontent.com/Y-oHr-N/kenchi/master/docs/images/readme.png
+.. figure:: https://raw.githubusercontent.com/HazureChi/Kenchi/master/docs/images/readme.png
     :align: center
 
 License
