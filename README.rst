@@ -1,23 +1,32 @@
-.. image:: https://travis-ci.org/HazureChi/Kenchi.svg?branch=master
-    :target: https://travis-ci.org/HazureChi/Kenchi
+.. image:: https://img.shields.io/github/license/HazureChi/Kenchi.svg
+    :target: https://github.com/HazureChi/Kenchi/blob/master/LICENSE
 
-.. image:: https://ci.appveyor.com/api/projects/status/fo0ofm15ff1fskvs/branch/master?svg=true
-    :target: https://ci.appveyor.com/project/Y-oHr-N/Kenchi/branch/master
+.. image:: https://img.shields.io/pypi/v/Kenchi.svg
+    :target: https://pypi.org/project/Kenchi
 
-.. image:: https://coveralls.io/repos/github/HazureChi/Kenchi/badge.svg?branch=master
-    :target: https://coveralls.io/github/HazureChi/Kenchi?branch=master
+.. image:: https://img.shields.io/pypi/pyversions/Kenchi.svg
+    :target: https://pypi.org/project/Kenchi
 
-.. image:: https://codeclimate.com/github/HazureChi/Kenchi/badges/gpa.svg
-    :target: https://codeclimate.com/github/HazureChi/Kenchi
-
-.. image:: https://badge.fury.io/py/kenchi.svg
-    :target: https://badge.fury.io/py/kenchi
-
-.. image:: https://anaconda.org/Y_oHr_N/Kenchi/badges/version.svg
+.. image:: https://img.shields.io/conda/v/Y_oHr_N/Kenchi.svg
     :target: https://anaconda.org/Y_oHr_N/Kenchi
 
-.. image:: https://readthedocs.org/projects/kenchi/badge/?version=latest
-    :target: http://kenchi.rtfd.io/en/latest/?badge=latest
+.. image:: https://img.shields.io/conda/pn/Y_oHr_N/Kenchi.svg
+    :target: https://anaconda.org/Y_oHr_N/Kenchi
+
+.. image:: https://img.shields.io/readthedocs/kenchi/stable.svg
+    :target: http://kenchi.rtfd.io/en/stable
+
+.. image:: https://img.shields.io/travis/HazureChi/Kenchi/master.svg
+    :target: https://travis-ci.org/HazureChi/Kenchi
+
+.. image:: https://img.shields.io/appveyor/ci/Y-oHr-N/Kenchi/master.svg
+    :target: https://ci.appveyor.com/project/Y-oHr-N/Kenchi/branch/master
+
+.. image:: https://img.shields.io/coveralls/github/HazureChi/Kenchi/master.svg
+    :target: https://coveralls.io/github/HazureChi/Kenchi?branch=master
+
+.. image:: https://img.shields.io/codeclimate/maintainability/HazureChi/Kenchi.svg
+    :target: https://codeclimate.com/github/HazureChi/Kenchi
 
 .. image:: https://mybinder.org/badge.svg
    :target: https://mybinder.org/v2/gh/HazureChi/Kenchi/master?urlpath=lab
@@ -30,7 +39,6 @@ This is a set of python modules for anomaly detection.
 Dependencies
 ------------
 
--  Python (>=3.6)
 -  `numpy <http://www.numpy.org/>`_ (>=1.14.0)
 -  `scikit-learn <http://scikit-learn.org/>`_ (>=0.19.1)
 -  `scipy <https://www.scipy.org/scipylib/>`_ (>=1.0.0)
@@ -109,13 +117,6 @@ Examples
 
 .. figure:: https://raw.githubusercontent.com/HazureChi/Kenchi/master/docs/images/readme.png
     :align: center
-
-License
--------
-
-BSD 3-Clause "New" or "Revised" License
-
-Copyright (c) 2018, Kon
 
 References
 ----------
