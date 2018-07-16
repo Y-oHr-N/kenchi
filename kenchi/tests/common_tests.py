@@ -88,16 +88,6 @@ class OutlierDetectorTestMixin:
         self.assertEqual(anomaly_score.shape, self.y_test.shape)
         self.assertGreaterEqual(np.min(anomaly_score), 0.)
 
-    def test_score(self):
-        if hasattr(self.sut, 'novelty'):
-            self.sut.set_params(novelty=True)
-
-        self.sut.fit(self.X_train)
-
-        score = self.sut.score(self.X_test, self.y_test)
-
-        self.assertIsInstance(score, float)
-
     def test_roc_auc_score(self):
         if hasattr(self.sut, 'novelty'):
             self.sut.set_params(novelty=True)
@@ -155,9 +145,6 @@ class OutlierDetectorTestMixin:
 
     def test_anomaly_score_notfitted(self):
         self.assertRaises(NotFittedError, self.sut.anomaly_score, self.X_test)
-
-    def test_score_notfitted(self):
-        self.assertRaises(NotFittedError, self.sut.score, self.X_test)
 
     @if_matplotlib
     def test_plot_anomaly_score_notfitted(self):

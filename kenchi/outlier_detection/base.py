@@ -7,7 +7,6 @@ from sklearn.externals.joblib import dump
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
-from ..metrics import lee_liu_score
 from ..plotting import plot_anomaly_score, plot_roc_curve
 from ..utils import check_contamination
 
@@ -282,30 +281,6 @@ class BaseOutlierDetector(BaseEstimator, ABC):
             'anomaly_score is not available when novelty=False, use '
             'novelty=True if you want to predict on new unseen data'
         )
-
-    def score(self, X=None, y=None):
-        """Compute the Lee-Liu metric.
-
-        Parameters
-        ----------
-        X : array-like of shape (n_samples, n_features), default None
-            Data. If None, compute the Lee-Liu metric for each training sample.
-
-        y : array-like of shape (n_samples,), default None
-            Labels. If None, assume that all samples are positive.
-
-        Returns
-        -------
-        score : float
-            Lee-Liu metric.
-        """
-
-        y_pred = self.predict(X)
-
-        if y is None:
-            y  = np.ones_like(y_pred)
-
-        return lee_liu_score(y, y_pred)
 
     def to_pickle(self, filename, **kwargs):
         """Persist an outlier detector object.
