@@ -69,7 +69,12 @@ class BaseOutlierDetector(BaseEstimator, ABC):
     def _check_is_fitted(self):
         """Raise NotFittedError if the estimator is not fitted."""
 
-        check_is_fitted(self, ['anomaly_score_', 'classes_', 'threshold_'])
+        check_is_fitted(
+            self, [
+                'anomaly_score_', 'classes_', 'contamination_', 'n_features_',
+                'random_variable_', 'threshold_'
+            ]
+        )
 
     def _get_contamination(self):
         """Get the contamination according to the derived anomaly scores."""
