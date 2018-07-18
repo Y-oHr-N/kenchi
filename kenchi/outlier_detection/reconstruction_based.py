@@ -43,6 +43,9 @@ class PCA(BaseOutlierDetector):
     anomaly_score_ : array-like of shape (n_samples,)
         Anomaly score for each training data.
 
+    contamination_ : float
+        Actual proportion of outliers in the data set.
+
     threshold_ : float
         Threshold.
 

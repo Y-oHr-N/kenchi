@@ -71,6 +71,18 @@ class BaseOutlierDetector(BaseEstimator, ABC):
 
         check_is_fitted(self, ['anomaly_score_', 'classes_', 'threshold_'])
 
+    def _get_contamination(self):
+        """Get the contamination according to the derived anomaly scores."""
+
+        if hasattr(self, 'contamination'):
+            return self.contamination
+
+        is_outlier = self.anomaly_score_ > self.threshold_
+        n_samples, = is_outlier.shape
+        n_outliers = np.sum(is_outlier)
+
+        return n_outliers / n_samples
+
     def _get_threshold(self):
         """Get the threshold according to the derived anomaly scores."""
 
@@ -117,10 +129,13 @@ class BaseOutlierDetector(BaseEstimator, ABC):
 
         self._fit(X)
 
-        self.anomaly_score_ = self._anomaly_score(X)
         self.classes_       = np.array([NEG_LABEL, POS_LABEL])
         _, self.n_features_ = X.shape
+
+        self.anomaly_score_ = self._anomaly_score(X)
         self.threshold_     = self._get_threshold()
+
+        self.contamination_ = self._get_contamination()
         self._rv            = self._get_rv()
 
         return self
