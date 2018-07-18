@@ -256,11 +256,11 @@ class OneTimeSampling(BaseOutlierDetector):
         self.subsamples_ = np.sort(subsamples)
         self.S_          = X[self.subsamples_]
 
-        self._metric     = DistanceMetric.get_metric(
+        self.metric_     = DistanceMetric.get_metric(
             self.metric, **self._metric_params
         )
 
         return self
 
     def _anomaly_score(self, X):
-        return np.min(self._metric.pairwise(X, self.S_), axis=1)
+        return np.min(self.metric_.pairwise(X, self.S_), axis=1)
