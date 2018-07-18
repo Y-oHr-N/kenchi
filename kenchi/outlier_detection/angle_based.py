@@ -90,9 +90,8 @@ class FastABOD(BaseOutlierDetector):
         metric='minkowski', novelty=False, n_jobs=1, n_neighbors=20,
         p=2, metric_params=None
     ):
-        super().__init__(contamination=contamination)
-
         self.algorithm     = algorithm
+        self.contamination = contamination
         self.leaf_size     = leaf_size
         self.metric        = metric
         self.novelty       = novelty

@@ -142,8 +142,7 @@ class GMM(BaseOutlierDetector):
         precisions_init=None, random_state=None, reg_covar=1e-06, tol=1e-03,
         warm_start=False, weights_init=None
     ):
-        super().__init__(contamination=contamination)
-
+        self.contamination   = contamination
         self.covariance_type = covariance_type
         self.init_params     = init_params
         self.max_iter        = max_iter
@@ -245,10 +244,9 @@ class HBOS(BaseOutlierDetector):
     """
 
     def __init__(self, bins='auto', contamination=0.1, novelty=False):
-        super().__init__(contamination=contamination)
-
-        self.bins    = bins
-        self.novelty = novelty
+        self.bins          = bins
+        self.contamination = contamination
+        self.novelty       = novelty
 
     def _check_is_fitted(self):
         super()._check_is_fitted()
@@ -365,12 +363,11 @@ class KDE(BaseOutlierDetector):
         breadth_first=True, contamination=0.1, kernel='gaussian', leaf_size=40,
         metric='euclidean', rtol=0., metric_params=None
     ):
-        super().__init__(contamination=contamination)
-
         self.algorithm     = algorithm
         self.atol          = atol
         self.bandwidth     = bandwidth
         self.breadth_first = breadth_first
+        self.contamination = contamination
         self.kernel        = kernel
         self.leaf_size     = leaf_size
         self.metric        = metric
@@ -534,11 +531,10 @@ class SparseStructureLearning(BaseOutlierDetector):
         enet_tol=1e-04, max_iter=100, mode='cd', tol=1e-04,
         apcluster_params=None
     ):
-        super().__init__(contamination=contamination)
-
         self.alpha            = alpha
         self.apcluster_params = apcluster_params
         self.assume_centered  = assume_centered
+        self.contamination    = contamination
         self.enet_tol         = enet_tol
         self.max_iter         = max_iter
         self.mode             = mode

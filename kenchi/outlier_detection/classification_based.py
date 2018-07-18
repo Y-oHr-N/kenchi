@@ -88,8 +88,6 @@ class OCSVM(BaseOutlierDetector):
         self, cache_size=200, gamma='auto', max_iter=-1,
         nu=0.5, shrinking=True, tol=0.001, random_state=None
     ):
-        super().__init__()
-
         self.cache_size   = cache_size
         self.gamma        = gamma
         self.max_iter     = max_iter

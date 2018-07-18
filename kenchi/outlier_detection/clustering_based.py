@@ -96,9 +96,8 @@ class MiniBatchKMeans(BaseOutlierDetector):
         init_size=None, max_iter=100, max_no_improvement=10, n_clusters=8,
         n_init=3, random_state=None, reassignment_ratio=0.01, tol=0.0
     ):
-        super().__init__(contamination=contamination)
-
         self.batch_size         = batch_size
+        self.contamination      = contamination
         self.init               = init
         self.init_size          = init_size
         self.max_iter           = max_iter

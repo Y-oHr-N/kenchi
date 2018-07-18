@@ -45,14 +45,11 @@ class BaseOutlierDetector(BaseEstimator, ABC):
 
     _estimator_type = 'outlier_detector'
 
-    @abstractmethod
-    def __init__(self, contamination=0.1):
-        self.contamination = contamination
-
     def _check_params(self):
         """Raise ValueError if parameters are not valid."""
 
-        check_contamination(self.contamination)
+        if hasattr(self, 'contamination'):
+            check_contamination(self.contamination)
 
     def _check_array(self, X, **kwargs):
         """Raise ValueError if the array is not valid."""

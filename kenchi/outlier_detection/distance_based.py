@@ -93,10 +93,9 @@ class KNN(BaseOutlierDetector):
         leaf_size=30, metric='minkowski', novelty=False, n_jobs=1,
         n_neighbors=20, p=2, metric_params=None
     ):
-        super().__init__(contamination=contamination)
-
         self.aggregate     = aggregate
         self.algorithm     = algorithm
+        self.contamination = contamination
         self.leaf_size     = leaf_size
         self.metric        = metric
         self.novelty       = novelty
@@ -207,8 +206,7 @@ class OneTimeSampling(BaseOutlierDetector):
         self, contamination=0.1, metric='euclidean', novelty=False,
         n_subsamples=20, random_state=None, metric_params=None
     ):
-        super().__init__(contamination=contamination)
-
+        self.contamination = contamination
         self.metric        = metric
         self.novelty       = novelty
         self.n_subsamples  = n_subsamples
