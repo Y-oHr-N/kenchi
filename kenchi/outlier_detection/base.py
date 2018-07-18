@@ -92,7 +92,7 @@ class BaseOutlierDetector(BaseEstimator, ABC):
             interpolation = 'lower'
         )
 
-    def _get_rv(self):
+    def _get_random_variable(self):
         """Get the RV object according to the derived anomaly scores."""
 
         loc, scale = norm.fit(self.anomaly_score_)
@@ -125,18 +125,16 @@ class BaseOutlierDetector(BaseEstimator, ABC):
 
         self._check_params()
 
-        X                   = self._check_array(X, estimator=self)
+        X                     = self._check_array(X, estimator=self)
 
         self._fit(X)
 
-        self.classes_       = np.array([NEG_LABEL, POS_LABEL])
-        _, self.n_features_ = X.shape
-
-        self.anomaly_score_ = self._anomaly_score(X)
-        self.threshold_     = self._get_threshold()
-
-        self.contamination_ = self._get_contamination()
-        self._rv            = self._get_rv()
+        self.classes_         = np.array([NEG_LABEL, POS_LABEL])
+        _, self.n_features_   = X.shape
+        self.anomaly_score_   = self._anomaly_score(X)
+        self.threshold_       = self._get_threshold()
+        self.contamination_   = self._get_contamination()
+        self.random_variable_ = self._get_random_variable()
 
         return self
 
@@ -276,7 +274,9 @@ class BaseOutlierDetector(BaseEstimator, ABC):
             anomaly_score = self.anomaly_score_
 
             if normalize:
-                return np.maximum(0., 2. * self._rv.cdf(anomaly_score) - 1.)
+                return np.maximum(
+                    0., 2. * self.random_variable_.cdf(anomaly_score) - 1.
+                )
             else:
                 return anomaly_score
 
@@ -285,7 +285,9 @@ class BaseOutlierDetector(BaseEstimator, ABC):
             anomaly_score = self._anomaly_score(X)
 
             if normalize:
-                return np.maximum(0., 2. * self._rv.cdf(anomaly_score) - 1.)
+                return np.maximum(
+                    0., 2. * self.random_variable_.cdf(anomaly_score) - 1.
+                )
             else:
                 return anomaly_score
 
