@@ -1,59 +1,14 @@
 import numpy as np
 from sklearn.metrics import auc, recall_score
-from sklearn.utils import check_array, check_random_state, column_or_1d
+from sklearn.utils import check_random_state
 
-__all__ = ['mv_curve', 'LeeLiuScorer', 'NegativeMVAUCScorer']
+__all__ = ['LeeLiuScorer', 'NegativeMVAUCScorer']
 
 
-def mv_curve(
-    score_samples, score_uniform_samples, data_volume, n_offsets=1000
-):
-    """Compute mass-volume pairs for different offsets.
+def _lebesgue_measure(score_samples, offset, data_volume):
+    """Compute Lebesgue measure."""
 
-    Parameters
-    ----------
-    score_samples : array-like of shape (n_samples,)
-        Opposite of the anomaly score for each sample.
-
-    score_uniform_samples : array-like of shape (n_uniform_samples,)
-        Opposite of the anomaly score for each sample which is drawn from the
-        uniform distribution over the hypercube enclosing the data.
-
-    data_volume : float
-        Volume of the hypercube enclosing the data.
-
-    n_offsets : int, default 1000
-        Number of offsets.
-
-    Returns
-    -------
-    mass : array-like of shape (n_offsets,)
-
-    volume : array-like of shape (n_offsets,)
-
-    offsets : array-like of shape (n_offsets,)
-
-    References
-    ----------
-    .. [#goix16] Goix, N.,
-        "How to evaluate the quality of unsupervised anomaly detection
-        algorithms?"
-        In ICML Anomaly Detection Workshop, 2016.
-    """
-
-    def lebesgue_measure(offset, score_uniform_samples, data_volume):
-        return np.mean(score_uniform_samples >= offset) * data_volume
-
-    score_samples         = column_or_1d(score_samples)
-    score_uniform_samples = column_or_1d(score_uniform_samples)
-
-    mass                  = np.linspace(0., 1., n_offsets)
-    offsets               = np.percentile(score_samples, 100. * (1. - mass))
-    volume                = np.vectorize(
-        lebesgue_measure, excluded=[1, 2]
-    )(offsets, score_uniform_samples, data_volume)
-
-    return mass, volume, offsets
+    return np.mean(score_samples >= offset) * data_volume
 
 
 class LeeLiuScorer:
@@ -102,8 +57,11 @@ class NegativeMVAUCScorer:
 
     Parameters
     ----------
-    X : array-like of shape (n_samples, n_features)
-        Training data.
+    data_max : array-like of shape (n_features,)
+        Per feature maximum seen in the data.
+
+    data_min : array-like of shape (n_features,)
+        Per feature minimum seen in the data.
 
     interval : tuple, default (0.9, 0.999)
         Interval of probabilities.
@@ -126,25 +84,17 @@ class NegativeMVAUCScorer:
         In ICML Anomaly Detection Workshop, 2016.
     """
 
-    max_n_features = 8
-
     def __init__(
-        self, X, interval=(0.9, 0.999), n_offsets=1000,
-        n_uniform_samples=1000, random_state=None
+        self, data_max, data_min, interval=(0.9, 0.999),
+        n_offsets=1000, n_uniform_samples=1000, random_state=None
     ):
-        self.interval    = interval
-        self.n_offsets   = n_offsets
-
-        rnd              = check_random_state(random_state)
-        X                = self._check_array(X)
-        _, n_features    = X.shape
-        data_max         = np.max(X, axis=0)
-        data_min         = np.min(X, axis=0)
-
-        self.data_volume = np.prod(data_max - data_min)
-        self.U           = rnd.uniform(
-            low=data_min, high=data_max, size=(n_uniform_samples, n_features)
-        )
+        self.data_max          = data_max
+        self.data_min          = data_min
+        self.interval          = interval
+        self.n_offsets         = n_offsets
+        self.n_uniform_samples = n_uniform_samples
+        self.random_state      = random_state
+        self.internal_state    = check_random_state(random_state).get_state()
 
     def __call__(self, det, X, y=None):
         """Compute the opposite of the area under the Mass-Volume (MV) curve.
@@ -165,14 +115,21 @@ class NegativeMVAUCScorer:
             Opposite of the area under the MV curve.
         """
 
-        score_samples         = det.score_samples(X)
-        score_uniform_samples = det.score_samples(self.U)
+        rnd                   = np.random.RandomState()
 
-        mass, volume, _       = mv_curve(
-            score_samples,
-            score_uniform_samples,
-            self.data_volume,
-            n_offsets         = self.n_offsets
+        rnd.set_state(self.internal_state)
+
+        U                     = rnd.uniform(
+            low               = self.data_min,
+            high              = self.data_max,
+            size              = (self.n_uniform_samples, det.n_features_)
+        )
+
+        score_samples         = det.score_samples(X)
+        score_uniform_samples = det.score_samples(U)
+
+        mass, volume, _       = self._mv_curve(
+            score_samples, score_uniform_samples
         )
 
         is_in_range           = \
@@ -180,16 +137,35 @@ class NegativeMVAUCScorer:
 
         return -auc(mass[is_in_range], volume[is_in_range], reorder=True)
 
-    def _check_array(self, X, **kwargs):
-        """Raise ValueError if the array is not valid."""
+    def _mv_curve(self, score_samples, score_uniform_samples):
+        """Compute mass-volume pairs for different offsets.
 
-        X             = check_array(X, **kwargs)
-        _, n_features = X.shape
+        Parameters
+        ----------
+        score_samples : array-like of shape (n_samples,)
+            Opposite of the anomaly score for each sample.
 
-        if n_features > self.max_n_features:
-            raise ValueError(
-                f'X is expected to have {self.max_n_features} or less '
-                f'features but had {n_features} features'
-            )
+        score_uniform_samples : array-like of shape (n_uniform_samples,)
+            Opposite of the anomaly score for each sample which is drawn from
+            the uniform distribution over the hypercube enclosing the data.
 
-        return X
+        Returns
+        -------
+        mass : array-like of shape (n_offsets,)
+
+        volume : array-like of shape (n_offsets,)
+
+        offsets : array-like of shape (n_offsets,)
+        """
+
+        data_volume           = np.prod(self.data_max - self.data_min)
+
+        mass                  = np.linspace(0., 1., self.n_offsets)
+        offsets               = np.percentile(
+            score_samples, 100. * (1. - mass)
+        )
+        volume                = np.vectorize(
+            _lebesgue_measure, excluded=[0, 2]
+        )(score_uniform_samples, offsets, data_volume)
+
+        return mass, volume, offsets
