@@ -71,7 +71,7 @@ Algorithms
 #. PCA
 #. GMM
 #. HBOS [#goldstein12]_
-#. KDE
+#. KDE [#parzen62]_
 #. SparseStructureLearning [#ide09]_
 
 Examples
@@ -160,6 +160,10 @@ References
 .. [#liu08] Liu, F. T., Ting, K. M., and Zhou, Z.-H.,
     `"Isolation forest," <https://doi.org/10.1145/2133360.2133363>`_
     In Proceedings of ICDM, pp. 413-422, 2008.
+
+.. [#parzen62] Parzen, E.,
+    `"On estimation of a probability density function and mode," <https://doi.org/10.1214/aoms/1177704472>`_
+    Ann. Math. Statist., 33(3), pp. 1065-1076, 1962.
 
 .. [#ramaswamy00] Ramaswamy, S., Rastogi, R., and Shim, K.,
     `"Efficient algorithms for mining outliers from large data sets," <https://doi.org/10.1145/335191.335437>`_

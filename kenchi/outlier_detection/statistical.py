@@ -350,6 +350,12 @@ class KDE(BaseOutlierDetector):
     X_ : array-like of shape (n_samples, n_features)
         Training data.
 
+    References
+    ----------
+    .. [#parzen62] Parzen, E.,
+        "On estimation of a probability density function and mode,"
+        Ann. Math. Statist., 33(3), pp. 1065-1076, 1962.
+
     Examples
     --------
     >>> import numpy as np
