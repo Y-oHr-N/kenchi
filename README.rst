@@ -34,14 +34,18 @@
 Kenchi
 ======
 
-This is a set of python modules for anomaly detection.
+This is a scikit-learn compatible library for anomaly detection.
 
 Dependencies
 ------------
 
--  `numpy <http://www.numpy.org/>`_ (>=1.14.0)
--  `scikit-learn <http://scikit-learn.org/>`_ (>=0.19.1)
--  `scipy <https://www.scipy.org/scipylib/>`_ (>=1.0.0)
+- Required dependencies
+    #. `numpy>=1.13.3 <http://www.numpy.org/>`_ (BSD 3-Clause License)
+    #. `scikit-learn>=0.19.2 <http://scikit-learn.org/>`_ (BSD 3-Clause License)
+    #. `scipy>=0.19.1 <https://www.scipy.org/scipylib/>`_ (BSD 3-Clause License)
+- Optional dependencies
+    #. `matplotlib>=2.1.2 <https://matplotlib.org/>`_ (PSF License)
+    #. `networkx>=2.1 <https://networkx.github.io/>`_ (BSD 3-Clause License)
 
 Installation
 ------------
@@ -61,18 +65,20 @@ or ``conda``.
 Algorithms
 ----------
 
-#. FastABOD [#kriegel08]_
-#. OCSVM [#scholkopf01]_
-#. MiniBatchKMeans
-#. LOF [#breunig00]_
-#. KNN [#angiulli02]_, [#ramaswamy00]_
-#. OneTimeSampling [#sugiyama13]_
-#. IForest [#liu08]_
-#. PCA
-#. GMM
-#. HBOS [#goldstein12]_
-#. KDE [#parzen62]_
-#. SparseStructureLearning [#ide09]_
+- Outlier detection
+    #. FastABOD [#kriegel08]_
+    #. LOF [#breunig00]_ (scikit-learn wrapper)
+    #. KNN [#angiulli02]_, [#ramaswamy00]_
+    #. OneTimeSampling [#sugiyama13]_
+    #. HBOS [#goldstein12]_
+- Novelty detection
+    #. OCSVM [#scholkopf01]_ (scikit-learn wrapper)
+    #. MiniBatchKMeans
+    #. IForest [#liu08]_ (scikit-learn wrapper)
+    #. PCA
+    #. GMM (scikit-learn wrapper)
+    #. KDE [#parzen62]_ (scikit-learn wrapper)
+    #. SparseStructureLearning [#ide09]_
 
 Examples
 --------
