@@ -330,7 +330,7 @@ def plot_graphical_model(
         ax.set_title(title)
 
     node_size = np.array([30. * (d + 1.) for _, d in G.degree])
-    pos       = nx.spring_layout(G, random_state=random_state)
+    pos       = nx.spring_layout(G, seed=random_state)
     width     = np.abs([3. * w for _, _, w in G.edges(data='weight')])
 
     # Add the draw_networkx kwargs here

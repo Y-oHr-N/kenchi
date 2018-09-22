@@ -45,7 +45,7 @@ Dependencies
     #. `scipy>=0.19.1 <https://www.scipy.org/scipylib/>`_ (BSD 3-Clause License)
 - Optional dependencies
     #. `matplotlib>=2.1.2 <https://matplotlib.org/>`_ (PSF License)
-    #. `networkx>=2.1 <https://networkx.github.io/>`_ (BSD 3-Clause License)
+    #. `networkx>=2.2 <https://networkx.github.io/>`_ (BSD 3-Clause License)
 
 Installation
 ------------
