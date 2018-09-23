@@ -1,19 +1,19 @@
 import doctest
 import unittest
 
-from kenchi.outlier_detection import clustering_based
+from kenchi.outlier_detection import knn
 from kenchi.tests.common_tests import OutlierDetectorTestMixin
 
 
 def load_tests(loader, tests, ignore):
-    tests.addTests(doctest.DocTestSuite(clustering_based))
+    tests.addTests(doctest.DocTestSuite(knn))
 
     return tests
 
 
-class MiniBatchKMeansTest(unittest.TestCase, OutlierDetectorTestMixin):
+class KNNTest(unittest.TestCase, OutlierDetectorTestMixin):
     def setUp(self):
         self.X_train, self.X_test, self.y_train, self.y_test = \
             self.prepare_data()
 
-        self.sut = clustering_based.MiniBatchKMeans(random_state=0)
+        self.sut = knn.KNN(n_neighbors=3)

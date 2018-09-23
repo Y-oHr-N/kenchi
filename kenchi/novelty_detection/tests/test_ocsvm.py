@@ -2,12 +2,12 @@ import doctest
 import unittest
 
 import numpy as np
-from kenchi.outlier_detection import classification_based
+from kenchi.novelty_detection import ocsvm
 from kenchi.tests.common_tests import OutlierDetectorTestMixin
 
 
 def load_tests(loader, tests, ignore):
-    tests.addTests(doctest.DocTestSuite(classification_based))
+    tests.addTests(doctest.DocTestSuite(ocsvm))
 
     return tests
 
@@ -17,7 +17,7 @@ class OCSVMTest(unittest.TestCase, OutlierDetectorTestMixin):
         self.X_train, self.X_test, self.y_train, self.y_test = \
             self.prepare_data()
 
-        self.sut = classification_based.OCSVM(random_state=0)
+        self.sut = ocsvm.OCSVM(random_state=0)
 
     def test_predict(self):
         super().test_predict()

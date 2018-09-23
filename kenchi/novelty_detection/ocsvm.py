@@ -2,7 +2,7 @@ from sklearn.metrics.pairwise import rbf_kernel
 from sklearn.svm import OneClassSVM
 from sklearn.utils.validation import check_is_fitted
 
-from .base import BaseOutlierDetector
+from ..base import BaseOutlierDetector
 
 __all__ = ['OCSVM']
 
@@ -61,7 +61,7 @@ class OCSVM(BaseOutlierDetector):
     Examples
     --------
     >>> import numpy as np
-    >>> from kenchi.outlier_detection import OCSVM
+    >>> from kenchi.novelty_detection import OCSVM
     >>> X = np.array([
     ...     [0., 0.], [1., 1.], [2., 0.], [3., -1.], [4., 0.],
     ...     [5., 1.], [6., 0.], [7., -1.], [8., 0.], [1000., 1.]

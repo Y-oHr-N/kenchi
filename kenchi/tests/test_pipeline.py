@@ -2,7 +2,7 @@ import doctest
 import unittest
 
 from kenchi import pipeline
-from kenchi.outlier_detection import SparseStructureLearning
+from kenchi.novelty_detection import SparseStructureLearning
 from kenchi.tests.common_tests import OutlierDetectorTestMixin
 from sklearn.exceptions import NotFittedError
 from sklearn.preprocessing import StandardScaler

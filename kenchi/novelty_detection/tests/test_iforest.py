@@ -2,12 +2,12 @@ import doctest
 import unittest
 
 import numpy as np
-from kenchi.outlier_detection import ensemble
+from kenchi.novelty_detection import iforest
 from kenchi.tests.common_tests import OutlierDetectorTestMixin
 
 
 def load_tests(loader, tests, ignore):
-    tests.addTests(doctest.DocTestSuite(ensemble))
+    tests.addTests(doctest.DocTestSuite(iforest))
 
     return tests
 
@@ -17,7 +17,7 @@ class IForestTest(unittest.TestCase, OutlierDetectorTestMixin):
         self.X_train, self.X_test, self.y_train, self.y_test = \
             self.prepare_data()
 
-        self.sut = ensemble.IForest(random_state=0)
+        self.sut = iforest.IForest(random_state=0)
 
     def test_predict(self):
         super().test_predict()

@@ -2,12 +2,12 @@ import doctest
 import unittest
 
 import numpy as np
-from kenchi.outlier_detection import density_based
+from kenchi.outlier_detection import lof
 from kenchi.tests.common_tests import OutlierDetectorTestMixin
 
 
 def load_tests(loader, tests, ignore):
-    tests.addTests(doctest.DocTestSuite(density_based))
+    tests.addTests(doctest.DocTestSuite(lof))
 
     return tests
 
@@ -17,7 +17,7 @@ class LOFTest(unittest.TestCase, OutlierDetectorTestMixin):
         self.X_train, self.X_test, self.y_train, self.y_test = \
             self.prepare_data()
 
-        self.sut = density_based.LOF(n_neighbors=3)
+        self.sut = lof.LOF(n_neighbors=3)
 
     def test_predict(self):
         super().test_predict()

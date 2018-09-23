@@ -22,7 +22,7 @@ def make_pipeline(*steps):
 
     Examples
     --------
-    >>> from kenchi.outlier_detection import MiniBatchKMeans
+    >>> from kenchi.novelty_detection import MiniBatchKMeans
     >>> from kenchi.pipeline import make_pipeline
     >>> from sklearn.preprocessing import StandardScaler
     >>> scaler = StandardScaler()
@@ -62,7 +62,7 @@ class Pipeline(_Pipeline):
     Examples
     --------
     >>> import numpy as np
-    >>> from kenchi.outlier_detection import MiniBatchKMeans
+    >>> from kenchi.novelty_detection import MiniBatchKMeans
     >>> from kenchi.pipeline import Pipeline
     >>> from sklearn.preprocessing import StandardScaler
     >>> X = np.array([

@@ -70,7 +70,7 @@ def plot_anomaly_score(
     --------
     >>> import matplotlib.pyplot as plt
     >>> from kenchi.datasets import load_wdbc
-    >>> from kenchi.outlier_detection import MiniBatchKMeans
+    >>> from kenchi.novelty_detection import MiniBatchKMeans
     >>> from kenchi.plotting import plot_anomaly_score
     >>> X, _ = load_wdbc(random_state=0, return_X_y=True)
     >>> det = MiniBatchKMeans(random_state=0).fit(X)
@@ -223,7 +223,7 @@ def plot_roc_curve(
     --------
     >>> import matplotlib.pyplot as plt
     >>> from kenchi.datasets import load_wdbc
-    >>> from kenchi.outlier_detection import MiniBatchKMeans
+    >>> from kenchi.novelty_detection import MiniBatchKMeans
     >>> from kenchi.plotting import plot_roc_curve
     >>> X, y = load_wdbc(random_state=0, return_X_y=True)
     >>> det = MiniBatchKMeans(random_state=0).fit(X)

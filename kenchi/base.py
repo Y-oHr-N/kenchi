@@ -7,8 +7,8 @@ from sklearn.externals.joblib import dump
 from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
-from ..plotting import plot_anomaly_score, plot_roc_curve
-from ..utils import check_contamination
+from .plotting import plot_anomaly_score, plot_roc_curve
+from .utils import check_contamination
 
 __all__   = ['is_outlier_detector', 'BaseOutlierDetector']
 
