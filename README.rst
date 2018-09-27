@@ -1,37 +1,37 @@
-.. image:: https://img.shields.io/github/license/HazureChi/Kenchi.svg
-    :target: https://github.com/HazureChi/Kenchi/blob/master/LICENSE
+.. image:: https://img.shields.io/pypi/v/kenchi.svg
+    :target: https://pypi.org/project/kenchi
 
-.. image:: https://img.shields.io/pypi/v/Kenchi.svg
-    :target: https://pypi.org/project/Kenchi
+.. image:: https://img.shields.io/pypi/pyversions/kenchi.svg
+    :target: https://pypi.org/project/kenchi
 
-.. image:: https://img.shields.io/pypi/pyversions/Kenchi.svg
-    :target: https://pypi.org/project/Kenchi
+.. image:: https://img.shields.io/pypi/l/HazureChi/kenchi.svg
+    :target: https://github.com/HazureChi/kenchi/blob/master/LICENSE
 
-.. image:: https://img.shields.io/conda/v/Y_oHr_N/Kenchi.svg
-    :target: https://anaconda.org/Y_oHr_N/Kenchi
+.. image:: https://img.shields.io/conda/v/Y_oHr_N/kenchi.svg
+    :target: https://anaconda.org/Y_oHr_N/kenchi
 
-.. image:: https://img.shields.io/conda/pn/Y_oHr_N/Kenchi.svg
-    :target: https://anaconda.org/Y_oHr_N/Kenchi
+.. image:: https://img.shields.io/conda/pn/Y_oHr_N/kenchi.svg
+    :target: https://anaconda.org/Y_oHr_N/kenchi
 
 .. image:: https://img.shields.io/readthedocs/kenchi/stable.svg
     :target: http://kenchi.rtfd.io/en/stable
 
-.. image:: https://img.shields.io/travis/HazureChi/Kenchi/master.svg
-    :target: https://travis-ci.org/HazureChi/Kenchi
+.. image:: https://img.shields.io/travis/HazureChi/kenchi/master.svg
+    :target: https://travis-ci.org/HazureChi/kenchi
 
-.. image:: https://img.shields.io/appveyor/ci/Y-oHr-N/Kenchi/master.svg
-    :target: https://ci.appveyor.com/project/Y-oHr-N/Kenchi/branch/master
+.. image:: https://img.shields.io/appveyor/ci/Y-oHr-N/kenchi/master.svg
+    :target: https://ci.appveyor.com/project/Y-oHr-N/kenchi/branch/master
 
-.. image:: https://img.shields.io/coveralls/github/HazureChi/Kenchi/master.svg
-    :target: https://coveralls.io/github/HazureChi/Kenchi?branch=master
+.. image:: https://img.shields.io/coveralls/github/HazureChi/kenchi/master.svg
+    :target: https://coveralls.io/github/HazureChi/kenchi?branch=master
 
-.. image:: https://img.shields.io/codeclimate/maintainability/HazureChi/Kenchi.svg
-    :target: https://codeclimate.com/github/HazureChi/Kenchi
+.. image:: https://img.shields.io/codeclimate/maintainability/HazureChi/kenchi.svg
+    :target: https://codeclimate.com/github/HazureChi/kenchi
 
 .. image:: https://mybinder.org/badge.svg
-   :target: https://mybinder.org/v2/gh/HazureChi/Kenchi/master?urlpath=lab
+   :target: https://mybinder.org/v2/gh/HazureChi/kenchi/master?urlpath=lab
 
-Kenchi
+kenchi
 ======
 
 This is a scikit-learn compatible library for anomaly detection.
@@ -44,7 +44,7 @@ Dependencies
     #. `scikit-learn>=0.19.2 <http://scikit-learn.org/>`_ (BSD 3-Clause License)
     #. `scipy>=0.19.1 <https://www.scipy.org/scipylib/>`_ (BSD 3-Clause License)
 - Optional dependencies
-    #. `matplotlib>=2.1.2 <https://matplotlib.org/>`_ (PSF License)
+    #. `matplotlib>=2.1.2 <https://matplotlib.org/>`_ (PSF-based License)
     #. `networkx>=2.2 <https://networkx.github.io/>`_ (BSD 3-Clause License)
 
 Installation
@@ -121,7 +121,7 @@ Examples
     # Display the figure
     plt.show()
 
-.. figure:: https://raw.githubusercontent.com/HazureChi/Kenchi/master/docs/images/readme.png
+.. figure:: https://raw.githubusercontent.com/HazureChi/kenchi/master/docs/images/readme.png
     :align: center
 
 References
@@ -180,5 +180,5 @@ References
     Neural Computation, 13(7), pp. 1443-1471, 2001.
 
 .. [#sugiyama13] Sugiyama, M., and Borgwardt, K.,
-    "Rapid distance-based outlier detection via sampling,"
+    `"Rapid distance-based outlier detection via sampling, <http://papers.nips.cc/paper/5127-rapid-distance-based-outlier-detection-via-sampling>"`_
     Advances in NIPS, pp. 467-475, 2013.
