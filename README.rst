@@ -180,5 +180,5 @@ References
     Neural Computation, 13(7), pp. 1443-1471, 2001.
 
 .. [#sugiyama13] Sugiyama, M., and Borgwardt, K.,
-    `"Rapid distance-based outlier detection via sampling, <http://papers.nips.cc/paper/5127-rapid-distance-based-outlier-detection-via-sampling>"`_
+    `"Rapid distance-based outlier detection via sampling," <http://papers.nips.cc/paper/5127-rapid-distance-based-outlier-detection-via-sampling>`_
     Advances in NIPS, pp. 467-475, 2013.
