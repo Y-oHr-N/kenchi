@@ -49,29 +49,6 @@ class PCA(BaseOutlierDetector):
     threshold_ : float
         Threshold.
 
-    components_ : array-like of shape (n_components, n_features)
-        Principal axes in feature space, representing the directions of maximum
-        variance in the data.
-
-    explained_variance_ : array-like of shape (n_components,)
-        Amount of variance explained by each of the selected components.
-
-    explained_variance_ratio_ : array-like of shape (n_components,)
-        Percentage of variance explained by each of the selected components.
-
-    mean_ : array-like of shape (n_features,)
-        Per-feature empirical mean, estimated from the training set.
-
-    noise_variance_ : float
-        Estimated noise covariance following the Probabilistic PCA model from
-        Tipping and Bishop 1999.
-
-    n_components_ : int
-        Estimated number of components.
-
-    singular_values_ : array-like of shape (n_components,)
-        Singular values corresponding to each of the selected components.
-
     Examples
     --------
     >>> import numpy as np
@@ -87,30 +64,58 @@ class PCA(BaseOutlierDetector):
 
     @property
     def components_(self):
+        """array-like of shape (n_components, n_features): Principal axes in
+        feature space, representing the directions of maximum variance in the
+        data.
+        """
+
         return self.estimator_.components_
 
     @property
     def explained_variance_(self):
+        """array-like of shape (n_components,): Amount of variance explained by
+        each of the selected components.
+        """
+
         return self.estimator_.explained_variance_
 
     @property
     def explained_variance_ratio_(self):
+        """array-like of shape (n_components,): Percentage of variance
+        explained by each of the selected components.
+        """
+
         return self.estimator_.explained_variance_ratio_
 
     @property
     def mean_(self):
+        """array-like of shape (n_features,): Per-feature empirical mean,
+        estimated from the training set.
+        """
+
         return self.estimator_.mean_
 
     @property
     def noise_variance_(self):
+        """float: Estimated noise covariance following the Probabilistic PCA
+        model from Tipping and Bishop 1999.
+        """
+
         return self.estimator_.noise_variance_
 
     @property
     def n_components_(self):
+        """int: Estimated number of components.
+        """
+
         return self.estimator_.n_components_
 
     @property
     def singular_values_(self):
+        """array-like of shape (n_components,): Singular values corresponding
+        to each of the selected components.
+        """
+
         return self.estimator_.singular_values_
 
     def __init__(

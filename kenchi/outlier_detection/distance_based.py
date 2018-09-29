@@ -61,9 +61,6 @@ class KNN(BaseOutlierDetector):
     n_neighbors_ : int
         Actual number of neighbors used for ``kneighbors`` queries.
 
-    X_ : array-like of shape (n_samples, n_features)
-        Training data.
-
     References
     ----------
     .. [#angiulli02] Angiulli, F., and Pizzuti, C.,
@@ -89,6 +86,9 @@ class KNN(BaseOutlierDetector):
 
     @property
     def X_(self):
+        """array-like of shape (n_samples, n_features): Training data.
+        """
+
         return self.estimator_._fit_X
 
     def __init__(

@@ -60,15 +60,6 @@ class MiniBatchKMeans(BaseOutlierDetector):
     threshold_ : float
         Threshold.
 
-    cluster_centers_ : array-like of shape (n_clusters, n_features)
-        Coordinates of cluster centers.
-
-    inertia_ : float
-        Value of the inertia criterion associated with the chosen partition.
-
-    labels_ : array-like of shape (n_samples,)
-        Label of each point.
-
     Examples
     --------
     >>> import numpy as np
@@ -84,14 +75,25 @@ class MiniBatchKMeans(BaseOutlierDetector):
 
     @property
     def cluster_centers_(self):
+        """array-like of shape (n_clusters, n_features): Coordinates of cluster
+        centers.
+        """
+
         return self.estimator_.cluster_centers_
 
     @property
     def inertia_(self):
+        """float: Value of the inertia criterion associated with the chosen
+        partition.
+        """
+
         return self.estimator_.inertia_
 
     @property
     def labels_(self):
+        """array-like of shape (n_samples,): Label of each point.
+        """
+
         return self.estimator_.labels_
 
     def __init__(

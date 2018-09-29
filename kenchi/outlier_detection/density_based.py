@@ -53,15 +53,6 @@ class LOF(BaseOutlierDetector):
     threshold_ : float
         Threshold.
 
-    negative_outlier_factor_ : array-like of shape (n_samples,)
-        Opposite LOF of the training samples.
-
-    n_neighbors_ : int
-        Actual number of neighbors used for ``kneighbors`` queries.
-
-    X_ : array-like of shape (n_samples, n_features)
-        Training data.
-
     References
     ----------
     .. [#breunig00] Breunig, M. M., Kriegel, H.-P., Ng, R. T., and Sander, J.,
@@ -87,14 +78,24 @@ class LOF(BaseOutlierDetector):
 
     @property
     def negative_outlier_factor_(self):
+        """array-like of shape (n_samples,): Opposite LOF of the training
+        samples.
+        """
+
         return self.estimator_.negative_outlier_factor_
 
     @property
     def n_neighbors_(self):
+        """int: Actual number of neighbors used for ``kneighbors`` queries.
+        """
+
         return self.estimator_.n_neighbors_
 
     @property
     def X_(self):
+        """array-like of shape (n_samples, n_features): Training data.
+        """
+
         return self.estimator_._fit_X
 
     def __init__(

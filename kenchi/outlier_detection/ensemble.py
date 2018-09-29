@@ -46,15 +46,6 @@ class IForest(BaseOutlierDetector):
     threshold_ : float
         Threshold.
 
-    estimators_ : list
-        Collection of fitted sub-estimators.
-
-    estimators_samples_ : int
-        Subset of drawn samples for each base estimator.
-
-    max_samples_ : int
-        Actual number of samples.
-
     References
     ----------
     .. [#liu08] Liu, F. T., Ting, K. M., and Zhou, Z.-H.,
@@ -76,14 +67,23 @@ class IForest(BaseOutlierDetector):
 
     @property
     def estimators_(self):
+        """list: Collection of fitted sub-estimators.
+        """
+
         return self.estimator_.estimators_
 
     @property
     def estimators_samples_(self):
+        """int: Subset of drawn samples for each base estimator.
+        """
+
         return self.estimator_.estimators_samples_
 
     @property
     def max_samples_(self):
+        """int: Actual number of samples.
+        """
+
         return self.estimator_.max_samples_
 
     def __init__(

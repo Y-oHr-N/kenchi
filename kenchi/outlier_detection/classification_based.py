@@ -46,18 +46,6 @@ class OCSVM(BaseOutlierDetector):
     threshold_ : float
         Threshold.
 
-    support_ : array-like of shape (n_SV)
-        Indices of support vectors.
-
-    support_vectors_ : array-like of shape (n_SV, n_features)
-        Support vectors.
-
-    dual_coef_ : array-like of shape (1, n_SV)
-        Coefficients of the support vectors in the decision function.
-
-    intercept_ : array-like of shape (1,)
-        Constant in the decision function.
-
     Examples
     --------
     >>> import numpy as np
@@ -73,18 +61,31 @@ class OCSVM(BaseOutlierDetector):
 
     @property
     def dual_coef_(self):
+        """array-like of shape (1, n_SV): Coefficients of the support vectors
+        in the decision function.
+        """
+
         return self.estimator_.dual_coef_ / self.nu_l_
 
     @property
     def support_(self):
+        """array-like of shape (n_SV): Indices of support vectors.
+        """
+
         return self.estimator_.support_
 
     @property
     def support_vectors_(self):
+        """array-like of shape (n_SV, n_features): Support vectors.
+        """
+
         return self.estimator_.support_vectors_
 
     @property
     def intercept_(self):
+        """array-like of shape (1,): Constant in the decision function.
+        """
+
         return self.estimator_.intercept_ / self.nu_l_
 
     def __init__(

@@ -69,31 +69,6 @@ class GMM(BaseOutlierDetector):
     threshold_ : float
         Threshold.
 
-    converged_ : bool
-        True when convergence was reached in ``fit``, False otherwise.
-
-    covariances_ : array-like
-        Covariance of each mixture component.
-
-    lower_bound_ : float
-        Log-likelihood of the best fit of EM.
-
-    means_ : array-like of shape (n_components, n_features)
-        Mean of each mixture component.
-
-    n_iter_ : int
-        Number of step used by the best fit of EM to reach the convergence.
-
-    precisions_ : array-like
-        Precision matrix for each component in the mixture.
-
-    precisions_cholesky_ : array-like
-        Cholesky decomposition of the precision matrices of each mixture
-        component.
-
-    weights_ : array-like of shape (n_components,)
-        Weight of each mixture components.
-
     Examples
     --------
     >>> import numpy as np
@@ -109,34 +84,62 @@ class GMM(BaseOutlierDetector):
 
     @property
     def converged_(self):
+        """bool: True when convergence was reached in ``fit``, False otherwise.
+        """
+
         return self.estimator_.converged_
 
     @property
     def covariances_(self):
+        """array-like: Covariance of each mixture component.
+        """
+
         return self.estimator_.covariances_
 
     @property
     def lower_bound_(self):
+        """float: Log-likelihood of the best fit of EM.
+        """
+
         return self.estimator_.lower_bound_
 
     @property
     def means_(self):
+        """array-like of shape (n_components, n_features): Mean of each mixture
+        component.
+        """
+
         return self.estimator_.means_
 
     @property
     def n_iter_(self):
+        """int: Number of step used by the best fit of EM to reach the
+        convergence.
+        """
+
         return self.estimator_.n_iter_
 
     @property
     def precisions_(self):
+        """array-like: Precision matrix for each component in the mixture.
+        """
+
         return self.estimator_.precisions_
 
     @property
     def precisions_cholesky_(self):
+        """array-like: Cholesky decomposition of the precision matrices of each
+        mixture component.
+        """
+
         return self.estimator_.precisions_cholesky_
 
     @property
     def weights_(self):
+        """array-like of shape (n_components,): Weight of each mixture
+        components.
+        """
+
         return self.estimator_.weights_
 
     def __init__(
@@ -347,9 +350,6 @@ class KDE(BaseOutlierDetector):
     threshold_ : float
         Threshold.
 
-    X_ : array-like of shape (n_samples, n_features)
-        Training data.
-
     References
     ----------
     .. [#parzen62] Parzen, E.,
@@ -371,6 +371,9 @@ class KDE(BaseOutlierDetector):
 
     @property
     def X_(self):
+        """array-like of shape (n_samples, n_features): Training data.
+        """
+
         return self.estimator_.tree_.data
 
     def __init__(
@@ -457,29 +460,8 @@ class SparseStructureLearning(BaseOutlierDetector):
     threshold_ : float
         Threshold.
 
-    covariance_ : array-like of shape (n_features, n_features)
-        Estimated covariance matrix.
-
-    graphical_model_ : networkx Graph
-        GGM.
-
-    isolates_ : array-like of shape (n_isolates,)
-        Indices of isolates.
-
     labels_ : array-like of shape (n_features,)
         Label of each feature.
-
-    location_ : array-like of shape (n_features,)
-        Estimated location.
-
-    n_iter_ : int
-        Number of iterations run.
-
-    partial_corrcoef_ : array-like of shape (n_features, n_features)
-        Partial correlation coefficient matrix.
-
-    precision_ : array-like of shape (n_features, n_features)
-        Estimated pseudo inverse matrix.
 
     References
     ----------
@@ -509,30 +491,50 @@ class SparseStructureLearning(BaseOutlierDetector):
 
     @property
     def covariance_(self):
+        """array-like of shape (n_features, n_features): Estimated covariance
+        matrix.
+        """
+
         return self.estimator_.covariance_
 
     @property
     def graphical_model_(self):
+        """networkx Graph: GGM.
+        """
+
         import networkx as nx
 
         return nx.from_numpy_matrix(np.tril(self.partial_corrcoef_, k=-1))
 
     @property
     def isolates_(self):
+        """array-like of shape (n_isolates,): Indices of isolates.
+        """
+
         import networkx as nx
 
         return np.array(list(nx.isolates(self.graphical_model_)))
 
     @property
     def location_(self):
+        """array-like of shape (n_features,): Estimated location.
+        """
+
         return self.estimator_.location_
 
     @property
     def n_iter_(self):
+        """int: Number of iterations run.
+        """
+
         return self.estimator_.n_iter_
 
     @property
     def partial_corrcoef_(self):
+        """array-like of shape (n_features, n_features): Partial correlation
+        coefficient matrix.
+        """
+
         n_features, _    = self.precision_.shape
         diag             = np.diag(self.precision_)[np.newaxis]
         partial_corrcoef = - self.precision_ / np.sqrt(diag.T @ diag)
@@ -542,6 +544,10 @@ class SparseStructureLearning(BaseOutlierDetector):
 
     @property
     def precision_(self):
+        """array-like of shape (n_features, n_features): Estimated pseudo
+        inverse matrix.
+        """
+
         return self.estimator_.precision_
 
     def __init__(
