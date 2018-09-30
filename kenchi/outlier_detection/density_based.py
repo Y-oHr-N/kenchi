@@ -16,7 +16,7 @@ class LOF(BaseOutlierDetector):
         Tree algorithm to use. Valid algorithms are
         ['kd_tree'|'ball_tree'|'auto'].
 
-    contamination : float, default 0.1
+    contamination : float, default 'auto'
         Proportion of outliers in the data set. Used to define the threshold.
 
     leaf_size : int, default 30
@@ -99,7 +99,7 @@ class LOF(BaseOutlierDetector):
         return self.estimator_._fit_X
 
     def __init__(
-        self, algorithm='auto', contamination=0.1, leaf_size=30,
+        self, algorithm='auto', contamination='auto', leaf_size=30,
         metric='minkowski', novelty=False, n_jobs=1, n_neighbors=20,
         p=2, metric_params=None
     ):
@@ -121,7 +121,7 @@ class LOF(BaseOutlierDetector):
         )
 
     def _get_threshold(self):
-        return - self.estimator_.threshold_ - 1.
+        return - self.estimator_.offset_ - 1.
 
     def _fit(self, X):
         self.estimator_   = LocalOutlierFactor(
@@ -129,6 +129,7 @@ class LOF(BaseOutlierDetector):
             contamination = self.contamination,
             leaf_size     = self.leaf_size,
             metric        = self.metric,
+            novelty       = self.novelty,
             n_jobs        = self.n_jobs,
             n_neighbors   = self.n_neighbors,
             p             = self.p,
@@ -151,4 +152,4 @@ class LOF(BaseOutlierDetector):
         if X is self.X_:
             return -self.negative_outlier_factor_
         else:
-            return -self.estimator_._decision_function(X)
+            return -self.estimator_.score_samples(X)
