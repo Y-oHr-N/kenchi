@@ -1,6 +1,6 @@
 import numpy as np
 from sklearn.cluster import affinity_propagation
-from sklearn.covariance import GraphLasso
+from sklearn.covariance import GraphicalLasso
 from sklearn.mixture import GaussianMixture
 from sklearn.neighbors import KernelDensity
 from sklearn.utils.validation import check_is_fitted
@@ -575,7 +575,7 @@ class SparseStructureLearning(BaseOutlierDetector):
         )
 
     def _fit(self, X):
-        self.estimator_     = GraphLasso(
+        self.estimator_     = GraphicalLasso(
             alpha           = self.alpha,
             assume_centered = self.assume_centered,
             enet_tol        = self.enet_tol,

@@ -15,9 +15,9 @@ class OCSVM(BaseOutlierDetector):
     cache_size : float, default 200
         Specify the size of the kernel cache (in MB).
 
-    gamma : float, default 'auto'
-        Kernel coefficient. If gamma is 'auto', 1 / n_features will be used
-        instead.
+    gamma : float, default 'scale'
+        Kernel coefficient. If gamma is 'scale', 1 / (n_features * np.std(X))
+        will be used instead.
 
     max_iter : int, optional default -1
         Maximum number of iterations.
@@ -25,9 +25,6 @@ class OCSVM(BaseOutlierDetector):
     nu : float, default 0.5
         An upper bound on the fraction of training errors and a lower bound of
         the fraction of support vectors. Should be in the interval (0, 1].
-
-    random_state : int or RandomState instance, default None
-        Seed of the pseudo random number generator.
 
     shrinking : bool, default True
         If True, use the shrinking heuristic.
@@ -54,7 +51,7 @@ class OCSVM(BaseOutlierDetector):
     ...     [0., 0.], [1., 1.], [2., 0.], [3., -1.], [4., 0.],
     ...     [5., 1.], [6., 0.], [7., -1.], [8., 0.], [1000., 1.]
     ... ])
-    >>> det = OCSVM(gamma=1e-03, nu=0.25, random_state=0)
+    >>> det = OCSVM(gamma=1e-03, nu=0.25)
     >>> det.fit_predict(X)
     array([ 1,  1,  1,  1,  1,  1,  1,  1,  1, -1])
     """
@@ -89,8 +86,8 @@ class OCSVM(BaseOutlierDetector):
         return self.estimator_.intercept_ / self.nu_l_
 
     def __init__(
-        self, cache_size=200, gamma='auto', max_iter=-1,
-        nu=0.5, shrinking=True, tol=0.001, random_state=None
+        self, cache_size=200, gamma='scale', max_iter=-1,
+        nu=0.5, shrinking=True, tol=0.001
     ):
         self.cache_size   = cache_size
         self.gamma        = gamma
@@ -98,7 +95,6 @@ class OCSVM(BaseOutlierDetector):
         self.nu           = nu
         self.shrinking    = shrinking
         self.tol          = tol
-        self.random_state = random_state
 
     def _check_is_fitted(self):
         super()._check_is_fitted()
@@ -117,8 +113,7 @@ class OCSVM(BaseOutlierDetector):
             max_iter     = self.max_iter,
             nu           = self.nu,
             shrinking    = self.shrinking,
-            tol          = self.tol,
-            random_state = self.random_state
+            tol          = self.tol
         ).fit(X)
 
         l,               = self.support_.shape
@@ -134,4 +129,4 @@ class OCSVM(BaseOutlierDetector):
 
     def _anomaly_score(self, X):
         return self.R2_ \
-            - 2. / self.nu_l_ * self.estimator_.decision_function(X).flat[:]
+            - 2. / self.nu_l_ * self.estimator_.decision_function(X)

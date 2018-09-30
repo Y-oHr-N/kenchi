@@ -10,27 +10,10 @@ from sklearn.utils.validation import check_is_fitted
 from ..plotting import plot_anomaly_score, plot_roc_curve
 from ..utils import check_contamination
 
-__all__   = ['is_outlier_detector', 'BaseOutlierDetector']
+__all__   = ['BaseOutlierDetector']
 
 NEG_LABEL = -1
 POS_LABEL = 1
-
-
-def is_outlier_detector(estimator):
-    """Return True if the given estimator is (probably) an outlier detector.
-
-    Parameters
-    ----------
-    estimator : object
-        Estimator object to test.
-
-    Returns
-    -------
-    out : bool
-        True if estimator is an outlier detector and False otherwise.
-    """
-
-    return getattr(estimator, '_estimator_type', None) == 'outlier_detector'
 
 
 class BaseOutlierDetector(BaseEstimator, ABC):
@@ -161,7 +144,7 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         """
 
         if getattr(self, 'novelty', False):
-            raise ValueError(
+            raise AttributeError(
                 'fit_predict is not available when novelty=True, use '
                 'novelty=False if you want to predict on the training data'
             )
@@ -296,7 +279,7 @@ class BaseOutlierDetector(BaseEstimator, ABC):
             else:
                 return anomaly_score
 
-        raise ValueError(
+        raise AttributeError(
             'anomaly_score is not available when novelty=False, use '
             'novelty=True if you want to predict on new unseen data'
         )
