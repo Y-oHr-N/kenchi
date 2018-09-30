@@ -17,7 +17,7 @@ class OCSVMTest(unittest.TestCase, OutlierDetectorTestMixin):
         self.X_train, self.X_test, self.y_train, self.y_test = \
             self.prepare_data()
 
-        self.sut = classification_based.OCSVM(random_state=0)
+        self.sut = classification_based.OCSVM()
 
     def test_predict(self):
         super().test_predict()
