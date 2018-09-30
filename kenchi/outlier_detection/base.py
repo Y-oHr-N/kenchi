@@ -144,7 +144,7 @@ class BaseOutlierDetector(BaseEstimator, ABC):
         """
 
         if getattr(self, 'novelty', False):
-            raise ValueError(
+            raise AttributeError(
                 'fit_predict is not available when novelty=True, use '
                 'novelty=False if you want to predict on the training data'
             )
@@ -279,7 +279,7 @@ class BaseOutlierDetector(BaseEstimator, ABC):
             else:
                 return anomaly_score
 
-        raise ValueError(
+        raise AttributeError(
             'anomaly_score is not available when novelty=False, use '
             'novelty=True if you want to predict on new unseen data'
         )
