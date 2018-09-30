@@ -41,7 +41,7 @@ Dependencies
 
 - Required dependencies
     #. `numpy>=1.13.3 <http://www.numpy.org/>`_ (BSD 3-Clause License)
-    #. `scikit-learn>=0.19.2 <http://scikit-learn.org/>`_ (BSD 3-Clause License)
+    #. `scikit-learn>=0.20.0 <http://scikit-learn.org/>`_ (BSD 3-Clause License)
     #. `scipy>=0.19.1 <https://www.scipy.org/scipylib/>`_ (BSD 3-Clause License)
 - Optional dependencies
     #. `matplotlib>=2.1.2 <https://matplotlib.org/>`_ (PSF-based License)
