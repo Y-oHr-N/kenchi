@@ -4,7 +4,7 @@
 .. image:: https://img.shields.io/pypi/pyversions/kenchi.svg
     :target: https://pypi.org/project/kenchi
 
-.. image:: https://img.shields.io/pypi/l/HazureChi/kenchi.svg
+.. image:: https://img.shields.io/pypi/l/kenchi.svg
     :target: https://github.com/HazureChi/kenchi/blob/master/LICENSE
 
 .. image:: https://img.shields.io/conda/v/Y_oHr_N/kenchi.svg
@@ -14,7 +14,7 @@
     :target: https://anaconda.org/Y_oHr_N/kenchi
 
 .. image:: https://img.shields.io/readthedocs/kenchi/stable.svg
-    :target: http://kenchi.rtfd.io/en/stable
+    :target: http://kenchi.rtfd.io
 
 .. image:: https://img.shields.io/travis/HazureChi/kenchi/master.svg
     :target: https://travis-ci.org/HazureChi/kenchi
@@ -164,7 +164,7 @@ References
     In Proceedings of ICML, pp. 448-455, 2003.
 
 .. [#liu08] Liu, F. T., Ting, K. M., and Zhou, Z.-H.,
-    `"Isolation forest," <https://doi.org/10.1145/2133360.2133363>`_
+    `"Isolation forest," <https://doi.org/10.1109/ICDM.2008.17>`_
     In Proceedings of ICDM, pp. 413-422, 2008.
 
 .. [#parzen62] Parzen, E.,
