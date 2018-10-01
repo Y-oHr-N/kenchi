@@ -8,7 +8,7 @@ from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 
 from ..plotting import plot_anomaly_score, plot_roc_curve
-from ..utils import check_contamination
+from ..utils import check_contamination, check_novelty
 
 __all__   = ['BaseOutlierDetector']
 
@@ -143,11 +143,8 @@ class BaseOutlierDetector(BaseEstimator, ABC):
             Return -1 for outliers and +1 for inliers.
         """
 
-        if getattr(self, 'novelty', False):
-            raise AttributeError(
-                'fit_predict is not available when novelty=True, use '
-                'novelty=False if you want to predict on the training data'
-            )
+        if hasattr(self, 'novelty'):
+            check_novelty(self.novelty, 'fit_predict')
 
         return self.fit(X).predict()
 
@@ -268,21 +265,18 @@ class BaseOutlierDetector(BaseEstimator, ABC):
             else:
                 return anomaly_score
 
-        if getattr(self, 'novelty', True):
-            X             = self._check_array(X, estimator=self)
-            anomaly_score = self._anomaly_score(X)
+        if hasattr(self, 'novelty'):
+            check_novelty(self.novelty, 'anomaly_score')
 
-            if normalize:
-                return np.maximum(
-                    0., 2. * self.random_variable_.cdf(anomaly_score) - 1.
-                )
-            else:
-                return anomaly_score
+        X                 = self._check_array(X, estimator=self)
+        anomaly_score     = self._anomaly_score(X)
 
-        raise AttributeError(
-            'anomaly_score is not available when novelty=False, use '
-            'novelty=True if you want to predict on new unseen data'
-        )
+        if normalize:
+            return np.maximum(
+                0., 2. * self.random_variable_.cdf(anomaly_score) - 1.
+            )
+        else:
+            return anomaly_score
 
     def to_pickle(self, filename, **kwargs):
         """Persist an outlier detector object.
