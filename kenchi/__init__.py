@@ -1,7 +1,7 @@
 # PEP0440 compatible formatted version, see:
 # https://www.python.org/dev/peps/pep-0440/
 
-__version__          = '0.10.0a1'
+__version__          = '0.10.0'
 
 try:
     __KENCHI_SETUP__
